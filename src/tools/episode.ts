@@ -1,27 +1,26 @@
 import * as app from '..';
-import * as childProcess from 'child_process';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import childProcess from 'child_process';
+import fs from 'fs-extra';
+import os from 'os';
+import path from 'path';
 
-export async function episodeAsync(episodeUrl: string, outputPath: string) {
+export async function episodeAsync(episodeUrl: string, episodePath: string) {
   for (var i = 1; Boolean(i); i++) {
     const directoryPath = path.join(os.tmpdir(), app.createUniqueId());
     const options = `--all-subs --ffmpeg-location ${app.settings.binaries.ffmpeg}`;
     try {
-      await app.promisify(cb => fs.mkdir(directoryPath, cb));
+      await fs.ensureDir(directoryPath);
       await app.promisify(cb => childProcess.exec(`${app.settings.binaries.youtubedl} ${options} "${episodeUrl}"`, {cwd: directoryPath}, cb));
-      const fileNames = await app.promisify<string[]>(cb => fs.readdir(directoryPath, cb));
+      const fileNames = await fs.readdir(directoryPath);
       const filePaths = fileNames.map(fileName => path.join(directoryPath, fileName));
       const joinLines = filePaths.map(parse).sort(sort).map(transform);
-      await app.promisify(cb => childProcess.exec(`${app.settings.binaries.mkvmerge} -o "${outputPath}" ${joinLines.join(' ')}`, cb));
+      await app.promisify(cb => childProcess.exec(`${app.settings.binaries.mkvmerge} -o "${episodePath}" ${joinLines.join(' ')}`, cb));
       break;
     } catch (err) {
       if (i >= app.settings.episode.retryCount) throw err;
       await app.promisify(cb => setTimeout(cb, app.settings.episode.retryTimeout));
     } finally {
-      const stats = await app.promisify<fs.Stats>(cb => fs.stat(directoryPath, cb));
-      if (stats.isDirectory()) await app.promisify(cb => fs.rmdir(directoryPath, {recursive: true}, cb));
+      await fs.remove(directoryPath);
     }
   }
 }
