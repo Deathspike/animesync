@@ -1,4 +1,4 @@
-function crunchyroll() {
+function seasons() {
   return Array.from(document.querySelectorAll('.season-dropdown')).reverse().map(seasonNode => ({
     episodes: seasonNode.nextElementSibling ? extractEpisodes(seasonNode.nextElementSibling) : [],
     title: reduceWhitespace(seasonNode.textContent)
@@ -23,7 +23,7 @@ function crunchyroll() {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {crunchyroll};
+  module.exports = {seasons};
 } else {
-  console.log(crunchyroll());
+  console.log(seasons());
 }

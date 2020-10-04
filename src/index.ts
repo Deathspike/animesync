@@ -1,7 +1,7 @@
-export * from './common/Timer';
-export * from './tools/browser';
-export * from './tools/episode';
-export * from './tools/series';
+export * from './classes/Timer';
+export * from './providers/browser';
+export * from './providers/episode';
+export * from './providers/series';
 export * from './settings';
 export * from './utilities';
 import './app';

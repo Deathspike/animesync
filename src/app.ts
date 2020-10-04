@@ -5,7 +5,6 @@ import path from 'path';
 // TODO: Add login support for CrunchyRoll.
 // TODO: Region switching? Most anime isn't available in my region.
 // TODO: Funimation? Other sources?
-// TODO: CloudFlare protection is not checked/bypassed on CrunchyRoll.
 
 (async () => {
   const libraryPath = path.join(__dirname, '../lib');
