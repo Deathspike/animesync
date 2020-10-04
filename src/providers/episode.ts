@@ -8,15 +8,16 @@ export async function episodeAsync(episodeUrl: string, episodePath: string) {
   for (var i = 1; Boolean(i); i++) {
     const directoryPath = path.join(app.settings.episode, app.createUniqueId());
     const outputPath = path.join(directoryPath, app.createUniqueId());
-    const options = `--all-subs --ffmpeg-location ${app.binaries.ffmpeg}`;
+    const tempPath = `${episodePath}.tmp`;
     try {
       await fs.ensureDir(directoryPath);
-      await util.promisify(childProcess.exec)(`${app.binaries.youtubedl} ${options} "${episodeUrl}"`, {cwd: directoryPath});
+      await util.promisify(childProcess.exec)(`${app.binaries.youtubedl} --all-subs --ffmpeg-location ${app.binaries.ffmpeg} "${episodeUrl}"`, {cwd: directoryPath});
       const fileNames = await fs.readdir(directoryPath);
       const filePaths = fileNames.map(fileName => path.join(directoryPath, fileName));
       const joinLines = filePaths.map(parse).sort(sort).map(transform);
       await util.promisify(childProcess.exec)(`${app.binaries.mkvmerge} -o "${outputPath}" ${joinLines.join(' ')}`);
-      await fs.move(outputPath, episodePath, {overwrite: true});
+      await fs.move(outputPath, tempPath, {overwrite: true});
+      await fs.move(tempPath, episodePath, {overwrite: true});
       break;
     } catch (err) {
       if (i >= app.settings.episodeRetryCount) throw err;
