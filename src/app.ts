@@ -2,13 +2,13 @@ import * as app from '.';
 import fs from 'fs-extra';
 import path from 'path';
 
-// TODO: Add something resembling automation? Or a UI? At least prevent re-download after manual move.
+// TODO: Add something resembling automation? Or a UI?
 // TODO: Add login support for CrunchyRoll.
 // TODO: Region switching? Most anime isn't available in my region.
 // TODO: Funimation? Other sources?
 
 (async () => {
-  const libraryPath = path.join(__dirname, '../lib');
+  const rootPath = path.join(__dirname, '../lib');
   await fs.remove(app.settings.episode);
-  await app.seriesAsync('https://www.crunchyroll.com/that-time-i-got-reincarnated-as-a-slime', libraryPath);
+  await app.seriesAsync('https://www.crunchyroll.com/a-certain-magical-index', rootPath);
 })();
