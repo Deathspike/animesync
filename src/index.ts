@@ -1,5 +1,4 @@
 export * from './settings';
-export * from './utilities';
 export * from './classes/Timer';
 export * from './classes/Trace';
 export * from './providers/browser';
