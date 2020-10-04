@@ -29,15 +29,15 @@ export async function episodeAsync(episodeUrl: string, episodePath: string) {
 }
 
 function parse(filePath: string) {
-  const match = filePath.match(/(?:\.([a-z]{2})[a-z]*)?\.(.*)$/i);
-  const language = (match && match[1] || '').toLowerCase();
+  const match = filePath.match(/(?:\.([a-z]{4}))?\.(.*)$/i);
+  const language = (match && match[1] || '').replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
   const extension = (match && match[2] || '').toLowerCase();
   return {extension, language, filePath};
 }
 
 function sort(item: ReturnType<typeof parse>, otherItem: ReturnType<typeof parse>) {
   if (item.extension === 'mp4') return -1;
-  if (item.language === 'en') return -1;
+  if (item.language.startsWith('en')) return -1;
   return item.language.localeCompare(otherItem.language);
 }
 
