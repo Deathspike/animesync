@@ -1,7 +1,6 @@
 import * as app from '.';
 import path from 'path';
 
-// TODO: Logging? Either file-based or just console, but something, at least.
 // TODO: Add something resembling automation? Or a UI? At least prevent re-download after manual move.
 // TODO: Add login support for CrunchyRoll.
 // TODO: Region switching? Most anime isn't available in my region.
