@@ -9,11 +9,8 @@ export function createUniqueId() {
 export function promisify<T>(cb: (fn: (error?: Error | null, value?: T) => void) => void) {
   return new Promise<T>((resolve, reject) => {
     cb((error, value) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(value);
-      }
+      if (error) reject(error);
+      else resolve(value);
     });
   });
 }

@@ -1,3 +1,4 @@
+export * from './common/Timer';
 export * from './tools/browser';
 export * from './tools/episode';
 export * from './tools/series';
