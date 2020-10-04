@@ -7,6 +7,9 @@
   "repository": "git://github.com/Deathspike/animekaizoku",
   "types": "dist",
   "version": "0.1.0",
+  "bin": {
+    "animekaizoku": "./bin/animekaizoku"
+  },
   "engines": {
     "node": ">= 12.0.0",
     "npm": ">= 6.0.0"

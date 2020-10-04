@@ -9,6 +9,6 @@ import path from 'path';
 
 (async () => {
   const rootPath = path.join(__dirname, '../lib');
-  await fs.remove(app.settings.episode);
+  await fs.remove(app.settings.episodeSync);
   await app.seriesAsync('https://www.crunchyroll.com/a-certain-magical-index', rootPath);
 })();

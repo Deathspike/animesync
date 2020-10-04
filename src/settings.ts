@@ -7,8 +7,8 @@ export const settings = {
   chromeExitTimeout: 5000,
   chromeNavigationTimeout: 30000,
   chromeViewport: {width: 1920, height: 974},
-  episode: path.join(os.homedir(), 'animekaizoku', 'sync'),
   episodeRetryCount: 5,
   episodeRetryTimeout: 5000,
+  episodeSync: path.join(os.homedir(), 'animekaizoku', 'sync'),
   seriesTrace: '_trace.json'
 };
