@@ -7,6 +7,7 @@ import path from 'path';
 export async function episodeAsync(episodeUrl: string, episodePath: string) {
   for (var i = 1; Boolean(i); i++) {
     const directoryPath = path.join(os.tmpdir(), app.createUniqueId());
+    const outputPath = path.join(directoryPath, app.createUniqueId());
     const options = `--all-subs --ffmpeg-location ${app.settings.binaries.ffmpeg}`;
     try {
       await fs.ensureDir(directoryPath);
@@ -14,7 +15,8 @@ export async function episodeAsync(episodeUrl: string, episodePath: string) {
       const fileNames = await fs.readdir(directoryPath);
       const filePaths = fileNames.map(fileName => path.join(directoryPath, fileName));
       const joinLines = filePaths.map(parse).sort(sort).map(transform);
-      await app.promisify(cb => childProcess.exec(`${app.settings.binaries.mkvmerge} -o "${episodePath}" ${joinLines.join(' ')}`, cb));
+      await app.promisify(cb => childProcess.exec(`${app.settings.binaries.mkvmerge} -o "${outputPath}" ${joinLines.join(' ')}`, cb));
+      await fs.move(outputPath, episodePath, {overwrite: true});
       break;
     } catch (err) {
       if (i >= app.settings.episode.retryCount) throw err;
