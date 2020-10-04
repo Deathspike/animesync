@@ -1,4 +1,5 @@
 import * as app from '.';
+import fs from 'fs-extra';
 import path from 'path';
 
 // TODO: Add something resembling automation? Or a UI? At least prevent re-download after manual move.
@@ -8,5 +9,6 @@ import path from 'path';
 
 (async () => {
   const libraryPath = path.join(__dirname, '../lib');
+  await fs.remove(app.settings.episode);
   await app.seriesAsync('https://www.crunchyroll.com/that-time-i-got-reincarnated-as-a-slime', libraryPath);
 })();
