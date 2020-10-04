@@ -1,6 +1,6 @@
 {
   "author": "Roel van Uden",
-  "description": "",
+  "description": "AnimeKaizoku is capable of downloading anime episodes from popular streaming services.",
   "license": "MIT",
   "main": "dist",
   "name": "animekaizoku",
