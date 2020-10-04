@@ -8,12 +8,11 @@ export async function seriesAsync(seriesUrl: string, libraryPath: string) {
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
     switch (await page.evaluate(() => window.location.hostname)) {
       case 'www.crunchyroll.com':
-        console.log(`Fetching ${seriesUrl}`);
         await crunchyrollAsync(page, libraryPath);
         console.log(`Finished ${seriesUrl} (${elapsedTime})`);
         break;
       default:
-        console.log(`Rejected ${seriesUrl}`);
+        console.log(`Rejected ${seriesUrl} (${elapsedTime})`);
         break;
     }
   });
