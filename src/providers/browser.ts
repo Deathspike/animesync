@@ -14,9 +14,9 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
     const browser = await browserPromise;
     const userAgent = await browser.userAgent();
     page = await browser.newPage();
-    page.setDefaultTimeout(app.settings.browser.chromeNavigationTimeout);
+    page.setDefaultTimeout(app.settings.chromeNavigationTimeout);
     await page.setUserAgent(userAgent.replace(/HeadlessChrome/g, 'Chrome'));
-    await page.setViewport(app.settings.browser.chromeViewport);
+    await page.setViewport(app.settings.chromeViewport);
     return await handlerAsync(page);
   } finally {
     browserInstance = browserPromise;
@@ -27,12 +27,12 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
 }
 
 async function launchAsync() {
-  await fs.ensureDir(app.settings.browser.chrome);
+  await fs.ensureDir(app.settings.chrome);
   const chromiumRevision = String(require('puppeteer-core/package').puppeteer.chromium_revision);
-  const fetcher = puppeteer.createBrowserFetcher({path: app.settings.browser.chrome});
+  const fetcher = puppeteer.createBrowserFetcher({path: app.settings.chrome});
   await fetcher.localRevisions().then(x => Promise.all(x.filter((revision) => chromiumRevision !== revision).map((revision) => fetcher.remove(revision))));
   const downloadInfo = await fetcher.download(chromiumRevision);
-  return puppeteer.launch({executablePath: downloadInfo.executablePath, headless: app.settings.browser.chromeHeadless, userDataDir: path.join(downloadInfo.folderPath, 'user-data')});
+  return puppeteer.launch({executablePath: downloadInfo.executablePath, headless: app.settings.chromeHeadless, userDataDir: path.join(downloadInfo.folderPath, 'user-data')});
 }
 
 function updateTimeout() {
@@ -42,5 +42,5 @@ function updateTimeout() {
     if (numberOfPages) return;
     browserInstance = undefined;
     browser?.close().catch(console.log.bind(console));
-  }, app.settings.browser.chromeExitTimeout);
+  }, app.settings.chromeExitTimeout);
 }
