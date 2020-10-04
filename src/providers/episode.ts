@@ -9,7 +9,7 @@ import util from 'util';
 export async function episodeAsync(episodeUrl: string, episodePath: string) {
   for (var i = 1; Boolean(i); i++) {
     const currentId = Date.now().toString(16) + crypto.randomBytes(24).toString('hex');
-    const directoryPath = path.join(app.settings.episode, currentId);
+    const directoryPath = path.join(app.settings.episodeSync, currentId);
     const outputPath = path.join(directoryPath, currentId);
     const tempPath = `${episodePath}.tmp`;
     try {
