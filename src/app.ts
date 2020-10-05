@@ -1,14 +1,30 @@
 import * as app from '.';
-import fs from 'fs-extra';
-import path from 'path';
+import commander from 'commander';
 
-// TODO: Add something resembling automation? Or a UI?
-// TODO: Add login support for CrunchyRoll.
-// TODO: Region switching? Most anime isn't available in my region.
-// TODO: Funimation? Other sources?
+// TODO: Region switching? Most anime isn't available in my region. -> Proxy Support (Read browser settings?)
+// TODO: Add support for Funimation. And perhaps other sources?
+// TODO: Check out `puppeteer-extra` with `puppeteer-extra-plugin-stealth`
 
-(async () => {
-  const rootPath = path.join(__dirname, '../lib');
-  await fs.remove(app.settings.episodeSync);
-  await app.seriesAsync('https://www.crunchyroll.com/a-certain-magical-index', rootPath);
-})();
+commander.createCommand()
+  .description(require('../package').description)
+  .version(require('../package').version)
+  .addCommand(commander.createCommand('browser')
+    .description('Launch browser.')
+    .action(app.actions.browserAsync))
+  .addCommand(commander.createCommand('download')
+    .description('Downloads series.')
+    .action(app.actions.downloadAsync))
+  .addCommand(commander.createCommand('series')
+    .description('Manages series.')
+    .addCommand(commander.createCommand('add')
+      .arguments('<seriesUrl> [rootPath]')
+      .description('Adds the series.')
+      .action(app.actions.seriesAddAsync))
+    .addCommand(commander.createCommand('list')
+      .description('Lists each series.')
+      .action(app.actions.seriesListAsync))
+    .addCommand(commander.createCommand('remove')
+      .arguments('<seriesUrl>')
+      .description('Removes the series.')
+      .action(app.actions.seriesRemoveAsync)))
+  .parseAsync();

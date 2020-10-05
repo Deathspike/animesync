@@ -9,26 +9,26 @@ export default async function crunchyrollAsync(page: puppeteer.Page, rootPath: s
   for (const season of await page.evaluate(scraper.seasons)) {
     if (/\(.+\)/.test(season.title)) continue;
     const seriesPath = path.join(rootPath, sanitizeFilename(season.title));
-    const seriesTrace = await app.Trace.loadAsync(seriesPath);
+    const seriesReport = await app.Series.loadAsync(seriesPath);
     for (const episode of season.episodes) {
       const numberMatch = episode.title.match(/([0-9]+(?:\.[0-9])?)/);
       const number = numberMatch ? parseInt(numberMatch[1], 10) : -1;
       if (number >= 0) {
         const elapsedTime = new app.Timer();
-        const fileName = `${sanitizeFilename(season.title)} ${String(number).padStart(2, '0')} [CrunchyRoll].mkv`;
-        const filePath = path.join(seriesPath, fileName);
-        if (seriesTrace.includes(episode.url)) {
-          console.log(`Skipping ${fileName}`);
-        } else if (await fs.pathExists(filePath)) {
-          console.log(`Skipping ${fileName}`);
-          await seriesTrace.traceAsync(episode.url, fileName);
+        const episodeName = `${sanitizeFilename(season.title)} ${String(number).padStart(2, '0')} [CrunchyRoll].mkv`;
+        const episodePath = path.join(seriesPath, episodeName);
+        if (seriesReport.includes(episode.url)) {
+          console.log(`Skipping ${episodeName}`);
+        } else if (await fs.pathExists(episodePath)) {
+          console.log(`Skipping ${episodeName}`);
+          await seriesReport.trackAsync(episodeName, episode.url);
         } else try {
-          console.log(`Fetching ${fileName}`);
-          await app.episodeAsync(episode.url, filePath);
-          await seriesTrace.traceAsync(episode.url, filePath);
-          console.log(`Finished ${fileName} (${elapsedTime})`);
+          console.log(`Fetching ${episodeName}`);
+          await app.episodeAsync(page, episodePath, episode.url);
+          await seriesReport.trackAsync(episodeName, episode.url);
+          console.log(`Finished ${episodeName} (${elapsedTime})`);
         } catch (err) {
-          console.log(`Rejected ${fileName} (${elapsedTime})`);
+          console.log(`Rejected ${episodeName} (${elapsedTime})`);
           console.log(err);
         }
       }

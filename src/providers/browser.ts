@@ -41,6 +41,6 @@ function updateTimeout() {
     const browser = await browserInstance;
     if (numberOfPages) return;
     browserInstance = undefined;
-    browser?.close().catch(console.log.bind(console));
+    browser?.close().catch(() => undefined);
   }, app.settings.chromeExitTimeout);
 }
