@@ -1,24 +1,28 @@
 import * as app from '..';
 import childProcess from 'child_process';
+import cookieAsync from './services/cookie';
 import crypto from 'crypto';
+import find from './services/find';
 import fs from 'fs-extra';
-import os from 'os';
 import path from 'path';
+import puppeteer from 'puppeteer-core';
 import util from 'util';
 
-export async function episodeAsync(episodeUrl: string, episodePath: string) {
+export async function episodeAsync(page: puppeteer.Page, episodePath: string, episodeUrl: string) {
   for (var i = 1; Boolean(i); i++) {
-    const currentId = Date.now().toString(16) + crypto.randomBytes(24).toString('hex');
-    const directoryPath = path.join(app.settings.episodeSync, currentId);
-    const outputPath = path.join(directoryPath, currentId);
+    const basePath = path.join(app.settings.episodeSync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
+    const cookiePath = path.join(basePath, '.cookies');
+    const outputPath = path.join(basePath, '.episode');
     const tempPath = `${episodePath}.tmp`;
     try {
-      await fs.ensureDir(directoryPath);
-      await util.promisify(childProcess.exec)(`${fetch('youtube-dl')} --all-subs --ffmpeg-location "${fetch('ffmpeg')}" "${episodeUrl}"`, {cwd: directoryPath});
-      const fileNames = await fs.readdir(directoryPath);
-      const filePaths = fileNames.map(fileName => path.join(directoryPath, fileName));
+      await fs.ensureDir(basePath);
+      await cookieAsync(page, cookiePath);
+      const userAgent = await page.evaluate(() => window.navigator.userAgent);
+      await util.promisify(childProcess.exec)(`${find('youtube-dl')} --all-subs --cookies "${cookiePath}" --ffmpeg-location "${find('ffmpeg')}" --user-agent "${userAgent}" "${episodeUrl}"`, {cwd: basePath});
+      const fileNames = await fs.readdir(basePath);
+      const filePaths = fileNames.map(fileName => path.join(basePath, fileName)).filter(filePath => filePath !== cookiePath);
       const joinLines = filePaths.map(parse).sort(sort).map(transform);
-      await util.promisify(childProcess.exec)(`${fetch('mkvmerge')} -o "${outputPath}" ${joinLines.join(' ')}`);
+      await util.promisify(childProcess.exec)(`${find('mkvmerge')} -o "${outputPath}" ${joinLines.join(' ')}`);
       await fs.move(outputPath, tempPath, {overwrite: true});
       await fs.move(tempPath, episodePath, {overwrite: true});
       break;
@@ -26,14 +30,9 @@ export async function episodeAsync(episodeUrl: string, episodePath: string) {
       if (i >= app.settings.episodeRetryCount) throw err;
       await util.promisify(setTimeout)(app.settings.episodeRetryTimeout);
     } finally {
-      await fs.remove(directoryPath);
+      await fs.remove(basePath);
     }
   }
-}
-
-function fetch(name: string) {
-  if (os.platform() !== 'win32') return name;
-  return path.join(__dirname, `../../dep/${name}.exe`);
 }
 
 function parse(filePath: string) {
