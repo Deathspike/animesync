@@ -21,23 +21,20 @@ This application is not endorsed or affliated with any streaming service. The us
 ### Debian (Mint, Ubuntu, etc)
 
 0. (These instructions are currently untested; please contact me if you have issues)
-1. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm python3-pip`
-2. Run in *Terminal*: `sudo pip3 install youtube-dl`
-3. Run in *Terminal*: `sudo npm install -g animekaizoku`
+1. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
+2. Run in *Terminal*: `sudo npm install -g animekaizoku`
 
 ### Mac OS X
 
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Install *Homebrew* following the instructions at http://brew.sh/
-2. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node python3`
-3. Run in *Terminal*: `pip3 install youtube-dl`
-4. Run in *Terminal*: `npm install -g animekaizoku`
+2. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
+3. Run in *Terminal*: `npm install -g animekaizoku`
 
 ### Windows
 
 1. Install *NodeJS* following the instructions at http://nodejs.org/
-2. Install [ Microsoft Visual C++ 2010 Redistributable Package (x86)](https://www.microsoft.com/en-US/download/details.aspx?id=5555)
-3. Run in *Command Prompt*: `npm install -g animekaizoku`
+2. Run in *Command Prompt*: `npm install -g animekaizoku`
 
 # Streaming Services
 
