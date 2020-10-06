@@ -16,25 +16,42 @@ This application is not endorsed or affliated with any streaming service. The us
 * NodeJS >= 12 (http://nodejs.org/)
 * NPM >= 6 (https://www.npmjs.org/)
 
-# Installation
+# Install
 
-### Debian (Mint, Ubuntu, etc)
+## Debian (Mint, Ubuntu, etc)
 
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
 2. Run in *Terminal*: `sudo npm install -g animekaizoku`
 
-### Mac OS X
+## Mac OS X
 
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Install *Homebrew* following the instructions at http://brew.sh/
 2. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
 3. Run in *Terminal*: `npm install -g animekaizoku`
 
-### Windows
+## Windows
 
 1. Install *NodeJS* following the instructions at http://nodejs.org/
 2. Run in *Command Prompt*: `npm install -g animekaizoku`
+
+# Update
+
+## Debian (Mint, Ubuntu, etc)
+
+1. Ensure that *AnimeKaizoku* is [installed](#Install)
+2. Run in *Terminal*: `sudo npm update -g animekaizoku`
+
+## Mac OS X
+
+1. Ensure that *AnimeKaizoku* is [installed](#Install)
+2. Run in *Terminal*: `npm update -g animekaizoku`
+
+## Windows
+
+1. Ensure that *AnimeKaizoku* is [installed](#Install)
+2. Run in *Command Prompt*: `npm update -g animekaizoku`
 
 # Streaming Services
 
