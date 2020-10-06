@@ -6,7 +6,7 @@
   "name": "animekaizoku",
   "repository": "git://github.com/Deathspike/animekaizoku",
   "types": "dist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "bin": {
     "animekaizoku": "./bin/animekaizoku"
   },
