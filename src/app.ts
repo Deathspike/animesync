@@ -1,10 +1,6 @@
 import * as app from '.';
 import commander from 'commander';
 
-// TODO: Region switching? Most anime isn't available in my region. -> Proxy Support (Read browser settings?)
-// TODO: Add support for Funimation. And perhaps other sources?
-// TODO: Check out `puppeteer-extra` with `puppeteer-extra-plugin-stealth`
-
 commander.createCommand()
   .description(require('../package').description)
   .version(require('../package').version)

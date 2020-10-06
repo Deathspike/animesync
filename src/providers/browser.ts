@@ -7,7 +7,7 @@ let numberOfPages = 0;
 let timeoutHandle = setTimeout(() => undefined, 0);
 
 export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promise<void>) {
-  let browserPromise = browserInstance || launchAsync();
+  let browserPromise = browserInstance || (browserInstance = launchAsync());
   let page: puppeteer.Page | undefined;
   try {
     numberOfPages++;
@@ -17,9 +17,8 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
     page.setDefaultTimeout(app.settings.chromeNavigationTimeout);
     await page.setUserAgent(userAgent.replace(/HeadlessChrome/g, 'Chrome'));
     await page.setViewport(app.settings.chromeViewport);
-    return await handlerAsync(page);
+    await handlerAsync(page);
   } finally {
-    browserInstance = browserPromise;
     numberOfPages--;
     updateTimeout();
     await page?.close();
