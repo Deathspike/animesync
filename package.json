@@ -1,14 +1,14 @@
 {
   "author": "Roel van Uden",
-  "description": "AnimeKaizoku is capable of downloading anime episodes from popular streaming services.",
+  "description": "AnimeSync is capable of downloading anime episodes from popular streaming services.",
   "license": "MIT",
   "main": "dist",
-  "name": "animekaizoku",
-  "repository": "git://github.com/Deathspike/animekaizoku",
+  "name": "animesync",
+  "repository": "git://github.com/Deathspike/animesync",
   "types": "dist",
   "version": "0.2.0",
   "bin": {
-    "animekaizoku": "./bin/animekaizoku"
+    "animesync": "./bin/animesync"
   },
   "engines": {
     "node": ">= 12.0.0",
