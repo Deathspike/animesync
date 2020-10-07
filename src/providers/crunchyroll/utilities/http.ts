@@ -1,6 +1,7 @@
 import http from 'http';
 import https from 'https';
 
+// TODO: Deprecate httpAsync in favor of using Chrome directly.
 export function httpAsync(url: string) {
   return new Promise<string>((resolve, reject) => {
     const get = url.startsWith('https:')

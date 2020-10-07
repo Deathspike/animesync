@@ -1,5 +1,4 @@
 import {find} from './utilities/find';
-import {httpAsync} from './utilities/http';
 import childProcess from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs-extra';
@@ -29,16 +28,16 @@ export class Worker {
     await fs.move(`${episodePath}.tmp`, episodePath, {overwrite: true});
   }
 
-  async streamAsync(requestUrl: string) {
+  async streamAsync(streamUrl: string) {
     const videoPath = path.join(this._basePath, '.video.mp4');
     await fs.ensureDir(this._basePath);
-    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -i "${requestUrl}" -codec copy "${videoPath}"`, {cwd: this._basePath});
+    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -i "${streamUrl}" -codec copy "${videoPath}"`, {cwd: this._basePath});
   }
 
-  async subtitleAsync(fileName: string, requestUrl: string) {
-    const content = await httpAsync(requestUrl);
+  async writeAsync(fileName: string, content: string) {
+    const filePath = path.join(this._basePath, fileName);
     await fs.ensureDir(this._basePath);
-    await fs.writeFile(path.join(this._basePath, fileName), content, {encoding: 'utf8'});
+    await fs.writeFile(filePath, content, {encoding: 'utf8'});
   }
 }
 
