@@ -58,10 +58,10 @@ This application is not endorsed or affliated with any streaming service. The us
 
 # Streaming Services
 
-The following streaming services are currently planned or supported:
+The following streaming services are currently supported:
 
 * [CrunchyRoll](https://www.crunchyroll.com/)
-* [Funimation](https://www.funimation.com/) (Coming Soon)
+* [Funimation](https://www.funimation.com/)
 
 Requests to support additional streaming services are welcome.
 
