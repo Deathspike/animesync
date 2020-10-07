@@ -1,6 +1,6 @@
-# animekaizoku
+# animesync
 
-AnimeKaizoku is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
+AnimeSync is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
 A Certain Scientific Railgun 01 [CrunchyRoll].mkv`.
 
 ## Motivation
@@ -23,7 +23,7 @@ This application is not endorsed or affliated with any streaming service. The us
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
 2. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
-3. Run in *Terminal*: `sudo npm install -g animekaizoku`
+3. Run in *Terminal*: `sudo npm install -g animesync`
 
 ## Mac OS X
 
@@ -31,30 +31,30 @@ This application is not endorsed or affliated with any streaming service. The us
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
 2. Install *Homebrew* following the instructions at http://brew.sh/
 3. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
-4. Run in *Terminal*: `npm install -g animekaizoku`
+4. Run in *Terminal*: `npm install -g animesync`
 
 ## Windows
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
 2. Install *NodeJS* following the instructions at http://nodejs.org/
-3. Run in *Command Prompt*: `npm install -g animekaizoku`
+3. Run in *Command Prompt*: `npm install -g animesync`
 
 # Update
 
 ## Debian (Mint, Ubuntu, etc)
 
-1. Ensure that *AnimeKaizoku* is [installed](#Install)
-2. Run in *Terminal*: `sudo npm update -g animekaizoku`
+1. Ensure that `animesync` is [installed](#Install)
+2. Run in *Terminal*: `sudo npm update -g animesync`
 
 ## Mac OS X
 
-1. Ensure that *AnimeKaizoku* is [installed](#Install)
-2. Run in *Terminal*: `npm update -g animekaizoku`
+1. Ensure that `animesync` is [installed](#Install)
+2. Run in *Terminal*: `npm update -g animesync`
 
 ## Windows
 
-1. Ensure that *AnimeKaizoku* is [installed](#Install)
-2. Run in *Command Prompt*: `npm update -g animekaizoku`
+1. Ensure that `animesync` is [installed](#Install)
+2. Run in *Command Prompt*: `npm update -g animesync`
 
 # Streaming Services
 
@@ -68,7 +68,7 @@ Requests to support additional streaming services are welcome.
 # Usage
 
 ```
-Usage: animekaizoku [options] [command]
+Usage: animesync [options] [command]
 
 Download anime episodes from popular streaming services.
 
@@ -87,9 +87,9 @@ Commands:
 
 Streaming services often require an active subscription. Launch the browser:
 
-    animekaizoku browser
+    animesync browser
 
-This will launch the *Chrome* instance for `animekaizoku`. Then:
+This will launch the *Chrome* instance for `animesync`. Then:
 
 * Open your favourite streaming service website.
 * Login to your account on the website.
@@ -97,17 +97,17 @@ This will launch the *Chrome* instance for `animekaizoku`. Then:
 
 ## 2. Series
 
-Series can now be added to `animekaizoku`. Add the series:
+Series can now be added to `animesync`. Add the series:
 
-    animekaizoku series add https://www.crunchyroll.com/a-certain-scientific-railgun
+    animesync series add https://www.crunchyroll.com/a-certain-scientific-railgun
 
 ## 3. Download
 
 Episodes can now be downloaded. Download the episodes:
 
-    animekaizoku download
+    animesync download
 
-Your episodes will be saved to the `animekaizoku` library, as shown in your console.
+Your episodes will be saved to the `animesync` library, as shown in your console.
 
 # Contributions
 
