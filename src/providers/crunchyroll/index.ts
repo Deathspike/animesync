@@ -45,7 +45,7 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     const metadataMatch = content.match(/vilos\.config\.media\s*=\s*({.+?});/);
     const metadata = metadataMatch && JSON.parse(metadataMatch[1]) as Metadata;
     const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
-    const worker = new app.Worker(app.settings.episodeSync);
+    const worker = new app.Worker(app.settings.sync);
     if (metadata && stream) try {
       await Promise.all(metadata.subtitles.map(x => worker.subtitleAsync(`${x.language.replace(/([a-z])([A-Z])/g, '$1-$2')}.${x.format}`, x.url)));
       await worker.streamAsync(stream.url);

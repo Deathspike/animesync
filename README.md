@@ -21,20 +21,23 @@ This application is not endorsed or affliated with any streaming service. The us
 ## Debian (Mint, Ubuntu, etc)
 
 0. (These instructions are currently untested; please contact me if you have issues)
-1. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
-2. Run in *Terminal*: `sudo npm install -g animekaizoku`
+1. Install *Chrome* following the instructions at https://www.google.com/chrome/
+2. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
+3. Run in *Terminal*: `sudo npm install -g animekaizoku`
 
 ## Mac OS X
 
 0. (These instructions are currently untested; please contact me if you have issues)
-1. Install *Homebrew* following the instructions at http://brew.sh/
-2. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
-3. Run in *Terminal*: `npm install -g animekaizoku`
+1. Install *Chrome* following the instructions at https://www.google.com/chrome/
+2. Install *Homebrew* following the instructions at http://brew.sh/
+3. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
+4. Run in *Terminal*: `npm install -g animekaizoku`
 
 ## Windows
 
-1. Install *NodeJS* following the instructions at http://nodejs.org/
-2. Run in *Command Prompt*: `npm install -g animekaizoku`
+1. Install *Chrome* following the instructions at https://www.google.com/chrome/
+2. Install *NodeJS* following the instructions at http://nodejs.org/
+3. Run in *Command Prompt*: `npm install -g animekaizoku`
 
 # Update
 
@@ -86,7 +89,7 @@ Streaming services often require an active subscription. Launch the browser:
 
     animekaizoku browser
 
-The browser may need to be downloaded, so wait for it to launch. Then:
+This will launch the *Chrome* instance for `animekaizoku`. Then:
 
 * Open your favourite streaming service website.
 * Login to your account on the website.

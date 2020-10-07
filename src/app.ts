@@ -23,4 +23,4 @@ commander.createCommand()
       .arguments('<seriesUrl>')
       .description('Removes the series.')
       .action(app.actions.seriesRemoveAsync)))
-  .parseAsync();
+  .parse();
