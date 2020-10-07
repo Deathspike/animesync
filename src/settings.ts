@@ -1,14 +1,12 @@
-import * as os from 'os';
-import * as path from 'path';
+import os from 'os';
+import path from 'path';
 
 export const settings = {
-  chrome: path.join(os.homedir(), 'animekaizoku', 'chrome'),
+  chrome: path.join(os.homedir(), 'animekaizoku', 'chrome-data'),
   chromeHeadless: true,
   chromeExitTimeout: 1000,
   chromeNavigationTimeout: 30000,
   chromeViewport: {width: 1920, height: 974},
-  episodeRetryCount: 5,
-  episodeRetryTimeout: 5000,
-  episodeSync: path.join(os.homedir(), 'animekaizoku', 'sync'),
-  library: path.join(os.homedir(), 'animekaizoku', 'library')
+  library: path.join(os.homedir(), 'animekaizoku', 'library'),
+  sync: path.join(os.homedir(), 'animekaizoku', 'sync')
 };

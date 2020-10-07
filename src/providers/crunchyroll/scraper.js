@@ -9,7 +9,7 @@ function seasons() {
    * @param {Element?} containerNode 
    */
   function extractEpisodes(containerNode) {
-    if (!containerNode) throw new Error('Invalid episode node.');
+    if (!containerNode) throw new Error('Invalid episode node');
     return Array.from(containerNode.querySelectorAll('a')).reverse().map(episodeNode => ({
       title: textContent(episodeNode),
       url: episodeNode.href
@@ -20,8 +20,8 @@ function seasons() {
    * @param {Element?} node
    **/
   function textContent(node) {
-    if (!node) throw new Error('Invalid text node.');
-    if (!node.textContent) throw new Error('Invalid text node content.');
+    if (!node) throw new Error('Invalid text node');
+    if (!node.textContent) throw new Error('Invalid text node content');
     return node.textContent.trim().replace(/\s+/g, ' ');
   }
 }

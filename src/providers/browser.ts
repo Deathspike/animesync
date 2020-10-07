@@ -1,6 +1,4 @@
 import * as app from '..';
-import fs from 'fs-extra';
-import path from 'path';
 import puppeteer from 'puppeteer-core';
 let browserInstance: Promise<puppeteer.Browser> | undefined;
 let numberOfPages = 0;
@@ -26,12 +24,10 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
 }
 
 async function launchAsync() {
-  await fs.ensureDir(app.settings.chrome);
-  const chromiumRevision = String(require('puppeteer-core/package').puppeteer.chromium_revision);
-  const fetcher = puppeteer.createBrowserFetcher({path: app.settings.chrome});
-  await fetcher.localRevisions().then(x => Promise.all(x.filter((revision) => chromiumRevision !== revision).map((revision) => fetcher.remove(revision))));
-  const downloadInfo = await fetcher.download(chromiumRevision);
-  return puppeteer.launch({executablePath: downloadInfo.executablePath, headless: app.settings.chromeHeadless, userDataDir: path.join(downloadInfo.folderPath, 'user-data')});
+  const executableFinder = require('chrome-launcher/dist/chrome-finder')[process.platform]
+  const executablePath = executableFinder()[0];
+  if (executablePath) return puppeteer.launch({executablePath, headless: app.settings.chromeHeadless, userDataDir: app.settings.chrome});
+  throw new Error('Invalid browser');
 }
 
 function updateTimeout() {
