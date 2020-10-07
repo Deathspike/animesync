@@ -4,5 +4,7 @@ export * from './classes/Library';
 export * from './classes/Series';
 export * from './classes/Timer';
 export * from './classes/Worker';
+export * from './common/Future';
+export * from './common/Watcher';
 export * from './providers/browser';
 export * from './providers/series';
