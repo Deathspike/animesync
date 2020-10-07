@@ -6,7 +6,7 @@
   "name": "animesync",
   "repository": "git://github.com/Deathspike/animesync",
   "types": "dist",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "bin": {
     "animesync": "./bin/animesync"
   },
