@@ -19,14 +19,15 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
   } finally {
     numberOfPages--;
     updateTimeout();
-    await page?.close();
+    await page?.close().catch(() => undefined);
   }
 }
 
 async function launchAsync() {
+  const args = ['--autoplay-policy=no-user-gesture-required'];
   const executableFinder = require('chrome-launcher/dist/chrome-finder')[process.platform]
   const executablePath = executableFinder()[0];
-  if (executablePath) return puppeteer.launch({executablePath, headless: app.settings.chromeHeadless, userDataDir: app.settings.chrome});
+  if (executablePath) return puppeteer.launch({args, executablePath, headless: app.settings.chromeHeadless, userDataDir: app.settings.chrome});
   throw new Error('Invalid browser');
 }
 
