@@ -1,3 +1,4 @@
+import * as app from '..';
 import {find} from './utilities/find';
 import childProcess from 'child_process';
 import crypto from 'crypto';
@@ -29,9 +30,10 @@ export class Worker {
   }
 
   async streamAsync(streamUrl: string) {
-    const videoPath = path.join(this._basePath, '.video.mp4');
+    const httpProxy = app.settings.httpProxy;
+    const filePath = path.join(this._basePath, '.video.mp4');
     await fs.ensureDir(this._basePath);
-    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -i "${streamUrl}" -codec copy "${videoPath}"`, {cwd: this._basePath});
+    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -http_proxy "${httpProxy}" -i "${streamUrl}" -codec copy "${filePath}"`, {cwd: this._basePath});
   }
 
   async writeAsync(fileName: string, content: string) {
