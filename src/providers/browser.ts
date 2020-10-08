@@ -1,20 +1,21 @@
 import * as app from '..';
-import puppeteer from 'puppeteer-core';
-let browserInstance: Promise<puppeteer.Browser> | undefined;
+import playwright from 'playwright-core';
+let browserInstance: Promise<playwright.ChromiumBrowserContext> | undefined;
+let browserPath = require('chrome-launcher/dist/chrome-finder')[process.platform]()[0];
 let numberOfPages = 0;
 let timeoutHandle = setTimeout(() => undefined, 0);
 
-export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promise<void>) {
+export async function browserAsync(handlerAsync: (page: playwright.Page) => Promise<void>) {
   let browserPromise = browserInstance || (browserInstance = launchAsync());
-  let page: puppeteer.Page | undefined;
+  let page: playwright.Page | undefined;
   try {
     numberOfPages++;
-    const browser = await browserPromise;
-    const userAgent = await browser.userAgent();
-    page = await browser.newPage();
-    page.setDefaultTimeout(app.settings.chromeNavigationTimeout);
-    await page.setUserAgent(userAgent.replace(/HeadlessChrome/g, 'Chrome'));
-    await page.setViewport(app.settings.chromeViewport);
+    const browserContext = await browserPromise;
+    page = await browserContext.newPage();
+    page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
+    const userAgent = await page.evaluate(() => navigator.userAgent);
+    const session = await browserContext.newCDPSession(page);
+    await session.send('Emulation.setUserAgentOverride', {userAgent: userAgent.replace(/Headless/, '')});
     await handlerAsync(page);
   } finally {
     numberOfPages--;
@@ -24,11 +25,15 @@ export async function browserAsync(handlerAsync: (page: puppeteer.Page) => Promi
 }
 
 async function launchAsync() {
-  const args = ['--autoplay-policy=no-user-gesture-required'];
-  const executableFinder = require('chrome-launcher/dist/chrome-finder')[process.platform]
-  const executablePath = executableFinder()[0];
-  if (executablePath) return puppeteer.launch({args, executablePath, headless: app.settings.chromeHeadless, userDataDir: app.settings.chrome});
-  throw new Error('Invalid browser');
+  if (!browserPath) throw new Error('Invalid browser');
+  const match = app.settings.httpProxy.match(/^(https?)\:\/\/(?:(.+)\:(.+)@)?(.+)$/i);
+  return await playwright.chromium.launchPersistentContext(app.settings.chrome, { 
+    args: ['--autoplay-policy=no-user-gesture-required'],
+    executablePath: browserPath,
+    headless: app.settings.chromeHeadless,
+    proxy: match && match[1] && match[4] ? {server: `${match[1]}://${match[4]}`, username: match[2], password: match[3]} : undefined,
+    viewport: app.settings.chromeHeadless ? app.settings.chromeViewport : null
+  }) as playwright.ChromiumBrowserContext;
 }
 
 function updateTimeout() {
