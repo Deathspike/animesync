@@ -48,7 +48,7 @@ async function seasonAsync(rootPath: string, metadata: SeasonMetadata) {
         console.log(`Finished ${episodeName} (${elapsedTime})`);
       } catch (err) {
         console.log(`Rejected ${episodeName} (${elapsedTime})`);
-        console.log(err);
+        console.error(err);
       }
     }
   }
