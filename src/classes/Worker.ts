@@ -39,7 +39,7 @@ export class Worker {
   async writeAsync(fileName: string, content: string) {
     const filePath = path.join(this._basePath, fileName);
     await fs.ensureDir(this._basePath);
-    await fs.writeFile(filePath, content, {encoding: 'utf8'});
+    await fs.writeFile(filePath, content);
   }
 }
 

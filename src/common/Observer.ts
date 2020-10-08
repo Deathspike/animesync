@@ -1,7 +1,8 @@
 import * as app from '..';
 import playwright from 'playwright-core';
+import url from 'url';
 
-export class Watcher {
+export class Observer {
   private readonly _responses: Array<{expression: RegExp, future: app.Future<playwright.Response>}>;
 
   constructor(page: playwright.Page) {
@@ -11,7 +12,7 @@ export class Watcher {
 
   getAsync(...expression: RegExp[]) {
     return expression.map((expression) => {
-      const future = new app.Future<playwright.Response>(app.settings.chromeNavigationTimeout);
+      const future = new app.Future<playwright.Response>(app.settings.chromeObserverTimeout);
       this._responses.push({expression, future});
       return future.getAsync();
     });
@@ -19,7 +20,8 @@ export class Watcher {
 
   private _onResponse(response: playwright.Response) {
     for (const {expression, future} of this._responses) {
-      if (!expression.test(response.url())) continue;
+      const data = url.parse(response.url());
+      if (!data.pathname || !expression.test(data.pathname)) continue;
       future.resolve(response);
     }
   }
