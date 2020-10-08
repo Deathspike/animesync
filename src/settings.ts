@@ -9,7 +9,7 @@ export const settings = {
   chromeNavigationTimeout: 30000,
   chromeObserverTimeout: 30000,
   chromeViewport: {width: 1920, height: 974},
-  httpProxy: '',
+  proxyServer: '',
   library: path.join(os.homedir(), 'animesync', 'library'),
   sync: path.join(os.homedir(), 'animesync', 'sync')
 };

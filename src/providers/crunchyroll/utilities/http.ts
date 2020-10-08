@@ -5,8 +5,8 @@ import url from 'url';
 
 // TODO: Deprecate `httpAsync` and use Chrome. And remove `https-proxy-agent` module.
 export function httpAsync(requestUrl: string) {
-  const agent = app.settings.httpProxy
-    ? new HttpsProxyAgent(app.settings.httpProxy)
+  const agent = app.settings.proxyServer
+    ? new HttpsProxyAgent(app.settings.proxyServer)
     : undefined;
   return new Promise<string>((resolve, reject) => {
     const options = url.parse(requestUrl);

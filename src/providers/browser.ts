@@ -26,7 +26,7 @@ export async function browserAsync(handlerAsync: (page: playwright.Page) => Prom
 
 async function launchAsync() {
   if (!browserPath) throw new Error('Invalid browser');
-  const match = app.settings.httpProxy.match(/^(https?)\:\/\/(?:(.+)\:(.+)@)?(.+)$/i);
+  const match = app.settings.proxyServer.match(/^(https?)\:\/\/(?:(.+)\:(.+)@)?(.+)$/i);
   return await playwright.chromium.launchPersistentContext(app.settings.chrome, { 
     args: ['--autoplay-policy=no-user-gesture-required'],
     executablePath: browserPath,

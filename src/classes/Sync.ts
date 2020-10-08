@@ -1,4 +1,3 @@
-import * as app from '..';
 import {find} from './utilities/find';
 import childProcess from 'child_process';
 import crypto from 'crypto';
@@ -6,7 +5,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import util from 'util';
 
-export class Worker {
+export class Sync {
   private readonly _basePath: string;
   private readonly _mergePath: string;
 
@@ -29,11 +28,10 @@ export class Worker {
     await fs.move(`${episodePath}.tmp`, episodePath, {overwrite: true});
   }
 
-  async streamAsync(streamUrl: string) {
-    const httpProxy = app.settings.httpProxy;
+  async streamAsync(proxyServer: string, streamUrl: string) {
     const filePath = path.join(this._basePath, '.video.mp4');
     await fs.ensureDir(this._basePath);
-    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -http_proxy "${httpProxy}" -i "${streamUrl}" -codec copy "${filePath}"`, {cwd: this._basePath});
+    await util.promisify(childProcess.exec)(`${find('ffmpeg')} -http_proxy "${proxyServer}" -i "${streamUrl}" -codec copy "${filePath}"`, {cwd: this._basePath});
   }
 
   async writeAsync(fileName: string, content: string) {

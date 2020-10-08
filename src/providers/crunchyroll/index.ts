@@ -50,13 +50,13 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     const metadataMatch = content.match(/vilos\.config\.media\s*=\s*({.+?});/);
     const metadata = metadataMatch && JSON.parse(metadataMatch[1]) as EpisodeMetadata;
     const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
-    const worker = new app.Worker(app.settings.sync);
+    const sync = new app.Sync(app.settings.sync);
     if (metadata && stream) try {
-      await Promise.all(metadata.subtitles.map(s => httpAsync(s.url).then(d => worker.writeAsync(`${s.language.replace(/([a-z])([A-Z])/g, '$1-$2')}.${s.format}`, d))));
-      await worker.streamAsync(stream.url);
-      await worker.mergeAsync(episodePath);
+      await Promise.all(metadata.subtitles.map(s => httpAsync(s.url).then(d => sync.writeAsync(`${s.language.replace(/([a-z])([A-Z])/g, '$1-$2')}.${s.format}`, d))));
+      await sync.streamAsync(app.settings.proxyServer, stream.url);
+      await sync.mergeAsync(episodePath);
     } finally {
-      await worker.disposeAsync();
+      await sync.disposeAsync();
     } else {
       throw new Error(`Invalid episode: ${episodeUrl}`);
     }
