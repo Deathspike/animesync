@@ -7,24 +7,24 @@ import scraper from './scraper';
 
 export async function funimationAsync(rootPath: string, seriesUrl: string) {
   await app.browserAsync(async (page) => {
-    const [metadataPromise] = new app.Watcher(page).getAsync(/\/api\/episodes\//i);
+    const [metadataPromise] = new app.Observer(page).getAsync(/\/api\/episodes\//i);
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-    const metadata = await metadataPromise.then(x => x.json()) as SeasonMetadata;
+    const metadata = await metadataPromise.then(x => x.json()) as SeriesMetadata;
     const seasons = [metadata];
     while (!page.isClosed()) {
-      const [seasonPromise] = new app.Watcher(page).getAsync(/\/api\/episodes\//i);
+      const [seasonPromise] = new app.Observer(page).getAsync(/\/api\/episodes\//i);
       if (!await page.evaluate(scraper.nextSeason)) {
         seasonPromise.catch(() => undefined);
         await page.close();
         await seasons.reduce((p, x) => p.then(() => seasonAsync(rootPath, x)), Promise.resolve());
       } else {
-        seasons.push(await seasonPromise.then(x => x.json()) as SeasonMetadata);
+        seasons.push(await seasonPromise.then(x => x.json()) as SeriesMetadata);
       }
     }
   });
 }
 
-async function seasonAsync(rootPath: string, metadata: SeasonMetadata) {
+async function seasonAsync(rootPath: string, metadata: SeriesMetadata) {
   for (const episode of metadata.items.filter(x => x.audio.includes('Japanese'))) {
     const episodeNumber = parseFloat(episode.item.episodeNum);
     const seasonNumber = parseFloat(episode.item.seasonNum);
@@ -56,16 +56,15 @@ async function seasonAsync(rootPath: string, metadata: SeasonMetadata) {
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
   return await app.browserAsync(async (page) => {
-    const [metadataPromise, vttSubtitlePromise] = new app.Watcher(page).getAsync(/\/api\/showexperience\//i, /\.vtt$/i);
+    const [m3u8Promise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
-    const metadata = await metadataPromise.then(x => x.json()) as EpisodeMetadata;
+    const m3u8 = await m3u8Promise.then(x => x.url());
     const vttSubtitle = await vttSubtitlePromise.then(x => x.text());
     await page.close();
-    const stream = metadata.items.find(x => x.videoType === 'm3u8');
     const worker = new app.Worker(app.settings.sync);
-    if (metadata && stream) try {
+    if (m3u8 && vttSubtitle) try {
       await worker.writeAsync('en-US.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
-      await worker.streamAsync(stream.src);
+      await worker.streamAsync(m3u8);
       await worker.mergeAsync(episodePath);
     } finally {
       await worker.disposeAsync();
@@ -75,10 +74,6 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
   });
 }
 
-type SeasonMetadata = {
+type SeriesMetadata = {
   items: Array<{audio: Array<string>, item: {episodeNum: string, episodeSlug: string, seasonNum: string, titleName: string, titleSlug: string}}>;
-};
-
-type EpisodeMetadata = {
-  items: Array<{src: string, videoType: string}>;
 };

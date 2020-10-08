@@ -43,5 +43,5 @@ function updateTimeout() {
     if (numberOfPages) return;
     browserInstance = undefined;
     browser?.close().catch(() => undefined);
-  }, app.settings.chromeExitTimeout);
+  }, app.settings.chromeInactiveTimeout);
 }
