@@ -3,11 +3,13 @@ import commander from 'commander';
 
 commander.createCommand()
   .description(require('../package').description)
+  .name(require('../package').name)
   .version(require('../package').version)
   .addCommand(commander.createCommand('browser')
     .description('Launch browser.')
     .action(app.actions.browserAsync))
   .addCommand(commander.createCommand('download')
+    .arguments('[seriesUrl...]')
     .description('Downloads series.')
     .action(app.actions.downloadAsync))
   .addCommand(commander.createCommand('series')

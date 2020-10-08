@@ -19,7 +19,7 @@ export class Library {
   static async listAsync(libraryPath: string) {
     const filePath = path.join(libraryPath, '.library');
     const source = await fs.readJson(filePath).catch(() => undefined) || {};
-    return Object.keys(source).map(seriesUrl => ({seriesPath: source[seriesUrl], seriesUrl}));
+    return Object.keys(source).map(seriesUrl => ({rootPath: String(source[seriesUrl]), seriesUrl}));
   }
   
   async addAsync(seriesUrl: string, rootPath: string) {

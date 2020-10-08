@@ -70,44 +70,62 @@ Requests to support additional streaming services are welcome.
 ```
 Usage: animesync [options] [command]
 
-Download anime episodes from popular streaming services.
+AnimeSync is capable of downloading anime episodes from popular streaming services.
 
 Options:
-  -V, --version   output the version number
-  -h, --help      display help for command
+  -V, --version         output the version number
+  -h, --help            display help for command
 
 Commands:
-  browser         Launch browser.
-  download        Downloads series.
-  series          Manages series.
-  help [command]  display help for command
+  browser               Launch browser.
+  download [seriesUrl]  Downloads series.
+  series                Manages series.
+  help [command]        display help for command
 ```
 
-## 1. Login
+## Log In
 
-Streaming services often require an active subscription. Launch the browser:
+Since streaming services require active subscriptions to access all content, you may want to log into your account. To access content, `animesync` uses a private instance of *Google Chrome*. This private instance does not share information with your normal instance, so even if you are already logged in there, `animesync` does not know of it. Launch the `animesync` browser instance:
 
     animesync browser
 
-This will launch the *Chrome* instance for `animesync`. Then:
+A *Google Chrome* window will appear. You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. Now you can use this browser instance to open the website of your streaming service, and log into your account. Once you're done, close the browser.
 
-* Open your favourite streaming service website.
-* Login to your account on the website.
-* Close the browser.
+## Quick Download
 
-## 2. Series
+To download a series, you can use:
 
-Series can now be added to `animesync`. Add the series:
+    animesync download [seriesUrl...]
+
+For example, to download *A Certain Scientific Railgun* from *CrunchyRoll*, you can use:
+
+    animesync download https://www.crunchyroll.com/a-certain-scientific-railgun
+
+It is recommended to add the series to your library if the series is ongoing.
+
+## Your Library
+
+To add a series to your library, you can use:
+
+    animesync series add <seriesUrl> [rootPath]
+
+For example, to add *A Certain Scientific Railgun* from *CrunchyRoll*, you can use:
 
     animesync series add https://www.crunchyroll.com/a-certain-scientific-railgun
 
-## 3. Download
-
-Episodes can now be downloaded. Download the episodes:
+To download all the series in your library, you can use:
 
     animesync download
 
-Your episodes will be saved to the `animesync` library, as shown in your console.
+To list all the series in your library, you can use:
+
+    animesync series list
+
+To remove a series from your library, you can use:
+
+    animesync series remove <seriesUrl>
+
+Please note that removing a series does **NOT** delete downloaded files.
 
 # Contributions
 
