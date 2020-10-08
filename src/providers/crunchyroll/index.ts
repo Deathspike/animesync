@@ -34,7 +34,7 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string) {
             console.log(`Finished ${episodeName} (${elapsedTime})`);
           } catch (err) {
             console.log(`Rejected ${episodeName} (${elapsedTime})`);
-            console.log(err);
+            console.error(err);
           }
         }
       }
