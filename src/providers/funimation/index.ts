@@ -61,13 +61,13 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     const m3u8 = await m3u8Promise.then(x => x.url());
     const vttSubtitle = await vttSubtitlePromise.then(x => x.text());
     await page.close();
-    const worker = new app.Worker(app.settings.sync);
+    const sync = new app.Sync(app.settings.sync);
     if (m3u8 && vttSubtitle) try {
-      await worker.writeAsync('en-US.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
-      await worker.streamAsync(m3u8);
-      await worker.mergeAsync(episodePath);
+      await sync.writeAsync('en-US.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
+      await sync.streamAsync(app.settings.proxyServer, m3u8);
+      await sync.mergeAsync(episodePath);
     } finally {
-      await worker.disposeAsync();
+      await sync.disposeAsync();
     } else {
       throw new Error(`Invalid episode: ${episodeUrl}`);
     }
