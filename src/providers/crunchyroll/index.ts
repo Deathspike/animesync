@@ -17,7 +17,7 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string) {
       const seriesReport = await app.Series.loadAsync(seriesPath);
       for (const episode of season.episodes) {
         const numberMatch = episode.title.match(/([0-9]+(?:\.[0-9])?)/);
-        const number = numberMatch ? parseInt(numberMatch[1], 10) : -1;
+        const number = numberMatch ? parseFloat(numberMatch[1]) : -1;
         if (number >= 0) {
           const elapsedTime = new app.Timer();
           const episodeName = `${seriesName} ${String(number).padStart(2, '0')} [CrunchyRoll].mkv`;
