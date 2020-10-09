@@ -3,7 +3,6 @@ import {HttpsProxyAgent} from 'https-proxy-agent';
 import https from 'https';
 import url from 'url';
 
-// TODO: Deprecate `httpAsync` and use Chrome. And remove `https-proxy-agent` module.
 export function httpAsync(requestUrl: string) {
   const agent = app.settings.proxyServer
     ? new HttpsProxyAgent(app.settings.proxyServer)
