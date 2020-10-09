@@ -63,7 +63,7 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     await page.close();
     const sync = new app.Sync(app.settings.sync);
     if (m3u8 && vttSubtitle) try {
-      await sync.writeAsync('en-US.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
+      await sync.writeAsync('eng.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
       await sync.streamAsync(app.settings.proxyServer, m3u8);
       await sync.mergeAsync(episodePath);
     } finally {

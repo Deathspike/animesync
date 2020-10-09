@@ -52,7 +52,7 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
     const sync = new app.Sync(app.settings.sync);
     if (metadata && stream) try {
-      await Promise.all(metadata.subtitles.map(s => httpAsync(s.url).then(d => sync.writeAsync(`${s.language.replace(/([a-z])([A-Z])/g, '$1-$2')}.${s.format}`, d))));
+      await Promise.all(metadata.subtitles.map(s => httpAsync(s.url).then(d => sync.writeAsync(getSubtitleName(s.language, s.format), d))));
       await sync.streamAsync(app.settings.proxyServer, stream.url);
       await sync.mergeAsync(episodePath);
     } finally {
@@ -61,6 +61,21 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
       throw new Error(`Invalid episode: ${episodeUrl}`);
     }
   });
+}
+
+function getSubtitleName(language: string, format: string) {
+  switch (language) {
+    case 'enUS': return `en-US.eng.${format}`;
+    case 'ptBR': return `pt-BR.por.${format}`;
+    case 'deDE': return `de-DE.ger.${format}`;
+    case 'esLA': return `es-LA.spa.${format}`;
+    case 'esES': return `es-ES.spa.${format}`;
+    case 'frFR': return `fr-FR.fre.${format}`;
+    case 'arME': return `ar-ME.ara.${format}`;
+    case 'itIT': return `it-IT.ita.${format}`;
+    case 'ruRU': return `ru-RU.rus.${format}`;
+    default: return `${language}.${format}`;
+  }
 }
 
 type EpisodeMetadata = {

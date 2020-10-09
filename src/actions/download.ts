@@ -1,6 +1,6 @@
 import * as app from '..';
 
-export async function downloadAsync(seriesList: string[]) {
+export async function downloadAsync(seriesList: Array<string>) {
   if (seriesList.length) {
     console.log(`Sourcing ${app.settings.library}`);
     for (const series of seriesList) await app.seriesAsync(app.settings.library, series);

@@ -22,7 +22,7 @@ This application is not endorsed or affliated with any streaming service. The us
 
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Run in *Terminal*: `sudo apt-get install ffmpeg mkvtoolnix nodejs npm`
+2. Run in *Terminal*: `sudo apt-get install ffmpeg nodejs npm`
 3. Run in *Terminal*: `sudo npm install -g animesync`
 
 ## Mac OS X
@@ -30,7 +30,7 @@ This application is not endorsed or affliated with any streaming service. The us
 0. (These instructions are currently untested; please contact me if you have issues)
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
 2. Install *Homebrew* following the instructions at http://brew.sh/
-3. Run in *Terminal*: `brew install ffmpeg mkvtoolnix node`
+3. Run in *Terminal*: `brew install ffmpeg node`
 4. Run in *Terminal*: `npm install -g animesync`
 
 ## Windows
