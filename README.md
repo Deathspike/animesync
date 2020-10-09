@@ -44,17 +44,17 @@ This application is not endorsed or affliated with any streaming service. The us
 ## Debian (Mint, Ubuntu, etc)
 
 1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Terminal*: `sudo npm update -g animesync`
+2. Run in *Terminal*: `sudo npm install -g animesync`
 
 ## Mac OS X
 
 1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Terminal*: `npm update -g animesync`
+2. Run in *Terminal*: `npm install -g animesync`
 
 ## Windows
 
 1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Command Prompt*: `npm update -g animesync`
+2. Run in *Command Prompt*: `npm install -g animesync`
 
 # Streaming Services
 
