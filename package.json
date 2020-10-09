@@ -6,7 +6,14 @@
   "name": "animesync",
   "repository": "git://github.com/Deathspike/animesync",
   "types": "dist",
-  "version": "0.4.0",
+  "version": "0.4.1",
+  "keywords": [
+    "animesync",
+    "anime",
+    "download",
+    "crunchyroll",
+    "funimation"
+  ],
   "bin": {
     "animesync": "./bin/animesync"
   },
