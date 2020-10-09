@@ -22,8 +22,8 @@ export class Sync {
     await fs.ensureDir(this._basePath);
     const fileNames = await fs.readdir(this._basePath);
     const filePaths = fileNames.map(fileName => path.join(this._basePath, fileName));
-    const joinLines = filePaths.map(parse).sort(sort).map(transform);
-    await util.promisify(childProcess.exec)(`${find('mkvmerge')} -o "${this._mergePath}" ${joinLines.join(' ')}`);
+    const execLines = transform(filePaths.map(parse).sort(sort));
+    await util.promisify(childProcess.exec)(`${find('ffmpeg')} ${execLines} -c copy "${this._mergePath}"`);
     await fs.move(this._mergePath, `${episodePath}.tmp`, {overwrite: true});
     await fs.move(`${episodePath}.tmp`, episodePath, {overwrite: true});
   }
@@ -42,7 +42,7 @@ export class Sync {
 }
 
 function parse(filePath: string) {
-  const match = filePath.match(/(?:([a-z]{2}-[a-z]{2}))?\.([^.]+)$/i);
+  const match = filePath.match(/(?:(?:\\|\/|\.)([a-z]{3}))?\.([^.]+)$/i);
   const language = (match && match[1] || '').toLowerCase();
   const extension = (match && match[2] || '').toLowerCase();
   return {extension, language, filePath};
@@ -54,7 +54,9 @@ function sort(item: ReturnType<typeof parse>, otherItem: ReturnType<typeof parse
   return item.language.localeCompare(otherItem.language);
 }
 
-function transform(item: ReturnType<typeof parse>) {
-  if (item.extension === 'mp4') return `"${item.filePath}"`;
-  return `--language "0:${item.language}" "${item.filePath}"`;
+function transform(items: Array<ReturnType<typeof parse>>) {
+  const input = items.map((x) => `-i "${x.filePath}"`);
+  const map = items.map((_, i) => `-map ${i}`)
+  const metadata = items.filter(x => x.language).map((x, i) => `-metadata:s:s:${i} language="${x.language}"`);
+  return input.concat(map).concat(metadata).join(' ');
 }

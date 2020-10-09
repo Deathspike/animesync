@@ -10,7 +10,7 @@ export class Observer {
     this._responses = [];
   }
 
-  getAsync(...expression: RegExp[]) {
+  getAsync(...expression: Array<RegExp>) {
     return expression.map((expression) => {
       const future = new app.Future<playwright.Response>(app.settings.chromeObserverTimeout);
       this._responses.push({expression, future});
