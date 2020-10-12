@@ -2,28 +2,18 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export class Series {
-  private readonly _filePath: string;
-  private readonly _source: Record<string, string>;
+  private readonly _rootPath: string;
 
-  private constructor(filePath: string, source: Record<string, string>) {
-    this._filePath = filePath;
-    this._source = source;
+  constructor(libraryPath: string) {
+    this._rootPath = path.join(libraryPath, '.animesync');
   }
 
-  static async loadAsync(seriesPath: string) {
-    const filePath = path.join(seriesPath, '.series');
-    const source = await fs.readJson(filePath).catch(() => undefined) || {};
-    return new Series(filePath, source);
+  async existsAsync(seriesName: string, episodeName: string) {
+    return await fs.pathExists(path.join(this._rootPath, seriesName, episodeName));
   }
 
-  includes(episodeUrl: string) {
-    return this._source.hasOwnProperty(episodeUrl)
-  }
-
-  async trackAsync(episodeName: string, episodeUrl: string) {
-    this._source[episodeUrl] = episodeName;
-    await fs.ensureDir(path.dirname(this._filePath));
-    await fs.writeJson(`${this._filePath}.tmp`, this._source, {spaces: 2});
-    await fs.move(`${this._filePath}.tmp`, this._filePath, {overwrite: true});
+  async trackAsync(seriesName: string, episodeName: string) {
+    await fs.ensureDir(path.join(this._rootPath, seriesName));
+    await fs.writeFile(path.join(this._rootPath, seriesName, episodeName), Buffer.alloc(0));
   }
 }

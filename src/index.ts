@@ -7,4 +7,5 @@ export * from './common/Future';
 export * from './common/Observer';
 export * from './common/Timer';
 export * from './providers/browser';
+export * from './providers/migrate';
 export * from './providers/series';

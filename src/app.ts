@@ -50,7 +50,7 @@ function primitiveNumber(value: string) {
 }
 
 function validatePath(value: string) {
-  return fs.pathExistsSync(path.resolve(value)) ? path.resolve(value) : undefined;
+  return fs.pathExistsSync(value) ? path.resolve(value) : undefined;
 }
 
 function validateProxyServer(value: string) {

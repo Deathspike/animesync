@@ -3,34 +3,34 @@ import path from 'path';
 
 export class Library {
   private readonly _filePath: string;
-  private readonly _source: Record<string, string>;
+  private readonly _source: ILibrary;
 
-  private constructor(filePath: string, source: Record<string, string>) {
+  private constructor(filePath: string, source: ILibrary) {
     this._filePath = filePath;
     this._source = source;
   }
 
   static async loadAsync(libraryPath: string) {
-    const filePath = path.join(libraryPath, '.library');
+    const filePath = path.join(libraryPath, '.animesync', 'library.json');
     const source = await fs.readJson(filePath).catch(() => undefined) || {};
     return new Library(filePath, source);
   }
 
   static async listAsync(libraryPath: string) {
-    const filePath = path.join(libraryPath, '.library');
-    const source = await fs.readJson(filePath).catch(() => undefined) || {};
-    return Object.keys(source).map(seriesUrl => ({rootPath: String(source[seriesUrl]), seriesUrl}));
+    const library = await this.loadAsync(libraryPath);
+    const entries = library._source.entries;
+    return Object.keys(entries).map(seriesUrl => Object.assign({}, entries[seriesUrl], {seriesUrl}));
   }
   
-  async addAsync(seriesUrl: string, rootPath: string) {
-    if (this._source[seriesUrl]) return false;
-    this._source[seriesUrl] = rootPath;
+  async addAsync(seriesUrl: string, rootPath?: string) {
+    if (this._source.entries[seriesUrl]) return false;
+    this._source.entries[seriesUrl] = {rootPath};
     return await this._saveAsync(true);
   }
 
   async removeAsync(seriesUrl: string) {
-    if (!this._source[seriesUrl]) return false;
-    delete this._source[seriesUrl];
+    if (!this._source.entries[seriesUrl]) return false;
+    delete this._source.entries[seriesUrl];
     return await this._saveAsync(true);
   }
 
@@ -40,4 +40,13 @@ export class Library {
     await fs.move(`${this._filePath}.tmp`, this._filePath, {overwrite: true});
     return result;
   }
+}
+
+export interface ILibrary {
+  version: number;
+  entries: Record<string, ILibraryItem>;
+}
+
+export interface ILibraryItem {
+  rootPath?: string;
 }
