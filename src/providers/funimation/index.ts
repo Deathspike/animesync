@@ -25,6 +25,7 @@ export async function funimationAsync(rootPath: string, seriesUrl: string) {
 }
 
 async function seasonAsync(rootPath: string, metadata: SeriesMetadata) {
+  const series = new app.Series(app.settings.library);
   for (const episode of metadata.items.filter(x => x.audio.includes('Japanese'))) {
     const episodeNumber = parseFloat(episode.item.episodeNum);
     const seasonNumber = parseFloat(episode.item.seasonNum);
@@ -32,19 +33,18 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata) {
       const elapsedTime = new app.Timer();
       const seriesName = sanitizeFilename(episode.item.titleName);
       const seriesPath = path.join(rootPath, seriesName);
-      const seriesReport = await app.Series.loadAsync(seriesPath);
-      const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeNumber).padStart(2, '0')} [Funimation].mkv`;
-      const episodePath = path.join(seriesPath, episodeName);
+      const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeNumber).padStart(2, '0')} [Funimation]`;
+      const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       const episodeUrl = `https://www.funimation.com/shows/${episode.item.titleSlug}/${episode.item.episodeSlug}/?qid=&lang=japanese`;
-      if (seriesReport.includes(episodeUrl)) {
+      if (await series.existsAsync(seriesName, episodeName)) {
         console.log(`Skipping ${episodeName}`);
       } else if (await fs.pathExists(episodePath)) {
         console.log(`Skipping ${episodeName}`);
-        await seriesReport.trackAsync(episodeName, episodeUrl);
+        await series.trackAsync(seriesName, episodeName);
       } else try {
         console.log(`Fetching ${episodeName}`);
         await episodeAsync(episodePath, episodeUrl);
-        await seriesReport.trackAsync(episodeName, episodeUrl);
+        await series.trackAsync(seriesName, episodeName);
         console.log(`Finished ${episodeName} (${elapsedTime})`);
       } catch (err) {
         console.log(`Rejected ${episodeName} (${elapsedTime})`);
