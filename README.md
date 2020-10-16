@@ -130,6 +130,14 @@ To remove a series from your library, you can use:
 
 Please note that removing a series **does NOT delete** downloaded files.
 
+### Filtering
+
+To avoid downloading every episode, you can run:
+
+    animesync download --skipDownload [seriesUrl...]
+
+Which generates tracking files in the `.animesync` folder of your library. Just delete a tracking file and run `animesync download [seriesUrl...`] to download the missing episodes.
+
 ## User Settings
 
 To check the settings, you can use:

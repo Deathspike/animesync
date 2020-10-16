@@ -5,7 +5,7 @@ import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
 
-export async function crunchyrollAsync(rootPath: string, seriesUrl: string) {
+export async function crunchyrollAsync(rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
   const series = new app.Series(app.settings.library);
   await app.browserAsync(async (page) => {
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
@@ -26,6 +26,9 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string) {
             console.log(`Skipping ${episodeName}`);
           } else if (await fs.pathExists(episodePath)) {
             console.log(`Skipping ${episodeName}`);
+            await series.trackAsync(seriesName, episodeName);
+          } else if (options && options.skipDownload) {
+            console.log(`Tracking ${episodeName}`);
             await series.trackAsync(seriesName, episodeName);
           } else try {
             console.log(`Fetching ${episodeName}`);
