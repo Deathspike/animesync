@@ -1,11 +1,12 @@
+import * as app from '..';
 import fs from 'fs-extra';
 import path from 'path';
 
 export class Library {
   private readonly _filePath: string;
-  private readonly _source: ILibrary;
+  private readonly _source: app.ILibraryData;
 
-  private constructor(filePath: string, source: ILibrary) {
+  private constructor(filePath: string, source: app.ILibraryData) {
     this._filePath = filePath;
     this._source = source;
   }
@@ -40,13 +41,4 @@ export class Library {
     await fs.move(`${this._filePath}.tmp`, this._filePath, {overwrite: true});
     return result;
   }
-}
-
-export interface ILibrary {
-  version: number;
-  entries: Record<string, ILibraryItem>;
-}
-
-export interface ILibraryItem {
-  rootPath?: string;
 }

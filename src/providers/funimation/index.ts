@@ -5,7 +5,7 @@ import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
 
-export async function funimationAsync(rootPath: string, seriesUrl: string) {
+export async function funimationAsync(rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
   await app.browserAsync(async (page) => {
     const [metadataPromise] = new app.Observer(page).getAsync(/\/api\/episodes\//i);
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
@@ -16,7 +16,7 @@ export async function funimationAsync(rootPath: string, seriesUrl: string) {
       if (!await page.evaluate(scraper.nextSeason)) {
         seasonPromise.catch(() => undefined);
         await page.close();
-        await seasons.reduce((p, x) => p.then(() => seasonAsync(rootPath, x)), Promise.resolve());
+        await seasons.reduce((p, x) => p.then(() => seasonAsync(rootPath, x, options)), Promise.resolve());
       } else {
         seasons.push(await seasonPromise.then(x => x.json()) as SeriesMetadata);
       }
@@ -24,7 +24,7 @@ export async function funimationAsync(rootPath: string, seriesUrl: string) {
   });
 }
 
-async function seasonAsync(rootPath: string, metadata: SeriesMetadata) {
+async function seasonAsync(rootPath: string, metadata: SeriesMetadata, options?: app.ISeriesOptions) {
   const series = new app.Series(app.settings.library);
   for (const episode of metadata.items.filter(x => x.audio.includes('Japanese'))) {
     const episodeNumber = parseFloat(episode.item.episodeNum);
@@ -40,6 +40,9 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata) {
         console.log(`Skipping ${episodeName}`);
       } else if (await fs.pathExists(episodePath)) {
         console.log(`Skipping ${episodeName}`);
+        await series.trackAsync(seriesName, episodeName);
+      } else if (options && options.skipDownload) {
+        console.log(`Tracking ${episodeName}`);
         await series.trackAsync(seriesName, episodeName);
       } else try {
         console.log(`Fetching ${episodeName}`);
