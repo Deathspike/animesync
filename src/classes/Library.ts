@@ -13,7 +13,7 @@ export class Library {
 
   static async loadAsync(libraryPath: string) {
     const filePath = path.join(libraryPath, '.animesync', 'library.json');
-    const source = await fs.readJson(filePath).catch(() => undefined) || {};
+    const source = await fs.readJson(filePath).catch(() => ({version: 1, entries: {}}));
     return new Library(filePath, source);
   }
 
