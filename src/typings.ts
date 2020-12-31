@@ -1,10 +1,6 @@
 export interface ILibraryData {
   version: number;
-  entries: Record<string, ILibraryDataItem>;
-}
-
-export interface ILibraryDataItem {
-  rootPath?: string;
+  entries: Record<string, {rootPath?: string}>;
 }
 
 export interface ISeriesOptions {
