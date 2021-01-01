@@ -2,6 +2,7 @@ import * as app from '.';
 import commander from 'commander';
 import fs from 'fs-extra';
 import path from 'path';
+import process from 'process';
 
 commander.createCommand()
   .description(require('../package').description)
@@ -40,7 +41,14 @@ commander.createCommand()
     .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.chromeViewport), validateViewport)
     .option('--proxyServer [string]', withCurrent('Proxy server (HTTP or HTTPS).', app.settings.proxyServer), validateProxyServer)
     .action((command) => app.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
-  .parse();
+  .parse(checkVersion());
+
+function checkVersion() {
+  const versionMatch = process.version.match(/^v(\d+)\.(\d+)\.(\d)$/);
+  const majorVersion = versionMatch ? Number(versionMatch[1]) : Number.MAX_SAFE_INTEGER;
+  if (majorVersion >= 12) return undefined;
+  throw new Error(`Invalid node version: ${majorVersion}. Must be >= 12.`);
+}
 
 function primitiveBoolean(value: string) {
   return /^yes|true|1/.test(value);
