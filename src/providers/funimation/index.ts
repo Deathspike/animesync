@@ -55,7 +55,7 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata, options?:
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
   const sync = new app.Sync(episodePath, 'srt');
-  await app.browserAsync(async (page, userAgent) => {
+  await app.browserAsync(async (page, options) => {
     const [metadataPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\/api\/showexperience\//i, /\.vtt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
     const m3u8 = await metadataPromise.then(x => x.response()).then(x => x?.json()).then(extractAsync);
@@ -63,7 +63,7 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
     await page.close();
     if (m3u8 && vttSubtitle) try {
       const srtSubtitle = subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'});
-      await sync.saveAsync(m3u8, srtSubtitle, {proxyServer: app.settings.proxyServer, userAgent});
+      await sync.saveAsync(m3u8, srtSubtitle, options);
     } finally { 
       await sync.disposeAsync();
     } else {

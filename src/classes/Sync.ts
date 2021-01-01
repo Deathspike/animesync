@@ -1,3 +1,4 @@
+import * as app from '..';
 import childProcess from 'child_process';
 import fs from 'fs-extra';
 import os from 'os';
@@ -17,20 +18,23 @@ export class Sync {
     await fs.remove(this._subtitlePath);
   }
 
-  async saveAsync(streamUrl: string, subtitle: string, options?: {proxyServer?: string, userAgent?: string}) {
-    // Initialize the options.
-    const cli: string[] = [];
-    if (options && options.proxyServer) cli.push(`-http_proxy "${options.proxyServer}"`);
-    if (options && options.userAgent) cli.push(`-user_agent "${options.userAgent}"`);
-
-    // Initialize the stream.
+  async saveAsync(streamUrl: string, subtitle: string, options?: {broker?: app.Broker, userAgent?: string}) {
+    const cli = {'user_agent': options?.userAgent};
+    const env = {'http_proxy': options?.broker?.address};
     await fs.ensureDir(path.dirname(this._episodePath));
     await fs.writeFile(this._subtitlePath, subtitle);
-    await util.promisify(childProcess.exec)(`${ffmpeg()} ${cli.join(' ')} -y -i "${streamUrl}" -i "${this._subtitlePath}" -c copy "${this._episodePath}"`);
+    await util.promisify(childProcess.exec)(`${ffmpeg()} ${parse(cli)} -y -i "${streamUrl}" -i "${this._subtitlePath}" -c copy "${this._episodePath}"`, {env});
   }
 }
 
 function ffmpeg() {
   if (os.platform() !== 'win32') return 'ffmpeg';
   return path.join(__dirname, `../../dep/ffmpeg.exe`)
+}
+
+function parse<T>(obj: {[k: string]: T}) {
+  return Object.entries(obj)
+    .filter(([_, v]) => Boolean(v))
+    .map(([k, v]) => `-${k} "${v}"`)
+    .join(' ');
 }
