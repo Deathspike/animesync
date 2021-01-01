@@ -154,9 +154,9 @@ Manage settings.
 Options:
   --chrome [string]                   Path to chrome-data.
                                       ⠀⠀C:\Users\Deathspike\animesync\chrome-data
-  --library [string]                  Path to library. Completed videos are here.
+  --library [string]                  Path to library. Video files are stored here.
                                       ⠀⠀C:\Users\Deathspike\animesync\library
-  --sync [string]                     Path to sync. Downloading videos are here.
+  --sync [string]                     Path to sync. Temporary files are stored here.
                                       ⠀⠀C:\Users\Deathspike\animesync\sync
   --chromeHeadless [bool]             Chrome headless mode.
                                       ⠀⠀true

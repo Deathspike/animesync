@@ -54,7 +54,7 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata, options?:
 }
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
-  const sync = new app.Sync(episodePath, 'srt');
+  const sync = new app.Sync(episodePath, 'srt', app.settings.sync);
   await app.browserAsync(async (page, options) => {
     const [metadataPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\/api\/showexperience\//i, /\.vtt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});

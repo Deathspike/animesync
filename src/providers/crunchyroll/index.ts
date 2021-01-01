@@ -42,7 +42,7 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
 }
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
-  const sync = new app.Sync(episodePath, 'ass');
+  const sync = new app.Sync(episodePath, 'ass', app.settings.sync);
   await app.browserAsync(async (page, options) => {
     const [assSubtitlePromise] = new app.Observer(page).getAsync(/\.txt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
