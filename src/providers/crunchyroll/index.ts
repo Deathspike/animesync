@@ -1,6 +1,5 @@
 import * as app from '../..';
 import {httpAsync} from './utilities/http';
-import fs from 'fs-extra';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
@@ -24,9 +23,6 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
           const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
           if (await series.existsAsync(seriesName, episodeName)) {
             console.log(`Skipping ${episodeName}`);
-          } else if (await fs.pathExists(episodePath)) {
-            console.log(`Skipping ${episodeName}`);
-            await series.trackAsync(seriesName, episodeName);
           } else if (options && options.skipDownload) {
             console.log(`Tracking ${episodeName}`);
             await series.trackAsync(seriesName, episodeName);
@@ -46,18 +42,15 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
 }
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
-  return await app.browserAsync(async (page) => {
+  const sync = new app.Sync(episodePath, 'ass');
+  await app.browserAsync(async (page, userAgent) => {
+    const [assSubtitlePromise] = new app.Observer(page).getAsync(/\.txt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
-    const content = await page.content();
+    const m3u8 = await page.content().then(extractAsync);
+    const assSubtitle = await assSubtitlePromise.then(x => x.url()).then(httpAsync);
     await page.close();
-    const metadataMatch = content.match(/vilos\.config\.media\s*=\s*({.+});/);
-    const metadata = metadataMatch && JSON.parse(metadataMatch[1]) as EpisodeMetadata;
-    const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
-    const sync = new app.Sync(app.settings.sync);
-    if (metadata && stream) try {
-      await Promise.all(metadata.subtitles.map(s => httpAsync(s.url).then(d => sync.writeAsync(getSubtitleName(s.language, s.format), d))));
-      await sync.streamAsync(app.settings.proxyServer, stream.url);
-      await sync.mergeAsync(episodePath);
+    if (m3u8 && assSubtitle) try {
+      await sync.saveAsync(m3u8, assSubtitle, {proxyServer: app.settings.proxyServer, userAgent});
     } finally {
       await sync.disposeAsync();
     } else {
@@ -66,22 +59,13 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
   });
 }
 
-function getSubtitleName(language: string, format: string) {
-  switch (language) {
-    case 'enUS': return `en-US.eng.${format}`;
-    case 'ptBR': return `pt-BR.por.${format}`;
-    case 'deDE': return `de-DE.ger.${format}`;
-    case 'esLA': return `es-LA.spa.${format}`;
-    case 'esES': return `es-ES.spa.${format}`;
-    case 'frFR': return `fr-FR.fre.${format}`;
-    case 'arME': return `ar-ME.ara.${format}`;
-    case 'itIT': return `it-IT.ita.${format}`;
-    case 'ruRU': return `ru-RU.rus.${format}`;
-    default: return `${language}.${format}`;
-  }
+async function extractAsync(content: string) {
+  const metadataMatch = content.match(/vilos\.config\.media\s*=\s*({.+});/);
+  const metadata = metadataMatch && JSON.parse(metadataMatch[1]) as EpisodeMetadata;
+  const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
+  return stream?.url;
 }
 
 type EpisodeMetadata = {
-  streams: Array<{format: string, hardsub_lang: string | null, url: string}>,
-  subtitles: Array<{format: string, language: string, url: string}>
+  streams: Array<{format: string, hardsub_lang: string | null, url: string}>;
 };

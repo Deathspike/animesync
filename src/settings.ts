@@ -4,8 +4,7 @@ import path from 'path';
 
 const defaultPaths = {
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
-  library: path.join(os.homedir(), 'animesync', 'library'),
-  sync: path.join(os.homedir(), 'animesync', 'sync'),
+  library: path.join(os.homedir(), 'animesync', 'library')
 };
 
 const defaultSettings = {

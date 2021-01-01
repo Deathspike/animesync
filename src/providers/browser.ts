@@ -5,7 +5,7 @@ let browserPath = require('chrome-launcher/dist/chrome-finder')[process.platform
 let numberOfPages = 0;
 let timeoutHandle = setTimeout(() => undefined, 0);
 
-export async function browserAsync(handlerAsync: (page: playwright.Page) => Promise<void>) {
+export async function browserAsync<T>(handlerAsync: (page: playwright.Page, userAgent: string) => Promise<T>) {
   let browserPromise = browserInstance || (browserInstance = launchAsync());
   let page: playwright.Page | undefined;
   try {
@@ -13,10 +13,10 @@ export async function browserAsync(handlerAsync: (page: playwright.Page) => Prom
     const browserContext = await browserPromise;
     page = await browserContext.newPage();
     page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
-    const userAgent = await page.evaluate(() => navigator.userAgent);
+    const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
     const session = await browserContext.newCDPSession(page);
-    await session.send('Emulation.setUserAgentOverride', {userAgent: userAgent.replace(/Headless/, '')});
-    await handlerAsync(page);
+    await session.send('Emulation.setUserAgentOverride', {userAgent});
+    return await handlerAsync(page, userAgent);
   } finally {
     numberOfPages--;
     updateTimeout();

@@ -1,6 +1,5 @@
 import * as app from '../..';
 import * as subtitle from 'subtitle';
-import fs from 'fs-extra';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
@@ -9,7 +8,7 @@ export async function funimationAsync(rootPath: string, seriesUrl: string, optio
   await app.browserAsync(async (page) => {
     const [metadataPromise] = new app.Observer(page).getAsync(/\/api\/episodes\//i);
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-    const metadata = await metadataPromise.then(x => x.json()) as SeriesMetadata;
+    const metadata = await metadataPromise.then(x => x.response()).then(x => x?.json()) as SeriesMetadata;
     const seasons = [metadata];
     while (!page.isClosed()) {
       const [seasonPromise] = new app.Observer(page).getAsync(/\/api\/episodes\//i);
@@ -18,7 +17,7 @@ export async function funimationAsync(rootPath: string, seriesUrl: string, optio
         await page.close();
         await seasons.reduce((p, x) => p.then(() => seasonAsync(rootPath, x, options)), Promise.resolve());
       } else {
-        seasons.push(await seasonPromise.then(x => x.json()) as SeriesMetadata);
+        seasons.push(await seasonPromise.then(x => x.response()).then(x => x?.json()) as SeriesMetadata);
       }
     }
   });
@@ -38,9 +37,6 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata, options?:
       const episodeUrl = `https://www.funimation.com/shows/${episode.item.titleSlug}/${episode.item.episodeSlug}/?qid=&lang=japanese`;
       if (await series.existsAsync(seriesName, episodeName)) {
         console.log(`Skipping ${episodeName}`);
-      } else if (await fs.pathExists(episodePath)) {
-        console.log(`Skipping ${episodeName}`);
-        await series.trackAsync(seriesName, episodeName);
       } else if (options && options.skipDownload) {
         console.log(`Tracking ${episodeName}`);
         await series.trackAsync(seriesName, episodeName);
@@ -58,18 +54,17 @@ async function seasonAsync(rootPath: string, metadata: SeriesMetadata, options?:
 }
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
-  return await app.browserAsync(async (page) => {
-    const [m3u8Promise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
+  const sync = new app.Sync(episodePath, 'srt');
+  await app.browserAsync(async (page, userAgent) => {
+    const [metadataPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\/api\/showexperience\//i, /\.vtt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
-    const m3u8 = await m3u8Promise.then(x => x.url());
-    const vttSubtitle = await vttSubtitlePromise.then(x => x.text());
+    const m3u8 = await metadataPromise.then(x => x.response()).then(x => x?.json()).then(extractAsync);
+    const vttSubtitle = await vttSubtitlePromise.then(x => x.response()).then(x => x?.text());
     await page.close();
-    const sync = new app.Sync(app.settings.sync);
     if (m3u8 && vttSubtitle) try {
-      await sync.writeAsync('eng.srt', subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'}));
-      await sync.streamAsync(app.settings.proxyServer, m3u8);
-      await sync.mergeAsync(episodePath);
-    } finally {
+      const srtSubtitle = subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'});
+      await sync.saveAsync(m3u8, srtSubtitle, {proxyServer: app.settings.proxyServer, userAgent});
+    } finally { 
       await sync.disposeAsync();
     } else {
       throw new Error(`Invalid episode: ${episodeUrl}`);
@@ -77,6 +72,16 @@ async function episodeAsync(episodePath: string, episodeUrl: string) {
   });
 }
 
+async function extractAsync(json: any) {
+  const metadata = json as EpisodeMetadata;
+  const stream = metadata.items.find(x => x.videoType === 'm3u8');
+  return stream?.src;
+}
+
 type SeriesMetadata = {
   items: Array<{audio: Array<string>, item: {episodeNum: string, episodeSlug: string, seasonNum: string, titleName: string, titleSlug: string}}>;
+};
+
+type EpisodeMetadata = {
+  items: Array<{src: string, videoType: string}>
 };
