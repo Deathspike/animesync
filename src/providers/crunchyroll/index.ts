@@ -43,14 +43,14 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
 
 async function episodeAsync(episodePath: string, episodeUrl: string) {
   const sync = new app.Sync(episodePath, 'ass');
-  await app.browserAsync(async (page, userAgent) => {
+  await app.browserAsync(async (page, options) => {
     const [assSubtitlePromise] = new app.Observer(page).getAsync(/\.txt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
     const m3u8 = await page.content().then(extractAsync);
     const assSubtitle = await assSubtitlePromise.then(x => x.url()).then(httpAsync);
     await page.close();
     if (m3u8 && assSubtitle) try {
-      await sync.saveAsync(m3u8, assSubtitle, {proxyServer: app.settings.proxyServer, userAgent});
+      await sync.saveAsync(m3u8, assSubtitle, options);
     } finally {
       await sync.disposeAsync();
     } else {
