@@ -1,5 +1,6 @@
 import * as app from '..';
 import childProcess from 'child_process';
+import crypto from 'crypto';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
@@ -9,9 +10,9 @@ export class Sync {
   private readonly _episodePath: string;
   private readonly _subtitlePath: string;
 
-  constructor(episodePath: string, subtitleFormat: string) {
+  constructor(episodePath: string, subtitleFormat: string, syncPath: string) {
     this._episodePath = episodePath;
-    this._subtitlePath = `${this._episodePath}.${subtitleFormat}`;
+    this._subtitlePath = `${path.join(syncPath, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'))}.${subtitleFormat}`;
   }
 
   async disposeAsync() {
@@ -21,8 +22,9 @@ export class Sync {
   async saveAsync(streamUrl: string, subtitle: string, options?: {broker?: app.Broker, userAgent?: string}) {
     const cli = {'user_agent': options?.userAgent};
     const env = {'http_proxy': options?.broker?.address};
-    await fs.ensureDir(path.dirname(this._episodePath));
+    await fs.ensureDir(path.dirname(this._subtitlePath));
     await fs.writeFile(this._subtitlePath, subtitle);
+    await fs.ensureDir(path.dirname(this._episodePath));
     await util.promisify(childProcess.exec)(`${ffmpeg()} ${parse(cli)} -y -i "${streamUrl}" -i "${this._subtitlePath}" -c copy "${this._episodePath}"`, {env});
   }
 }
