@@ -40,9 +40,12 @@ async function launchAsync(broker?: app.Broker) {
 function updateTimeout() {
   clearTimeout(timeoutHandle);
   timeoutHandle = setTimeout(async () => {
+    const broker = await brokerInstance;
     const browser = await browserInstance;
     if (numberOfPages) return;
+    brokerInstance = undefined;
     browserInstance = undefined;
+    broker?.disposeAsync().catch(() => undefined);
     browser?.close().catch(() => undefined);
   }, app.settings.chromeInactiveTimeout);
 }
