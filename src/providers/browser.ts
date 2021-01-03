@@ -1,8 +1,8 @@
 import * as app from '..';
+import * as chromeLauncher from 'chrome-launcher';
 import playwright from 'playwright-core';
 let brokerInstance: Promise<app.Broker> | undefined;
 let browserInstance: Promise<playwright.ChromiumBrowserContext> | undefined;
-let browserPath = require('chrome-launcher/dist/chrome-finder')[process.platform]()[0];
 let numberOfPages = 0;
 let timeoutHandle = setTimeout(() => undefined, 0);
 
@@ -11,11 +11,11 @@ export async function browserAsync<T>(handlerAsync: (page: playwright.Page, opti
   try {
     numberOfPages++;
     const broker = await (brokerInstance ?? (brokerInstance = app.Broker.createAsync(app.settings.proxyServer)));
-    const browserContext = await (browserInstance ?? (browserInstance = launchAsync(broker)));
-    page = await browserContext.newPage();
+    const browser = await (browserInstance ?? (browserInstance = launchAsync(broker)));
+    page = await browser.newPage();
     page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
     const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
-    const session = await browserContext.newCDPSession(page);
+    const session = await browser.newCDPSession(page);
     await session.send('Emulation.setUserAgentOverride', {userAgent});
     return await handlerAsync(page, {broker, userAgent});
   } finally {
@@ -26,11 +26,10 @@ export async function browserAsync<T>(handlerAsync: (page: playwright.Page, opti
 }
 
 async function launchAsync(broker?: app.Broker) {
-  if (!browserPath) throw new Error('Invalid browser');
   const cv = app.settings.chromeViewport.match(/^([0-9]+)x([0-9]+)$/);
   return await playwright.chromium.launchPersistentContext(app.settings.chrome, { 
     args: ['--autoplay-policy=no-user-gesture-required'],
-    executablePath: browserPath,
+    executablePath: chromeLauncher.Launcher.getFirstInstallation(),
     headless: app.settings.chromeHeadless,
     proxy: broker ? {server: broker.address} : undefined,
     viewport: app.settings.chromeHeadless && cv ? {width: parseInt(cv[1]), height: parseInt(cv[2])} : null
