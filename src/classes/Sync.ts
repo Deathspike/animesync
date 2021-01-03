@@ -24,7 +24,12 @@ export class Sync {
     await fs.ensureDir(path.dirname(this._subtitlePath));
     await fs.writeFile(this._subtitlePath, subtitle);
     await fs.ensureDir(path.dirname(this._episodePath));
-    await spawnAsync(ffmpeg(), parse(cli).concat(['-y', '-i', streamUrl, '-i', this._subtitlePath, '-c', 'copy', this._episodePath]), env);
+    await spawnAsync(ffmpeg(), parse(cli).concat(['-y', 
+      '-i', streamUrl,
+      '-i', this._subtitlePath,
+      '-metadata:s:a:0', 'language=jpn',
+      '-metadata:s:s:0', 'language=eng',
+      '-c', 'copy', this._episodePath]), env);
   }
 }
 
