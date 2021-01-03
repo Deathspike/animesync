@@ -2,7 +2,6 @@ import * as app from '..';
 import http from 'http';
 import net from 'net';
 import url from 'url';
-import stream from 'stream';
 import tls from 'tls';
 
 export class Broker {
@@ -36,7 +35,7 @@ export class Broker {
     return await future.getAsync();
   }
 
-  private _forwardHttp(req: http.IncomingMessage, clientSocket: stream.Duplex) {
+  private _forwardHttp(req: http.IncomingMessage, clientSocket: net.Socket) {
     // Initialize the connection.
     const port = Number(this._settings.port) || 80;
     const serverSocket = net.connect(port, this._settings.hostname || '');
@@ -44,8 +43,14 @@ export class Broker {
     // Initialize the handlers.
     clientSocket.on('error', () => serverSocket.end());
     clientSocket.on('end', () => serverSocket.end());
+    clientSocket.on('timeout', () => clientSocket.end());
     serverSocket.on('error', () => clientSocket.end());
     serverSocket.on('end', () => clientSocket.end());
+    serverSocket.on('timeout', () => serverSocket.end());
+
+    // Initialize the socket timeouts.
+    clientSocket.setTimeout(app.settings.brokerTimeout);
+    serverSocket.setTimeout(app.settings.brokerTimeout);
 
     // Initialize the socket.
     serverSocket.on('connect', () => {
@@ -56,16 +61,22 @@ export class Broker {
     });
   }
 
-  private _forwardHttps(req: http.IncomingMessage, clientSocket: stream.Duplex) {
+  private _forwardHttps(req: http.IncomingMessage, clientSocket: net.Socket) {
     // Initialize the connection.
     const port = Number(this._settings.port) || 443;
     const serverSocket = tls.connect(port, this._settings.hostname || '');
-
+    
     // Initialize the handlers.
     clientSocket.on('error', () => serverSocket.end());
     clientSocket.on('end', () => serverSocket.end());
+    clientSocket.on('timeout', () => clientSocket.end());
     serverSocket.on('error', () => clientSocket.end());
     serverSocket.on('end', () => clientSocket.end());
+    serverSocket.on('timeout', () => serverSocket.end());
+
+    // Initialize the socket timeouts.
+    clientSocket.setTimeout(app.settings.brokerTimeout);
+    serverSocket.setTimeout(app.settings.brokerTimeout);
 
     // Initialize the socket.
     serverSocket.on('secureConnect', () => {
@@ -82,7 +93,7 @@ export class Broker {
     return lines.concat(['', '']).join('\r\n');
   }
 
-  private _onConnect(req: http.IncomingMessage, socket: stream.Duplex) {
+  private _onConnect(req: http.IncomingMessage, socket: net.Socket) {
     switch (this._settings.protocol) {
       case 'http:':
         this._forwardHttp(req, socket);

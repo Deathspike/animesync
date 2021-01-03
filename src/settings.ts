@@ -9,6 +9,7 @@ const defaultPaths = {
 };
 
 const defaultSettings = {
+  brokerTimeout: 30000,
   chromeHeadless: true,
   chromeInactiveTimeout: 1000,
   chromeNavigationTimeout: 30000,

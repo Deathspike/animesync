@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 
-export async function settingsAsync(values: {[key: string]: boolean | string | undefined}) {
+export async function settingsAsync(values: Record<string, boolean | string | undefined>) {
   const settingsPath = path.join(os.homedir(), 'animesync', 'settings.json');
   const settings = await fs.readJson(settingsPath, {throws: false}) || {};
   if (mergeSettings(values, settings)) {
@@ -14,7 +14,7 @@ export async function settingsAsync(values: {[key: string]: boolean | string | u
   }
 }
 
-function mergeSettings(values: {[key: string]: boolean | string | undefined}, settings: {[key: string]: boolean | number | string}) {
+function mergeSettings(values: Record<string, boolean | string | undefined>, settings: Record<string, boolean | number | string>) {
   return Object.keys(app.settings).reduce((p, key) => {
     const value = values[key];
     if (value === true) {
