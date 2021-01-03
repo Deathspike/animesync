@@ -10,25 +10,25 @@ commander.createCommand()
   .version(require('../package').version)
   .addCommand(commander.createCommand('browser')
     .description('Launch browser.')
-    .action(app.actions.browserAsync))
+    .action(checkStart(app.actions.browserAsync)))
   .addCommand(commander.createCommand('download')
     .arguments('[seriesUrl...]')
     .description('Downloads series.')
     .option('--skipDownload', 'Generate tracking files but skip downloads.')
-    .action(app.actions.downloadAsync))
+    .action(checkStart(app.actions.downloadAsync)))
   .addCommand(commander.createCommand('series')
     .description('Manage series.')
     .addCommand(commander.createCommand('add')
       .arguments('<seriesUrl> [rootPath]')
       .description('Adds the series.')
-      .action(app.actions.seriesAddAsync))
+      .action(checkStart(app.actions.seriesAddAsync)))
     .addCommand(commander.createCommand('list')
       .description('Lists each series.')
-      .action(app.actions.seriesListAsync))
+      .action(checkStart(app.actions.seriesListAsync)))
     .addCommand(commander.createCommand('remove')
       .arguments('<seriesUrl>')
       .description('Removes the series.')
-      .action(app.actions.seriesRemoveAsync)))
+      .action(checkStart(app.actions.seriesRemoveAsync))))
   .addCommand(commander.createCommand('settings')
     .description('Manage settings.')
     .option('--chrome [string]', withCurrent('Path to chrome-data.', app.settings.chrome), validatePath)
@@ -41,13 +41,15 @@ commander.createCommand()
     .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.chromeViewport), validateViewport)
     .option('--proxyServer [string]', withCurrent('Proxy server (HTTP or HTTPS).', app.settings.proxyServer), validateProxyServer)
     .action((command) => app.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
-  .parse(checkVersion());
+  .parse();
 
-function checkVersion() {
-  const versionMatch = process.version.match(/^v(\d+)\.(\d+)\.(\d)$/);
-  const majorVersion = versionMatch ? Number(versionMatch[1]) : Number.MAX_SAFE_INTEGER;
-  if (majorVersion >= 12) return undefined;
-  throw new Error(`Invalid node version: ${majorVersion}. Must be >= 12.`);
+function checkStart(fn: Function) {
+  app.logger.debug(`commander ${JSON.stringify(process.argv)}`);
+  return function(this: any) {
+    const match = process.version.match(/^v(\d+)\.(\d+)\.(\d)$/);
+    if (match ? Number(match[1]) : Number.MAX_SAFE_INTEGER >= 12) return fn.apply(this, arguments);
+    throw new Error(`Invalid node version: Must be >= 12`);
+  };
 }
 
 function primitiveBoolean(value: string) {
