@@ -13,7 +13,7 @@ export function httpAsync(requestUrl: string) {
       let chunk = '';
       res.on('data', (x) => chunk += x);
       res.on('end', () => resolve(chunk));
-      res.on('error', (err) => reject(err));
-    }).on('error', (err) => reject(err));
+      res.on('error', (error) => reject(error));
+    }).on('error', (error) => reject(error));
   });
 }

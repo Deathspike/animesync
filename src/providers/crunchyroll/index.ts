@@ -22,18 +22,18 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
           const episodeName = `${seriesName} ${String(number).padStart(2, '0')} [CrunchyRoll]`;
           const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
           if (await series.existsAsync(seriesName, episodeName)) {
-            console.log(`Skipping ${episodeName}`);
+            app.logger.info(`Skipping ${episodeName}`);
           } else if (options && options.skipDownload) {
-            console.log(`Tracking ${episodeName}`);
+            app.logger.info(`Tracking ${episodeName}`);
             await series.trackAsync(seriesName, episodeName);
           } else try {
-            console.log(`Fetching ${episodeName}`);
+            app.logger.info(`Fetching ${episodeName}`);
             await episodeAsync(episodePath, episode.url);
             await series.trackAsync(seriesName, episodeName);
-            console.log(`Finished ${episodeName} (${elapsedTime})`);
-          } catch (err) {
-            console.log(`Rejected ${episodeName} (${elapsedTime})`);
-            console.error(err);
+            app.logger.info(`Finished ${episodeName} (${elapsedTime})`);
+          } catch (error) {
+            app.logger.info(`Rejected ${episodeName} (${elapsedTime})`);
+            app.logger.error(error);
           }
         }
       }

@@ -11,3 +11,4 @@ export * from './common/Timer';
 export * from './providers/browser';
 export * from './providers/migrate';
 export * from './providers/series';
+export * from './services/logger';

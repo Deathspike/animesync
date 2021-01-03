@@ -4,14 +4,14 @@ import {funimationAsync} from './funimation';
 
 export async function seriesAsync(rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
   if (seriesUrl.toLowerCase().startsWith('https://www.crunchyroll.com/')) {
-    console.log(`Fetching ${seriesUrl}`);
+    app.logger.info(`Fetching ${seriesUrl}`);
     await crunchyrollAsync(rootPath, seriesUrl, options);
-    console.log(`Finished ${seriesUrl}`);
+    app.logger.info(`Finished ${seriesUrl}`);
   } else if (seriesUrl.toLowerCase().startsWith('https://www.funimation.com/')) {
-    console.log(`Fetching ${seriesUrl}`);
+    app.logger.info(`Fetching ${seriesUrl}`);
     await funimationAsync(rootPath, seriesUrl, options);
-    console.log(`Finished ${seriesUrl}`);
+    app.logger.info(`Finished ${seriesUrl}`);
   } else {
-    console.log(`Skipping ${seriesUrl}`);
+    app.logger.info(`Skipping ${seriesUrl}`);
   }
 }
