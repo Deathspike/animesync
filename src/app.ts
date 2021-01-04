@@ -73,5 +73,5 @@ function validateViewport(value: string) {
 }
 
 function withCurrent<T>(description: string, value: T) {
-  return `${description}\n⠀⠀${value}`;
+  return `${description}\n-> ${value}`;
 }
