@@ -21,6 +21,7 @@ async function v1LibraryAsync() {
 }
 
 async function v1SeriesAsync() {
+  if (!await fs.pathExists(app.settings.library)) return;
   const rootPath = path.join(app.settings.library, '.animesync');
   const seriesNames = await fs.readdir(app.settings.library);
   for (let seriesName of seriesNames) {
