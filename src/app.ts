@@ -44,11 +44,10 @@ commander.createCommand()
   .parse();
 
 function checkStart(fn: Function) {
-  app.logger.debug(`commander ${JSON.stringify(process.argv)}`);
   return function(this: any) {
-    const match = process.version.match(/^v(\d+)\.(\d+)\.(\d)$/);
-    if (match ? Number(match[1]) : Number.MAX_SAFE_INTEGER >= 12) return fn.apply(this, arguments);
-    throw new Error(`Invalid node version: Must be >= 12`);
+    if ((process.version.match(/^v(\d+)\.\d+\.\d$/)?.pop() ?? 0) < 12) throw new Error(`Invalid node version: Must be >= 12`);
+    app.logger.debug(`commander ${JSON.stringify(process.argv)}`);
+    return fn.apply(this, arguments);
   };
 }
 
