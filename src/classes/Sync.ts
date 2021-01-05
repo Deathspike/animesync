@@ -18,18 +18,16 @@ export class Sync {
     await fs.remove(this._subtitlePath);
   }
 
-  async saveAsync(streamUrl: string, subtitle: string, options?: {broker?: app.Broker, userAgent?: string}) {
-    const cli = {'user_agent': options?.userAgent};
-    const env = {'http_proxy': options?.broker?.address};
+  async saveAsync(manifestUrl: string, subtitle: string) {
     await fs.ensureDir(path.dirname(this._subtitlePath));
     await fs.writeFile(this._subtitlePath, subtitle);
     await fs.ensureDir(path.dirname(this._episodePath));
-    await spawnAsync(ffmpeg(), parse(cli).concat(['-y', 
-      '-i', streamUrl,
+    await spawnAsync(ffmpeg(), ['-y',
+      '-i', manifestUrl,
       '-i', this._subtitlePath,
       '-metadata:s:a:0', 'language=jpn',
       '-metadata:s:s:0', 'language=eng',
-      '-c', 'copy', this._episodePath]), env);
+      '-c', 'copy', this._episodePath]);
   }
 }
 
@@ -38,19 +36,12 @@ function ffmpeg() {
   return path.join(__dirname, `../../dep/ffmpeg.exe`)
 }
 
-function parse(obj: Record<string, string | undefined>) {
-  return Object.entries(obj)
-    .filter(([_, v]) => Boolean(v))
-    .map(([k, v]) => ([`-${k}`, v!]))
-    .reduce((c, p) => p.concat(c), []);
-}
-
-async function spawnAsync(command: string, args: string[], env: Record<string, any>) {
-  app.logger.debug(`spawn ${command} ${JSON.stringify(args)} ${JSON.stringify({env})}`);
+async function spawnAsync(command: string, args: string[]) {
+  app.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
   const future = new app.Future<void>();
-  const process = childProcess.spawn(command, args, {env});
-  process.stdout.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8')));
-  process.stderr.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8')));
+  const process = childProcess.spawn(command, args);
+  process.stdout.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8').trim()));
+  process.stderr.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8').trim()));
   process.on('error', (error) => future.reject(error));
   process.on('exit', () => future.resolve());
   await future.getAsync();

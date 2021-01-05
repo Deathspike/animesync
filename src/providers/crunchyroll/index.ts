@@ -1,12 +1,12 @@
 import * as app from '../..';
-import {httpAsync} from './utilities/http';
+import fetch from 'node-fetch';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
 
-export async function crunchyrollAsync(rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
+export async function crunchyrollAsync(context: app.Context, rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
   const series = new app.Series(app.settings.library);
-  await app.browserAsync(async (page) => {
+  await app.browserAsync(context, async (page) => {
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
     const seasons = await page.evaluate(scraper.seasons);
     await page.close();
@@ -28,7 +28,7 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
             await series.trackAsync(seriesName, episodeName);
           } else try {
             app.logger.info(`Fetching ${episodeName}`);
-            await episodeAsync(episodePath, episode.url);
+            await episodeAsync(context, episodePath, episode.url);
             await series.trackAsync(seriesName, episodeName);
             app.logger.info(`Finished ${episodeName} (${elapsedTime})`);
           } catch (error) {
@@ -41,16 +41,20 @@ export async function crunchyrollAsync(rootPath: string, seriesUrl: string, opti
   });
 }
 
-async function episodeAsync(episodePath: string, episodeUrl: string) {
+async function episodeAsync(context: app.Context, episodePath: string, episodeUrl: string) {
   const sync = new app.Sync(episodePath, 'ass', app.settings.sync);
-  await app.browserAsync(async (page, options) => {
+  await app.browserAsync(context, async (page, userAgent) => {
     const [assSubtitlePromise] = new app.Observer(page).getAsync(/\.txt$/i);
     await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
-    const m3u8 = await page.content().then(extractAsync);
-    const assSubtitle = await assSubtitlePromise.then(x => x.url()).then(httpAsync);
+    const manifestSrc = await page.content().then(extractAsync);
+    const assSubtitleSrc = await assSubtitlePromise.then(x => x.url());
     await page.close();
-    if (m3u8 && assSubtitle) try {
-      await sync.saveAsync(m3u8, assSubtitle, options);
+    if (manifestSrc && assSubtitleSrc) try {
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const manifestUrl = context.rewrite.createHlsUrl(manifestSrc, headers);
+      const assSubtitleUrl = context.rewrite.createEmulateUrl(assSubtitleSrc, headers);
+      const assSubtitle = await fetch(assSubtitleUrl).then(x => x.text());
+      await sync.saveAsync(manifestUrl, assSubtitle);
     } finally {
       await sync.disposeAsync();
     } else {
@@ -65,6 +69,11 @@ async function extractAsync(content: string) {
   const stream = metadata?.streams.find(x => x.format === 'adaptive_hls' && !x.hardsub_lang);
   return stream?.url;
 }
+
+const defaultHeaders = {
+  origin: 'https://static.crunchyroll.com',
+  referer: 'https://static.crunchyroll.com/vilos-v2/web/vilos/player.html'
+};
 
 type EpisodeMetadata = {
   streams: Array<{format: string, hardsub_lang: string | null, url: string}>;
