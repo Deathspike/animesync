@@ -29,7 +29,7 @@ function evaluateSeries() {
     if (!containerNode) throw new Error();
     return Array.from(containerNode.querySelectorAll('.season')).reverse().map((seasonNode) => {
       const episodes = mapSeasonEpisodes(seasonNode.querySelector('ul')) ?? [];
-      const title = validateStrict(seasonNode.querySelector('a') ?? document.querySelector('#template_container h1'));
+      const title = validateStrict(seasonNode.querySelector(':scope > a') ?? document.querySelector('#template_container h1'));
       return {episodes, title};
     }).filter(x => !/\(.+\)/.test(x.title));
   }
@@ -43,7 +43,6 @@ function evaluateSeries() {
     if (!seasonNode) throw new Error();
     return Array.from(seasonNode.querySelectorAll('li')).reverse().map((episodeNode) => {
       const data = processBubbleData($(episodeNode).data('bubble_data'));
-      console.log(data);
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
       const number = validateStrict(data.number);
