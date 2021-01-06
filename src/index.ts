@@ -5,6 +5,7 @@ export * from './classes/contexts/Proxy';
 export * from './classes/contexts/Rewrite';
 export * from './classes/parsers/HlsManifest';
 export * from './classes/parsers/HlsManifestLine';
+export * from './classes/parsers/HlsManifestLineStream';
 export * from './classes/Library';
 export * from './classes/Series';
 export * from './classes/Sync';

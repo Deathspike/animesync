@@ -1,7 +1,5 @@
 import * as app from '../..';
-import * as subtitle from 'subtitle';
 import {funimationProvider} from './provider';
-import fetch from 'node-fetch';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
@@ -40,12 +38,6 @@ export async function funimationAsync(context: app.Context, rootPath: string, se
 
 async function saveAsync(context: app.Context, episodePath: string, episodeUrl: string) {
   const stream = await funimationProvider.streamAsync(context, episodeUrl);
-  const sync = new app.Sync(episodePath, 'srt', app.settings.sync);
-  try {
-    const vttSubtitle = await fetch(stream.subtitleUrl).then(x => x.text());
-    const srtSubtitle = subtitle.stringifySync(subtitle.parseSync(vttSubtitle), {format: 'SRT'});
-    await sync.saveAsync(stream.manifestUrl, srtSubtitle);
-  } finally {
-    await sync.disposeAsync();
-  }
+  const sync = new app.Sync(episodePath);
+  await sync.saveAsync(stream);
 }
