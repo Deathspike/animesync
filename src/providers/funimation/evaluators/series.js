@@ -10,10 +10,10 @@
 var titleData;
 
 /**
- * Scrapes the series.
+ * Evaluates the series.
  * @returns {Promise<IApiSeries>}
  **/
-async function seriesAsync() {
+async function evaluateSeriesAsync() {
   return {
     genres: titleData.genres.map(x => x.name),
     imageUrl: titleData.poster,
@@ -33,7 +33,7 @@ async function seriesAsync() {
   }
 
   /**
-   * Maps the episode.
+   * Maps the season episode.
    * @param {ISeriesSeasonEpisode} episode
    * @returns {IApiSeriesSeasonEpisode}
    **/
@@ -52,9 +52,9 @@ async function seriesAsync() {
    * @returns {Promise<Array<IApiSeriesSeason>>}
    */
   async function getSeasonAsync() {
-    return await Promise.all(titleData.children.map(async (child) => {
-      const episodes = await getSeasonEpisodeAsync(new URL(`/api/episodes/?title_id=${titleData.id}&season=${child.number}&sort=order&sort_direction=ASC`, location.href));
-      const title = child.title;
+    return await Promise.all(titleData.children.map(async (season) => {
+      const episodes = await getSeasonEpisodeAsync(new URL(`/api/episodes/?title_id=${titleData.id}&season=${season.number}&sort=order&sort_direction=ASC`, location.href));
+      const title = season.title;
       return {episodes, title};
     }));
   }
@@ -72,7 +72,7 @@ async function seriesAsync() {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {seriesAsync};
+  module.exports = {evaluateSeriesAsync};
 } else {
-  seriesAsync().then(console.log.bind(console));
+  evaluateSeriesAsync().then(console.log.bind(console));
 }
