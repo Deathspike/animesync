@@ -1,6 +1,5 @@
 export * from './actions';
 export * from './settings';
-export * from './typings';
 export * from './classes/contexts/Context';
 export * from './classes/contexts/Proxy';
 export * from './classes/contexts/Rewrite';
@@ -16,3 +15,5 @@ export * from './providers/browser';
 export * from './providers/migrate';
 export * from './providers/series';
 export * from './services/logger';
+export * from './typings/api';
+export * from './typings/cli';

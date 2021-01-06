@@ -2,7 +2,7 @@ import * as app from '..';
 import winston from 'winston';
 import 'winston-daily-rotate-file';
 
-export const logger = <LoggerService> winston.createLogger({
+export const logger = <app.ILoggerService> winston.createLogger({
   transports: [
     new winston.transports.Console({
       format: winston.format.printf(x => x.message),
@@ -18,9 +18,3 @@ export const logger = <LoggerService> winston.createLogger({
     })
   ]
 });
-
-type LoggerService = {
-  debug: winston.LeveledLogMethod,
-  error: winston.LeveledLogMethod,
-  info: winston.LeveledLogMethod,
-};

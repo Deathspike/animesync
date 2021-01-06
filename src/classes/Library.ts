@@ -4,9 +4,9 @@ import path from 'path';
 
 export class Library {
   private readonly _filePath: string;
-  private readonly _source: app.ILibraryData;
+  private readonly _source: app.ILibrarySource;
 
-  private constructor(filePath: string, source: app.ILibraryData) {
+  private constructor(filePath: string, source: app.ILibrarySource) {
     this._filePath = filePath;
     this._source = source;
   }

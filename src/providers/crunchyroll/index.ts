@@ -4,8 +4,8 @@ import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 import scraper from './scraper';
 
-export async function crunchyrollAsync(context: app.Context, rootPath: string, seriesUrl: string, options?: app.ISeriesOptions) {
-  const series = new app.Series(app.settings.library);
+export async function crunchyrollAsync(context: app.Context, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
+  const tracker = new app.Series(app.settings.library);
   await app.browserAsync(context, async (page) => {
     await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
     const seasons = await page.evaluate(scraper.seasons);
@@ -15,21 +15,21 @@ export async function crunchyrollAsync(context: app.Context, rootPath: string, s
       const seriesName = sanitizeFilename(season.title);
       const seriesPath = path.join(rootPath, seriesName);
       for (const episode of season.episodes) {
-        const numberMatch = episode.title.match(/([0-9]+(?:\.[0-9])?)/);
-        const number = numberMatch ? parseFloat(numberMatch[1]) : -1;
+        const numberMatch = episode.title.match(/([0-9\.]+)/);
+        const number = numberMatch ? parseFloat(numberMatch[1]) : NaN;
         if (number >= 0) {
           const elapsedTime = new app.Timer();
           const episodeName = `${seriesName} ${String(number).padStart(2, '0')} [CrunchyRoll]`;
           const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
-          if (await series.existsAsync(seriesName, episodeName)) {
+          if (await tracker.existsAsync(seriesName, episodeName)) {
             app.logger.info(`Skipping ${episodeName}`);
           } else if (options && options.skipDownload) {
             app.logger.info(`Tracking ${episodeName}`);
-            await series.trackAsync(seriesName, episodeName);
+            await tracker.trackAsync(seriesName, episodeName);
           } else try {
             app.logger.info(`Fetching ${episodeName}`);
             await episodeAsync(context, episodePath, episode.url);
-            await series.trackAsync(seriesName, episodeName);
+            await tracker.trackAsync(seriesName, episodeName);
             app.logger.info(`Finished ${episodeName} (${elapsedTime})`);
           } catch (error) {
             app.logger.info(`Rejected ${episodeName} (${elapsedTime})`);

@@ -36,7 +36,7 @@ function ffmpeg() {
   return path.join(__dirname, `../../dep/ffmpeg.exe`)
 }
 
-async function spawnAsync(command: string, args: string[]) {
+async function spawnAsync(command: string, args: Array<string>) {
   app.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
   const future = new app.Future<void>();
   const process = childProcess.spawn(command, args);
