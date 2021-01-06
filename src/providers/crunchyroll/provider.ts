@@ -20,7 +20,7 @@ export const crunchyrollProvider = {
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
       stream.manifestUrl = context.rewrite.createHlsUrl(stream.manifestUrl, headers);
-      stream.subtitleUrl = context.rewrite.createEmulateUrl(stream.subtitleUrl, headers);
+      stream.subtitles.forEach(x => x.url = context.rewrite.createEmulateUrl(x.url, headers));
       return stream;
     });
   }

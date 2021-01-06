@@ -18,15 +18,30 @@ export class Sync {
 
   async saveAsync(stream: app.IApiStream) {
     const bestStream = await this._bestStreamAsync(stream);
-    const subtitlePath = await this._subtitleAsync(stream);
-    if (bestStream && subtitlePath) try {
+    const subtitles = await this._subtitlesAsync(stream);
+    if (bestStream && subtitles) try {
+      const foreignSubtitles = subtitles
+        .filter(x => x.language !== 'eng')
+        .sort((a, b) => a.language.localeCompare(b.language));
+      const sortedSubtitles = subtitles
+        .filter(x => x.language === 'eng')
+        .concat(foreignSubtitles);
+      const inputs = [['-i', bestStream.url]]
+        .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
+        .reduce((p, c) => p.concat(c))
+      const mappings = [['-map', '0:v', '-map', '0:a']]
+        .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
+        .reduce((p, c) => p.concat(c));
+      const metadata = sortedSubtitles
+        .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
+        .reduce((p, c) => p.concat(c));
       await fs.ensureDir(path.dirname(this._episodePath));
-      await spawnAsync(ffmpeg(), ['-y',
-        '-i', bestStream.url,
-        '-i', subtitlePath,
-        '-metadata:s:a:0', 'language=jpn',
-        '-metadata:s:s:0', 'language=eng',
-        '-c', 'copy', this._episodePath]);
+      await spawnAsync(ffmpeg(), ['-y']
+        .concat(inputs)
+        .concat(mappings)
+        .concat(['-metadata:s:a:0', 'language=jpn'])
+        .concat(metadata)
+        .concat(['-c', 'copy', this._episodePath]));
     } finally {
       await fs.remove(this._syncPath);
     } else {
@@ -40,20 +55,21 @@ export class Sync {
     return manifest.fetchStreams().shift();
   }
   
-  private async _subtitleAsync(stream: app.IApiStream) {
-    if (stream.subtitleType === 'vtt') {
-      const subtitleData = await fetch(stream.subtitleUrl).then(x => x.text());
-      const subtitlePath = path.join(this._syncPath, `eng.srt`);
-      await fs.ensureDir(this._syncPath);
-      await fs.writeFile(subtitlePath, subtitle.stringifySync(subtitle.parseSync(subtitleData), {format: 'SRT'}));
-      return subtitlePath;
-    } else {
-      const subtitleData = await fetch(stream.subtitleUrl).then(x => x.text());
-      const subtitlePath = path.join(this._syncPath, `eng.${stream.subtitleType}`);
-      await fs.ensureDir(this._syncPath);
-      await fs.writeFile(subtitlePath, subtitleData);
-      return subtitlePath;
-    }
+  private async _subtitlesAsync(stream: app.IApiStream) {
+    await fs.ensureDir(this._syncPath);
+    return await Promise.all(stream.subtitles.map(async (x, i) => {
+      if (x.type === 'vtt') {
+        const subtitleData = await fetch(x.url).then(x => x.text());
+        const subtitlePath = path.join(this._syncPath, `${i}.${x.language}.srt`);
+        await fs.writeFile(subtitlePath, subtitle.stringifySync(subtitle.parseSync(subtitleData), {format: 'SRT'}));
+        return Object.assign(x, {subtitlePath});
+      } else {
+        const subtitleData = await fetch(x.url).then(x => x.text());
+        const subtitlePath = path.join(this._syncPath, `${i}.${x.language}.${x.type}`);
+        await fs.writeFile(subtitlePath, subtitleData);
+        return Object.assign(x, {subtitlePath});
+      }
+    }));
   }
 }
 
