@@ -20,6 +20,7 @@ export class Sync {
     const bestStream = await this._bestStreamAsync(stream);
     const subtitlePath = await this._subtitleAsync(stream);
     if (bestStream && subtitlePath) try {
+      await fs.ensureDir(path.dirname(this._episodePath));
       await spawnAsync(ffmpeg(), ['-y',
         '-i', bestStream.url,
         '-i', subtitlePath,
