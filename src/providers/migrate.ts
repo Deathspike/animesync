@@ -13,7 +13,7 @@ async function v1LibraryAsync() {
   if (await fs.pathExists(oldPath)) {
     const oldSource = await fs.readJson(oldPath) as Record<string, string>;
     const newSource = {version: 1, entries: {}} as app.ILibrarySource;
-    Object.keys(oldSource).forEach(seriesUrl => newSource.entries[seriesUrl] = {rootPath: oldSource[seriesUrl] === app.settings.library ? undefined : oldSource[seriesUrl]});
+    Object.keys(oldSource).forEach((seriesUrl) => newSource.entries[seriesUrl] = {rootPath: oldSource[seriesUrl] === app.settings.library ? undefined : oldSource[seriesUrl]});
     await fs.ensureDir(path.dirname(newPath));
     await fs.writeJson(newPath, newSource, {spaces: 2});
     await fs.remove(oldPath);
@@ -29,7 +29,7 @@ async function v1SeriesAsync() {
     if (await fs.pathExists(seriesSourcePath)) {
       const seriesSource = await fs.readJson(seriesSourcePath) as Record<string, string>;
       await fs.ensureDir(path.join(rootPath, seriesName));
-      await Promise.all(Object.values(seriesSource).map(episodeName => fs.writeFile(path.join(rootPath, seriesName, episodeName.replace(/\.(.+)$/, '')), Buffer.alloc(0))));
+      await Promise.all(Object.values(seriesSource).map((episodeName) => fs.writeFile(path.join(rootPath, seriesName, episodeName.replace(/\.(.+)$/, '')), Buffer.alloc(0))));
       await fs.remove(seriesSourcePath);
     }
   }

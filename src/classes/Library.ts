@@ -20,7 +20,7 @@ export class Library {
   static async listAsync(libraryPath: string) {
     const library = await this.loadAsync(libraryPath);
     const entries = library._source.entries;
-    return Object.keys(entries).map(seriesUrl => Object.assign({}, entries[seriesUrl], {seriesUrl}));
+    return Object.keys(entries).map((seriesUrl) => Object.assign({}, entries[seriesUrl], {seriesUrl}));
   }
   
   async addAsync(seriesUrl: string, rootPath?: string) {
