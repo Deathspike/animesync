@@ -7,6 +7,12 @@ export class HlsManifest extends Array<app.HlsManifestLine> {
     return result;
   }
 
+  fetchStreams() {
+    return this.filter(x => x.type === 'EXT-X-STREAM-INF')
+      .map(x => new app.HlsManifestLineStream(this, x))
+      .sort(app.HlsManifestLineStream.compareFn);
+  }
+
   toString() {
     return this.map(x => x.toString()).join('\n');
   }

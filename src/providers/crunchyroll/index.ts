@@ -1,6 +1,5 @@
 import * as app from '../..';
 import {crunchyrollProvider} from './provider';
-import fetch from 'node-fetch';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
@@ -38,11 +37,6 @@ export async function crunchyrollAsync(context: app.Context, rootPath: string, s
 
 async function saveAsync(context: app.Context, episodePath: string, episodeUrl: string) {
   const stream = await crunchyrollProvider.streamAsync(context, episodeUrl);
-  const sync = new app.Sync(episodePath, 'ass', app.settings.sync);
-  try {
-    const assSubtitle = await fetch(stream.subtitleUrl).then(x => x.text());
-    await sync.saveAsync(stream.manifestUrl, assSubtitle);
-  } finally {
-    await sync.disposeAsync();
-  }
+  const sync = new app.Sync(episodePath);
+  await sync.saveAsync(stream);
 }
