@@ -43,10 +43,11 @@ function evaluateSeries() {
     if (!seasonNode) throw new Error();
     return Array.from(seasonNode.querySelectorAll('li')).reverse().map((episodeNode) => {
       const data = processBubbleData($(episodeNode).data('bubble_data'));
+      console.log(data);
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
       const number = validateStrict(data.number);
-      const synopsis = validateStrict(data.description);
+      const synopsis = validate(data.description);
       const title = validate(data.title);
       const url = processUrl(episodeNode.querySelector('a'));
       return {imageUrl, isPremium, number, synopsis, title, url};
