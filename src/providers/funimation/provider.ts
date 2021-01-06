@@ -24,9 +24,9 @@ export const funimationProvider = {
         const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
         const manifestType = 'hls';
         const manifestUrl = context.rewrite.createHlsUrl(manifestSrc, headers);
-        const subtitleType = 'vtt';
         const subtitleUrl = context.rewrite.createEmulateUrl(vttSubtitleSrc, headers);
-        return {manifestType, manifestUrl, subtitleType, subtitleUrl};
+        const subtitles = [{language: 'eng', type: 'vtt', url: subtitleUrl}];
+        return {manifestType, manifestUrl, subtitles};
       } else {
         throw new Error();
       }

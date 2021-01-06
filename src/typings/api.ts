@@ -24,6 +24,11 @@ export type IApiSeriesSeasonEpisode = {
 export type IApiStream = {
   manifestType: 'hls';
   manifestUrl: string;
-  subtitleType: 'ass' | 'vtt';
-  subtitleUrl: string;
+  subtitles: Array<IApiStreamSubtitle>;
+}
+
+export type IApiStreamSubtitle = {
+  language: string;
+  type: string;
+  url: string;
 }
