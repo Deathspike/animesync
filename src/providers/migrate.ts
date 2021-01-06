@@ -12,7 +12,7 @@ async function v1LibraryAsync() {
   const oldPath = path.join(app.settings.library, '.library');
   if (await fs.pathExists(oldPath)) {
     const oldSource = await fs.readJson(oldPath) as Record<string, string>;
-    const newSource = {version: 1, entries: {}} as app.ILibraryData;
+    const newSource = {version: 1, entries: {}} as app.ILibrarySource;
     Object.keys(oldSource).forEach(seriesUrl => newSource.entries[seriesUrl] = {rootPath: oldSource[seriesUrl] === app.settings.library ? undefined : oldSource[seriesUrl]});
     await fs.ensureDir(path.dirname(newPath));
     await fs.writeJson(newPath, newSource, {spaces: 2});

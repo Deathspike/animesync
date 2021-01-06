@@ -52,15 +52,15 @@ export class Rewrite {
     }
   }
 
-  private _rewriteHls(hls: app.HlsManifest, queryHeaders: Record<string, string>) {
+  private _rewriteHls(hls: app.HlsManifest, headers?: Record<string, string>) {
     for (let i = 0; i < hls.length; i++) {
       if (hls[i].type === 'EXT-X-KEY' && hls[i].params['URI']) {
-        hls[i].params['URI'] = this.createEmulateUrl(hls[i].params['URI'], queryHeaders);
+        hls[i].params['URI'] = this.createEmulateUrl(hls[i].params['URI'], headers);
       } else if (hls[i].type === 'EXT-X-STREAM-INF') {
         while (hls[++i].type) continue;
-        hls[i].data = this.createHlsUrl(hls[i].data, queryHeaders);
+        hls[i].data = this.createHlsUrl(hls[i].data, headers);
       } else if (hls[i].data && !hls[i].type) {
-        hls[i].data = this.createEmulateUrl(hls[i].data, queryHeaders);
+        hls[i].data = this.createEmulateUrl(hls[i].data, headers);
       }
     }
   }

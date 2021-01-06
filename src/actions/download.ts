@@ -1,6 +1,6 @@
 import * as app from '..';
 
-export async function downloadAsync(this: app.ISeriesOptions, seriesList: Array<string>) {
+export async function downloadAsync(this: app.ICliOptions, seriesList: Array<string>) {
   await app.Context.createAsync(async (context) => {
     await app.migrateAsync();
     if (seriesList.length) {
