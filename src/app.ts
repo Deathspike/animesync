@@ -64,7 +64,7 @@ function validatePath(value: string) {
 }
 
 function validateProxyServer(value: string) {
-  return /^(https?)\:\/\/(?:(.+)\:(.+)@)?((?:.+)\.(?:.+))$/i.test(value) ? value : undefined;
+  return /^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?((?:.+)\.(?:.+))$/i.test(value) ? value : undefined;
 }
 
 function validateViewport(value: string) {
