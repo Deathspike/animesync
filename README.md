@@ -183,15 +183,26 @@ To remove a custom user setting, leave an option flag empty. For example:
 
 ### Proxy Server
 
-Using a proxy server is supported in case you need to change your region. For example:
+Using a proxy server is supported in case you need to change region. For example:
 
     animesync settings --proxyServer https://example.com
 
-A proxy server must be either HTTP or HTTPS. For authentication, you can use:
+Proxies often require authentication. You can use authentication like this:
 
     animesync settings --proxyServer https://username:password@example.com
 
-Please note that *CrunchyRoll* and *Funimation* are America-orientated. Thus, an American proxy is recommended.
+You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
+
+* `http://example.com`
+* `http://username:password@example.com`
+* `https://example.com`
+* `https://username:password@example.com`
+* `socks4://example.com`
+* `socks4://username:password@example.com`
+* `socks5://example.com`
+* `socks5://username:password@example.com`
+
+Note that *CrunchyRoll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
 
 # Contributions
 

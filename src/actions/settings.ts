@@ -5,7 +5,7 @@ import path from 'path';
 
 export async function settingsAsync(values: Record<string, boolean | string | undefined>) {
   const settingsPath = path.join(os.homedir(), 'animesync', 'settings.json');
-  const settings = await fs.readJson(settingsPath, {throws: false}) || {};
+  const settings = await fs.readJson(settingsPath, {throws: false}) ?? {};
   if (mergeSettings(values, settings)) {
     await fs.writeJson(settingsPath, settings, {spaces: 2});
     return false;
