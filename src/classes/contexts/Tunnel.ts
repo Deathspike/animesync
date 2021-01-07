@@ -7,7 +7,7 @@ import url from 'url';
 import tls from 'tls';
 import util from 'util';
 
-export class Proxy {
+export class Tunnel {
   private readonly _http: http.Server;
   
   constructor(http: http.Server) {
