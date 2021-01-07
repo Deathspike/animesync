@@ -4,14 +4,14 @@ import http from 'http';
 
 export class Context {
   private readonly _http: http.Server;
-  private readonly _proxy: app.Proxy;
   private readonly _rewrite: app.Rewrite;
+  private readonly _tunnel: app.Tunnel;
 
   private constructor() {
-    const server = express();
+    const server = express().disable('x-powered-by');
     this._http = http.createServer(server);
-    this._proxy = new app.Proxy(this._http);
     this._rewrite = new app.Rewrite(this, server);
+    this._tunnel = new app.Tunnel(this._http);
   }
 
   static async createAsync(handlerAsync: (context: Context) => Promise<void>) {
@@ -31,12 +31,12 @@ export class Context {
     }
   }
 
-  get proxy() {
-    return this._proxy;
-  }
-
   get rewrite() {
     return this._rewrite;
+  }
+
+  get tunnel() {
+    return this._tunnel;
   }
 
   async disposeAsync() {
