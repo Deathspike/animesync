@@ -9,15 +9,37 @@ import util from 'util';
 
 export class Tunnel {
   private readonly _http: http.Server;
-  
+  private readonly _nordVpn: app.NordVpn;
+
   constructor(http: http.Server) {
     this._http = http;
-    this._http.on('connect', this._onConnect.bind(this));
+    this._http.on('connect', this._connectHttp.bind(this));
+    this._nordVpn = new app.NordVpn();
   }
 
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = url.parse(clientUrl);
     const server = url.parse(app.settings.proxyServer);
+    if (server.protocol === 'nordvpn:') {
+      this._nordVpn.getAsync(server)
+        .then(x => this._connectTo(client, clientSocket, x))
+        .catch(() => clientSocket.end());
+    } else {
+      this._connectTo(client, clientSocket, server);
+    }
+  }
+
+  private _connectHttp(request: http.IncomingMessage, socket: net.Socket) {
+    if (request.url) {
+      const clientSocket = socket;
+      const clientUrl = `http://${request.url}`;
+      this.connect(clientSocket, clientUrl);
+    } else {
+      socket.end();
+    }
+  }
+
+  private _connectTo(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
     if (server.protocol === 'http:') {
       this._httpProxy(client, clientSocket, server);
     } else if (server.protocol === 'https:') {
@@ -66,16 +88,6 @@ export class Tunnel {
     const serverSocket = serverInfo.socket;
     const serverTunnel = tunnel(clientSocket, serverSocket);
     clientSocket.write(statusHeader(200, 'OK'), serverTunnel);
-  }
-
-  private _onConnect(request: http.IncomingMessage, socket: net.Socket) {
-    if (request.url) {
-      const clientSocket = socket;
-      const clientUrl = `http://${request.url}`;
-      this.connect(clientSocket, clientUrl);
-    } else {
-      socket.end();
-    }
   }
 }
 

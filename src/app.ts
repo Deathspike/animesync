@@ -39,7 +39,7 @@ commander.createCommand()
     .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.chromeNavigationTimeout), primitiveNumber)
     .option('--chromeObserverTimeout [number]', withCurrent('Chrome observation timeout in milliseconds.', app.settings.chromeObserverTimeout), primitiveNumber)
     .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.chromeViewport), validateViewport)
-    .option('--proxyServer [string]', withCurrent('Proxy server (HTTP or HTTPS).', app.settings.proxyServer), validateProxyServer)
+    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.proxyServer), validateProxyServer)
     .action((command) => app.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
   .parse();
 
@@ -64,7 +64,9 @@ function validatePath(value: string) {
 }
 
 function validateProxyServer(value: string) {
-  return /^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?((?:.+)\.(?:.+))$/i.test(value) ? value : undefined;
+  if (/^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?((?:.+)\.(?:.+))$/i.test(value)) return value;
+  if (/^nordvpn\:\/\/(?:(.+)\:(.+)@)?(?:.+)$/i.test(value)) return value;
+  return undefined;
 }
 
 function validateViewport(value: string) {

@@ -153,22 +153,22 @@ Manage settings.
 
 Options:
   --chrome [string]                   Path to chrome-data.
-                                      ⠀⠀C:\Users\Deathspike\animesync\chrome-data
+                                      -> C:\Users\Deathspike\animesync\chrome-data
   --library [string]                  Path to library. Video files are stored here.
-                                      ⠀⠀C:\Users\Deathspike\animesync\library
+                                      -> C:\Users\Deathspike\animesync\library
   --sync [string]                     Path to sync. Temporary files are stored here.
-                                      ⠀⠀C:\Users\Deathspike\animesync\sync
+                                      -> C:\Users\Deathspike\animesync\sync
   --chromeHeadless [bool]             Chrome headless mode.
-                                      ⠀⠀true
+                                      -> true
   --chromeInactiveTimeout [number]    Chrome inactive timeout in milliseconds.
-                                      ⠀⠀1000
+                                      -> 1000
   --chromeNavigationTimeout [number]  Chrome navigation timeout in milliseconds.
-                                      ⠀⠀30000
+                                      -> 30000
   --chromeObserverTimeout [number]    Chrome observation timeout in milliseconds.
-                                      ⠀⠀30000
+                                      -> 30000
   --chromeViewport [string]           Chrome viewport while headless.
-                                      ⠀⠀1920x974
-  --proxyServer [string]              Proxy server (HTTP or HTTPS).
+                                      ->⠀1920x974
+  --proxyServer [string]              Proxy server for network traffic.
                                       ⠀⠀
   -h, --help                          display help for command
 ```
@@ -203,6 +203,14 @@ You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
 * `socks5://username:password@example.com`
 
 Note that *CrunchyRoll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
+
+#### NordVPN
+
+If you have an account with *NordVPN*, you can use:
+
+    animesync settings --proxyServer nordvpn://username:password@us
+
+With this configuration, `animesync` periodically queries the list of proxies provided by *NordVPN* and automatically selects the HTTPS proxy with the least amount of load. That should be the fastest proxy available at that time. The `@us` suffix stands for *USA*, and ensures the proxy server is in that country. You can use whatever country flag you desire, but I recommend *USA* for the best video availability.
 
 # Contributions
 

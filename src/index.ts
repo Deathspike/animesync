@@ -6,6 +6,7 @@ export * from './classes/contexts/Tunnel';
 export * from './classes/parsers/HlsManifest';
 export * from './classes/parsers/HlsManifestLine';
 export * from './classes/parsers/HlsManifestLineStream';
+export * from './classes/vpn/NordVpn';
 export * from './classes/Library';
 export * from './classes/Series';
 export * from './classes/Sync';
