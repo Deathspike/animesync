@@ -1,8 +1,11 @@
 import * as app from '../..';
+import {SocksClient, SocksProxy, SocksRemoteHost} from 'socks';
+import dns from 'dns';
 import http from 'http';
 import net from 'net';
 import url from 'url';
 import tls from 'tls';
+import util from 'util';
 
 export class Proxy {
   private readonly _http: http.Server;
@@ -13,97 +16,62 @@ export class Proxy {
   }
 
   connect(clientSocket: net.Socket, clientUrl: string) {
+    const client = url.parse(clientUrl);
     const server = url.parse(app.settings.proxyServer);
     if (server.protocol === 'http:') {
-      this._httpProxy(clientSocket, clientUrl, server);
+      this._httpProxy(client, clientSocket, server);
     } else if (server.protocol === 'https:') {
-      this._httpsProxy(clientSocket, clientUrl, server);
+      this._httpsProxy(client, clientSocket, server);
+    } else if (server.protocol === 'socks4:') {
+      this._socksProxyAsync(client, clientSocket, server, true).catch(() => clientSocket.end());
+    } else if (server.protocol === 'socks5:' || server.protocol === 'socks:') {
+      this._socksProxyAsync(client, clientSocket, server, false).catch(() => clientSocket.end());
     } else {
-      this._noProxy(clientSocket, clientUrl);
+      this._noProxy(client, clientSocket);
     }
   }
 
-  private _httpProxy(clientSocket: net.Socket, clientUrl: string, server: url.UrlWithStringQuery) {
-    // Initialize the connection.
-    const serverPort = Number(server.port) || 80;
-    const serverSocket = net.connect(serverPort, server.hostname || '');
-
-    // Initialize the connection handlers.
-    clientSocket.on('error', () => serverSocket.end());
-    clientSocket.on('end', () => serverSocket.end());
-    clientSocket.on('timeout', () => clientSocket.end());
-    serverSocket.on('error', () => clientSocket.end());
-    serverSocket.on('end', () => clientSocket.end());
-    serverSocket.on('timeout', () => serverSocket.end());
-
-    // Initialize the socket timeouts.
-    clientSocket.setTimeout(app.settings.brokerTimeout);
-    serverSocket.setTimeout(app.settings.brokerTimeout);
-
-    // Initialize the socket.
-    serverSocket.on('connect', () => {
-      serverSocket.write(connectHeader(clientUrl, server), () => {
-        clientSocket.pipe(serverSocket);
-        serverSocket.pipe(clientSocket);
-      });
-    });
+  private _httpProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+    const serverPort = Number(server.port ?? 80);
+    const serverSocket = net.connect(serverPort, String(server.hostname));
+    const serverTunnel = tunnel(clientSocket, serverSocket);
+    serverSocket.on('connect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
 
-  private _httpsProxy(clientSocket: net.Socket, clientUrl: string, server: url.UrlWithStringQuery) {
-    // Initialize the connection.
-    const serverPort = Number(server.port) || 443;
-    const serverSocket = tls.connect(serverPort, server.hostname || '');
-    
-    // Initialize the connection handlers.
-    clientSocket.on('error', () => serverSocket.end());
-    clientSocket.on('end', () => serverSocket.end());
-    clientSocket.on('timeout', () => clientSocket.end());
-    serverSocket.on('error', () => clientSocket.end());
-    serverSocket.on('end', () => clientSocket.end());
-    serverSocket.on('timeout', () => serverSocket.end());
-
-    // Initialize the socket timeouts.
-    clientSocket.setTimeout(app.settings.brokerTimeout);
-    serverSocket.setTimeout(app.settings.brokerTimeout);
-
-    // Initialize the socket.
-    serverSocket.on('secureConnect', () => {
-      serverSocket.write(connectHeader(clientUrl, server), () => {
-        clientSocket.pipe(serverSocket);
-        serverSocket.pipe(clientSocket);
-      });
-    });
+  private _httpsProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+    const serverPort = Number(server.port ?? 443);
+    const serverSocket = tls.connect(serverPort, String(server.hostname));
+    const serverTunnel = tunnel(clientSocket, serverSocket);
+    serverSocket.on('secureConnect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
   
-  private _noProxy(clientSocket: net.Socket, clientUrl: string) {
-    // Initialize the connection.
-    const server = url.parse(`http://${clientUrl}`);
-    const serverPort = Number(server.port) || 80;
-    const serverSocket = net.connect(serverPort, server.hostname || '');
+  private _noProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket) {
+    const serverPort = Number(client.port ?? 80);
+    const serverSocket = net.connect(serverPort, String(client.hostname));
+    const serverTunnel = tunnel(clientSocket, serverSocket);
+    serverSocket.on('connect', () => clientSocket.write(statusHeader(200, 'OK'), serverTunnel));
+  }
 
-    // Initialize the connection handlers.
-    clientSocket.on('error', () => clientSocket.end());
-    clientSocket.on('end', () => serverSocket.end());
-    serverSocket.on('error', () => serverSocket.end());
-    serverSocket.on('end', () => clientSocket.end());
+  private async _socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
+    // Initialize the destination.
+    const destination: SocksRemoteHost = {host: String(client.hostname), port: Number(client.port ?? 80)};
+    const proxy: SocksProxy = {host: String(server.hostname), port: Number(server.port ?? 1080), type: socks4 ? 4 :5};
+    
+    // Initialize the options.
+    if (server.auth) [proxy.userId, proxy.password] = server.auth.split(':', 2);
+    if (socks4) destination.host = (await util.promisify(dns.lookup)(destination.host)).address;
 
-    // Initialize the socket timeouts.
-    clientSocket.setTimeout(app.settings.brokerTimeout);
-    serverSocket.setTimeout(app.settings.brokerTimeout);
-
-    // Initialize the socket.
-    serverSocket.on('connect', () => {
-      clientSocket.write(statusHeader(200, 'OK'), () => {
-        clientSocket.pipe(serverSocket);
-        serverSocket.pipe(clientSocket);
-      });
-    });
+    // Initialize the tunnel.
+    const serverInfo = await SocksClient.createConnection({command: 'connect', destination, proxy});
+    const serverSocket = serverInfo.socket;
+    const serverTunnel = tunnel(clientSocket, serverSocket);
+    clientSocket.write(statusHeader(200, 'OK'), serverTunnel);
   }
 
   private _onConnect(request: http.IncomingMessage, socket: net.Socket) {
     if (request.url) {
       const clientSocket = socket;
-      const clientUrl = request.url;
+      const clientUrl = `http://${request.url}`;
       this.connect(clientSocket, clientUrl);
     } else {
       socket.end();
@@ -111,15 +79,23 @@ export class Proxy {
   }
 }
 
-function connectHeader(clientUrl: string, server: url.UrlWithStringQuery) {
+function connectHeader(client: url.UrlWithStringQuery, server: url.UrlWithStringQuery) {
   if (server.auth) {
     const auth = Buffer.from(server.auth).toString('base64');
-    return [`CONNECT ${clientUrl} HTTP/1.1`, `Proxy-Authorization: Basic ${auth}`, '', ''].join('\r\n');
+    return [`CONNECT ${client.host} HTTP/1.1`, `Proxy-Authorization: Basic ${auth}`, '', ''].join('\r\n');
   } else {
-    return [`CONNECT ${clientUrl} HTTP/1.1`, '', ''].join('\r\n');
+    return [`CONNECT ${client.host} HTTP/1.1`, '', ''].join('\r\n');
   }
 }
 
 function statusHeader(statusCode: number, statusText: string) {
   return [`HTTP/1.1 ${statusCode} ${statusText}`, '', ''] .join('\r\n');
+}
+
+function tunnel(clientSocket: net.Socket, serverSocket: net.Socket) {
+  clientSocket.on('error', () => clientSocket.end());
+  clientSocket.on('end', () => serverSocket.end());
+  serverSocket.on('error', () => serverSocket.end());
+  serverSocket.on('end', () => clientSocket.end());
+  return () => clientSocket.pipe(serverSocket) && serverSocket.pipe(clientSocket);
 }

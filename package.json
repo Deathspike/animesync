@@ -30,6 +30,7 @@
     "node-fetch": "2.6.1",
     "playwright-core": "1.7.1",
     "sanitize-filename": "1.6.3",
+    "socks": "2.5.1",
     "subtitle": "4.0.1",
     "winston": "3.3.3",
     "winston-daily-rotate-file": "^4.5.0"

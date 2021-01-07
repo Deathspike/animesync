@@ -9,7 +9,7 @@ export async function downloadAsync(this: app.ICliOptions, seriesList: Array<str
     } else {
       app.logger.info(`Fetching ${app.settings.library}`);
       const seriesList = await app.Library.listAsync(app.settings.library);
-      for (const series of seriesList) await app.seriesAsync(context, series.rootPath || app.settings.library, series.seriesUrl, this);
+      for (const series of seriesList) await app.seriesAsync(context, series.rootPath ?? app.settings.library, series.seriesUrl, this);
     }
   });
 }
