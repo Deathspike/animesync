@@ -1,42 +1,56 @@
 import * as app from '../..';
-import {crunchyrollProvider} from './provider';
-import path from 'path';
-import sanitizeFilename from 'sanitize-filename';
+import {evaluateQuery} from './evaluators/query';
+import {evaluateSeries} from './evaluators/series';
+import {evaluateStream} from './evaluators/stream';
+import querystring from 'querystring';
+const baseUrl = 'https://www.crunchyroll.com';
 
-export async function crunchyrollAsync(context: app.Context, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
-  const series = await crunchyrollProvider.seriesAsync(context, seriesUrl);
-  const seriesName = sanitizeFilename(series.title);
-  const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new app.Series(app.settings.library);
-  for (const season of series.seasons) {
-    const seasonName = sanitizeFilename(season.title);
-    for (const episode of season.episodes) {
-      const episodeNumber = parseFloat(episode.number);
-      const elapsedTime = new app.Timer();
-      const episodeName = `${seasonName} ${String(episodeNumber).padStart(2, '0')} [CrunchyRoll]`;
-      const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
-      if (!isFinite(episodeNumber)) {
-        app.logger.info(`Ignoring ${episodeName}`);
-      } else if (await tracker.existsAsync(seasonName, episodeName) || await tracker.existsAsync(seriesName, episodeName)) {
-        app.logger.info(`Skipping ${episodeName}`);
-      } else if (options && options.skipDownload) {
-        app.logger.info(`Tracking ${episodeName}`);
-        await tracker.trackAsync(seriesName, episodeName);
-      } else try {
-        app.logger.info(`Fetching ${episodeName}`);
-        await saveAsync(context, episodePath, episode.url);
-        await tracker.trackAsync(seriesName, episodeName);
-        app.logger.info(`Finished ${episodeName} (${elapsedTime})`);
-      } catch (error) {
-        app.logger.info(`Rejected ${episodeName} (${elapsedTime})`);
-        app.logger.error(error);
-      }
-    }
+export const crunchyrollProvider = {
+  isSupported(url: string) {
+    return url.startsWith(baseUrl);
+  },
+
+  async popularAsync(context: app.Context, pageNumber = 1) {
+    const queryUrl = createQueryUrl('popular', pageNumber);
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const query = await page.evaluate(evaluateQuery);
+      query.series.forEach(x => x.imageUrl = context.rewrite.createEmulateUrl(x.imageUrl, headers));
+      return query;
+    });
+  },
+  
+  async seriesAsync(context: app.Context, seriesUrl: string) {
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const series = await page.evaluate(evaluateSeries);
+      series.imageUrl = context.rewrite.createEmulateUrl(series.imageUrl, headers);
+      series.seasons.forEach(x => x.episodes.forEach(y => y.imageUrl = context.rewrite.createEmulateUrl(y.imageUrl, headers)));
+      return series;
+    });
+  },
+
+  async streamAsync(context: app.Context, episodeUrl: string) {
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const stream = await page.evaluate(evaluateStream);
+      stream.manifestUrl = context.rewrite.createHlsUrl(stream.manifestUrl, headers);
+      stream.subtitles.forEach(x => x.url = context.rewrite.createEmulateUrl(x.url, headers));
+      return stream;
+    });
   }
+};
+
+function createQueryUrl(sort: string, pageNumber = 1) {
+  const page = pageNumber > 1 ? {pg: pageNumber} : undefined;
+  const query = querystring.stringify(page);
+  return new URL(`/videos/anime/${encodeURIComponent(sort)}/ajax_page?${query}`, baseUrl).toString();
 }
 
-async function saveAsync(context: app.Context, episodePath: string, episodeUrl: string) {
-  const stream = await crunchyrollProvider.streamAsync(context, episodeUrl);
-  const sync = new app.Sync(episodePath);
-  await sync.saveAsync(stream);
-}
+const defaultHeaders = {
+  origin: 'https://static.crunchyroll.com',
+  referer: 'https://static.crunchyroll.com/'
+};

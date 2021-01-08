@@ -1,43 +1,64 @@
 import * as app from '../..';
-import {funimationProvider} from './provider';
-import path from 'path';
-import sanitizeFilename from 'sanitize-filename';
+import {evaluateQuery} from './evaluators/query';
+import {evaluateSeriesAsync} from './evaluators/series';
+import querystring from 'querystring';
+const baseUrl = 'https://www.funimation.com';
 
-export async function funimationAsync(context: app.Context, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
-  const series = await funimationProvider.seriesAsync(context, seriesUrl);
-  const seriesName = sanitizeFilename(series.title);
-  const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new app.Series(app.settings.library);
-  for (const season of series.seasons) {
-    const seasonMatch = season.title.match(/([0-9\.]+)/);
-    const seasonNumber = seasonMatch ? parseFloat(seasonMatch[1]) : NaN;
-    for (const episode of season.episodes) {
-      const elapsedTime = new app.Timer();
-      const episodeNumber = parseFloat(episode.number);
-      const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeNumber).padStart(2, '0')} [Funimation]`;
-      const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
-      if (!isFinite(seasonNumber) || !isFinite(episodeNumber)) {
-        app.logger.info(`Ignoring ${episodeName}`);
-      } else if (await tracker.existsAsync(seriesName, episodeName)) {
-        app.logger.info(`Skipping ${episodeName}`);
-      } else if (options && options.skipDownload) {
-        app.logger.info(`Tracking ${episodeName}`);
-        await tracker.trackAsync(seriesName, episodeName);
-      } else try {
-        app.logger.info(`Fetching ${episodeName}`);
-        await saveAsync(context, episodePath, episode.url);
-        await tracker.trackAsync(seriesName, episodeName);
-        app.logger.info(`Finished ${episodeName} (${elapsedTime})`);
-      } catch (error) {
-        app.logger.info(`Rejected ${episodeName} (${elapsedTime})`);
-        app.logger.error(error);
+export const funimationProvider = {
+  isSupported(url: string) {
+    return url.startsWith(baseUrl);
+  },
+
+  async popularAsync(context: app.Context, pageNumber = 1) {
+    const queryUrl = createQueryUrl('popularity', pageNumber);
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const query = await page.evaluate(evaluateQuery);
+      query.series.forEach(x => x.imageUrl = context.rewrite.createEmulateUrl(x.imageUrl, headers));
+      return query;
+    });
+  },
+
+  async seriesAsync(context: app.Context, seriesUrl: string) {
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const series = await page.evaluate(evaluateSeriesAsync);
+      series.imageUrl = context.rewrite.createEmulateUrl(series.imageUrl, headers);
+      series.seasons.forEach(x => x.episodes.forEach(y => y.imageUrl = context.rewrite.createEmulateUrl(y.imageUrl, headers)));
+      return series;
+    });
+  },
+
+  async streamAsync(context: app.Context, episodeUrl: string): Promise<app.IApiStream> {
+    return await app.browserAsync(context, async (page, userAgent) => {
+      const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
+      await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
+      const manifestSrc = await manifestPromise.then(x => x.url());
+      const vttSubtitleSrc = await vttSubtitlePromise.then(x => x.url());
+      await page.close();
+      if (manifestSrc && vttSubtitleSrc) {
+        const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+        const manifestType = 'hls';
+        const manifestUrl = context.rewrite.createHlsUrl(manifestSrc, headers);
+        const subtitleUrl = context.rewrite.createEmulateUrl(vttSubtitleSrc, headers);
+        const subtitles = [{language: 'eng', type: 'vtt', url: subtitleUrl}];
+        return {manifestType, manifestUrl, subtitles};
+      } else {
+        throw new Error();
       }
-    }
+    });
   }
+};
+
+function createQueryUrl(sort: string, pageNumber = 1) {
+  const page = pageNumber > 1 ? {p: pageNumber} : undefined;
+  const query = querystring.stringify(Object.assign({audio: 'japanese', sort}, page));
+  return new URL(`/shows/all-shows/?${query}`, baseUrl).toString();
 }
 
-async function saveAsync(context: app.Context, episodePath: string, episodeUrl: string) {
-  const stream = await funimationProvider.streamAsync(context, episodeUrl);
-  const sync = new app.Sync(episodePath);
-  await sync.saveAsync(stream);
-}
+const defaultHeaders = {
+  origin: 'https://www.funimation.com',
+  referer: 'https://www.funimation.com/'
+};
