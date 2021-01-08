@@ -1,3 +1,14 @@
+export type IApiQuery = {
+  hasMorePages: boolean;
+  series: Array<IApiQuerySeries>;
+}
+
+export type IApiQuerySeries = {
+  imageUrl: string;
+  title: string;
+  url: string;
+}
+
 export type IApiSeries = {
   genres: Array<string>;
   imageUrl: string;
