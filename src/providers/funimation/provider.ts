@@ -1,7 +1,20 @@
 import * as app from '../..';
+import {evaluateQuery} from './evaluators/query';
 import {evaluateSeriesAsync} from './evaluators/series';
+import querystring from 'querystring';
 
 export const funimationProvider = {
+  async popularAsync(context: app.Context, pageNumber = 1): Promise<app.IApiQuery> {
+    const queryUrl = createQueryUrl(pageNumber, 'popularity');
+    return await app.browserAsync(context, async (page, userAgent) => {
+      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const query = await page.evaluate(evaluateQuery);
+      query.series.forEach(x => x.imageUrl = context.rewrite.createEmulateUrl(x.imageUrl, headers));
+      return query;
+    });
+  },
+
   async seriesAsync(context: app.Context, seriesUrl: string): Promise<app.IApiSeries> {
     return await app.browserAsync(context, async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
@@ -33,6 +46,12 @@ export const funimationProvider = {
     });
   }
 };
+
+function createQueryUrl(pageNumber: number, sort: string) {
+  const page = pageNumber > 1 ? {p: pageNumber} : undefined;
+  const query = querystring.stringify(Object.assign({audio: 'japanese', sort}, page));
+  return new URL(`https://www.funimation.com/shows/all-shows/?${query}`).toString();
+}
 
 const defaultHeaders = {
   origin: 'https://www.funimation.com',

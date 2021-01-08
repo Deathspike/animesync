@@ -64,7 +64,7 @@ export class NordVpn {
 
 type INordVPN = {
   domain: string;
-  features: {proxy_ssl_cybersec: boolean, socks: boolean};
+  features: {proxy_ssl_cybersec: boolean};
   flag: string;
   load: number;
 };
