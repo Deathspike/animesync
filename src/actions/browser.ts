@@ -1,7 +1,7 @@
 import * as app from '..';
 
 export async function browserAsync() {
-  await app.Context.createAsync(async (context) => {
+  await app.Context.usingAsync(async (context) => {
     app.logger.info(`Launching browser ...`);
     app.settings.chromeHeadless = false;
     await app.browserAsync(context, async (page) => {

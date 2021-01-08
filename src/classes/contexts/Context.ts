@@ -13,13 +13,13 @@ export class Context {
     this._rewrite = new app.Rewrite(this, server);
     this._tunnel = new app.Tunnel(this._http);
   }
-
-  static async createAsync(handlerAsync: (context: Context) => Promise<void>) {
+  
+  static async usingAsync(handlerAsync: (context: Context) => Promise<void>) {
     const context = new Context();
     await context.startAsync();
-    return await handlerAsync(context).finally(() => context.disposeAsync());
+    await handlerAsync(context).finally(() => context.disposeAsync());
   }
-  
+
   get address() {
     const result = this._http.address();
     if (typeof result === 'string') {
