@@ -15,7 +15,7 @@ export class Future<T> {
     return await new Promise<T>((resolve, reject) => {
       if (this._hasReject) {
         reject(this._reject);
-      } else if (this._hasResolve) {
+      } else if (this._hasResolve && typeof this._resolve !== 'undefined') {
         resolve(this._resolve);
       } else if (this._timeout) {
         setTimeout(reject, this._timeout);

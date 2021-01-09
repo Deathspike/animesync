@@ -1,45 +1,97 @@
-export type IApiQuery = {
-  hasMorePages: boolean;
-  series: Array<IApiQuerySeries>;
+import * as api from 'class-validator';
+
+export enum IApiProviderName {
+  CrunchyRoll = 'crunchyroll',
+  Funimation = 'funimation'
 }
 
-export type IApiQuerySeries = {
-  imageUrl: string;
-  title: string;
-  url: string;
+export class IApiQuerySeries {
+  @api.IsNotEmpty()
+  @api.IsUrl()
+  imageUrl!: string;
+
+  @api.IsNotEmpty()
+  title!: string;
+
+  @api.IsNotEmpty()
+  @api.IsUrl()
+  url!: string;
 }
 
-export type IApiSeries = {
-  genres: Array<string>;
-  imageUrl: string;
-  seasons: Array<IApiSeriesSeason>;
-  synopsis: string;
-  title: string;
-  url: string;
+export class IApiQuery {
+  @api.IsNotEmpty()
+  hasMorePages!: boolean;
+
+  @api.IsNotEmpty()
+  series!: Array<IApiQuerySeries>;
 }
 
-export type IApiSeriesSeason = {
-  episodes: Array<IApiSeriesSeasonEpisode>;
-  title: string;
+export class IApiSeriesSeasonEpisode {
+  @api.IsNotEmpty()
+  imageUrl!: string;
+
+  @api.IsNotEmpty()
+  isPremium!: boolean;
+
+  @api.IsNotEmpty()
+  number!: string;
+
+  @api.IsNotEmpty()
+  title!: string;
+
+  @api.IsNotEmpty()
+  synopsis!: string;
+
+  @api.IsNotEmpty()
+  url!: string;
 }
 
-export type IApiSeriesSeasonEpisode = {
-  imageUrl: string;
-  isPremium: boolean;
-  number: string;
-  title: string;
-  synopsis: string;
-  url: string;
+export class IApiSeriesSeason {
+  @api.IsNotEmpty()
+  episodes!: Array<IApiSeriesSeasonEpisode>;
+
+  @api.IsNotEmpty()
+  title!: string;
 }
 
-export type IApiStream = {
-  manifestType: 'hls';
-  manifestUrl: string;
-  subtitles: Array<IApiStreamSubtitle>;
+export class IApiSeries {
+  @api.IsNotEmpty()
+  genres!: Array<string>;
+
+  @api.IsNotEmpty()
+  imageUrl!: string;
+
+  @api.IsNotEmpty()
+  seasons!: Array<IApiSeriesSeason>;
+
+  @api.IsNotEmpty()
+  synopsis!: string;
+  
+  @api.IsNotEmpty()
+  title!: string;
+
+  @api.IsNotEmpty()
+  url!: string;
 }
 
-export type IApiStreamSubtitle = {
-  language: string;
-  type: string;
-  url: string;
+export class IApiStreamSubtitle {
+  @api.IsNotEmpty()
+  language!: string;
+
+  @api.IsNotEmpty()
+  type!: string;
+
+  @api.IsNotEmpty()
+  url!: string;
+}
+
+export class IApiStream {
+  @api.IsNotEmpty()
+  manifestType!: 'hls';
+
+  @api.IsNotEmpty()
+  manifestUrl!: string;
+
+  @api.IsNotEmpty()
+  subtitles!: Array<IApiStreamSubtitle>;
 }

@@ -3,7 +3,7 @@ import {crunchyrollProvider} from './crunchyroll';
 import {funimationProvider} from './funimation';
 
 export const provider = {
-  async popularAsync(context: app.Context, providerName: string, pageNumber?: number) {
+  async popularAsync(context: app.Context, providerName: app.IApiProviderName, pageNumber?: number) {
     switch (providerName) {
       case 'crunchyroll':
         return await crunchyrollProvider.popularAsync(context, pageNumber);
