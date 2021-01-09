@@ -14,6 +14,12 @@ export class Context {
     this._tunnel = new app.Tunnel(this._http);
   }
   
+  static async foreverAsync() {
+    const context = new Context();
+    await context.startAsync();
+    return context;
+  }
+
   static async usingAsync(handlerAsync: (context: Context) => Promise<void>) {
     const context = new Context();
     await context.startAsync();

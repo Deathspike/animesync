@@ -22,7 +22,13 @@
     "npm": ">= 6.0.0"
   },
   "dependencies": {
+    "@nestjs/common": "7.6.5",
+    "@nestjs/core": "7.6.5",
+    "@nestjs/platform-express": "7.6.5",
+    "@nestjs/swagger": "4.7.9",
     "chrome-launcher": "0.13.4",
+    "class-transformer": "0.3.1",
+    "class-validator": "0.12.2",
     "commander": "6.2.1",
     "cors": "2.8.5",
     "express": "4.17.1",
@@ -30,11 +36,14 @@
     "https-proxy-agent": "5.0.0",
     "node-fetch": "2.6.1",
     "playwright-core": "1.7.1",
+    "reflect-metadata": "0.1.13",
+    "rxjs": "6.6.3",
     "sanitize-filename": "1.6.3",
     "socks": "2.5.1",
     "subtitle": "4.0.1",
+    "swagger-ui-express": "4.1.6",
     "winston": "3.3.3",
-    "winston-daily-rotate-file": "^4.5.0"
+    "winston-daily-rotate-file": "4.5.0"
   },
   "devDependencies": {
     "@types/cors": "2.8.9",

@@ -9,7 +9,7 @@ export async function browserAsync() {
       const pages = context.pages();
       if (pages.length > 0) pages[0].goto('https://www.crunchyroll.com/');
       if (pages.length > 1) pages[1].goto('https://www.funimation.com/');
-      await new Promise((resolve) => context.on('close', resolve))
+      await new Promise<void>((resolve) => context.on('close', resolve))
     });
   });
 }
