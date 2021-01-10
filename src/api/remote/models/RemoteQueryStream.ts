@@ -5,5 +5,5 @@ export class RemoteQueryStream {
   @clv.IsString()
   @clv.IsUrl()
   @swg.ApiProperty()
-  readonly episodeUrl!: string;
+  readonly url!: string;
 }

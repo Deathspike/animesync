@@ -18,8 +18,7 @@ export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
         const response = context.switchToHttp().getResponse<express.Response>();
         const statusCode = 500;
         response.status(statusCode);
-        response.send({statusCode, message, errors});
-        return value;
+        return {statusCode, message, errors};
       } else {
         return value;
       }

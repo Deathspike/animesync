@@ -22,7 +22,7 @@ export class RemoteController {
   @swg.ApiResponse({status: 200, type: app.models.RemoteSeries})
   async seriesAsync(@api.Query() model: app.RemoteQuerySeries) {
     const context = await this.context.getAsync();
-    return app.provider.seriesAsync(context, model.seriesUrl);
+    return app.provider.seriesAsync(context, model.url);
   }
 
   @api.Get('stream')
@@ -30,6 +30,6 @@ export class RemoteController {
   @swg.ApiResponse({status: 200, type: app.models.RemoteStream})
   async streamAsync(@api.Query() model: app.RemoteQueryStream) {
     const context = await this.context.getAsync();
-    return app.provider.streamAsync(context, model.episodeUrl);
+    return app.provider.streamAsync(context, model.url);
   }
 }

@@ -5,5 +5,5 @@ export class RemoteQuerySeries {
   @clv.IsString()
   @clv.IsUrl()
   @swg.ApiProperty()
-  readonly seriesUrl!: string;
+  readonly url!: string;
 }
