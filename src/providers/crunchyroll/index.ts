@@ -1,7 +1,8 @@
 import * as app from '../..';
-import {evaluateQuery} from './evaluators/query';
+import {evaluateSearch} from './evaluators/search';
 import {evaluateSeries} from './evaluators/series';
 import {evaluateStream} from './evaluators/stream';
+import {rewrite} from '../rewrite';
 import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
@@ -15,9 +16,8 @@ export const crunchyrollProvider = {
     return await app.browserAsync(context, async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const query = await page.evaluate(evaluateQuery);
-      query.series.forEach(x => x.imageUrl = context.rewrite.createEmulateUrl(x.imageUrl, headers));
-      return query;
+      const search = await page.evaluate(evaluateSearch);
+      return rewrite.search(context, search, headers);
     });
   },
   
@@ -26,9 +26,7 @@ export const crunchyrollProvider = {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeries);
-      series.imageUrl = context.rewrite.createEmulateUrl(series.imageUrl, headers);
-      series.seasons.forEach(x => x.episodes.forEach(y => y.imageUrl = context.rewrite.createEmulateUrl(y.imageUrl, headers)));
-      return series;
+      return rewrite.series(context, series, headers);
     });
   },
 
@@ -37,9 +35,7 @@ export const crunchyrollProvider = {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
-      stream.manifestUrl = context.rewrite.createHlsUrl(stream.manifestUrl, headers);
-      stream.subtitles.forEach(x => x.url = context.rewrite.createEmulateUrl(x.url, headers));
-      return stream;
+      return rewrite.stream(context, stream, headers);
     });
   }
 };

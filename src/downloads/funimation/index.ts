@@ -6,7 +6,7 @@ export async function funimationAsync(context: app.Context, rootPath: string, se
   const series = await app.provider.seriesAsync(context, seriesUrl);
   const seriesName = sanitizeFilename(series.title);
   const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new app.Series(app.settings.library);
+  const tracker = new app.Tracker(app.settings.library);
   for (const season of series.seasons) {
     const seasonMatch = season.title.match(/([0-9\.]+)/);
     const seasonNumber = seasonMatch ? parseFloat(seasonMatch[1]) : NaN;

@@ -1,9 +1,9 @@
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
-export class RemoteStreamQuery {
+export class RemoteQuerySeries {
   @clv.IsString()
   @clv.IsUrl()
   @swg.ApiProperty()
-  readonly url!: string;
+  readonly seriesUrl!: string;
 }

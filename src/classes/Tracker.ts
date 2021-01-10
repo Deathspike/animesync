@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-export class Series {
+export class Tracker {
   private readonly _rootPath: string;
 
   constructor(libraryPath: string) {

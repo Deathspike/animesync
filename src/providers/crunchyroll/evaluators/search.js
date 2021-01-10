@@ -1,17 +1,17 @@
 /**
- * Evaluates the query.
- * @typedef {import('../../..').IApiQuery} IApiQuery
- * @typedef {import('../../..').IApiQuerySeries} IApiQuerySeries
- * @returns {IApiQuery}
+ * Evaluate the search.
+ * @typedef {import('../../..').models.RemoteSearch} RemoteSearch
+ * @typedef {import('../../..').models.RemoteSearchSeries} RemoteSearchSeries
+ * @returns {RemoteSearch}
  **/
-function evaluateQuery() {
+function evaluateSearch() {
   const series = mapSeries();
   const hasMorePages = Boolean(series.length);
   return {hasMorePages, series};
 
   /**
-   * Maps the series.
-   * @returns {Array<IApiQuerySeries>}
+   * Map the series.
+   * @returns {Array<RemoteSearchSeries>}
    */
   function mapSeries() {
     return Array.from(document.querySelectorAll('li')).map((containerNode) => {
@@ -23,7 +23,7 @@ function evaluateQuery() {
   }
 
   /**
-   * Processes the URL.
+   * Process the URL.
    * @throws If the URL is invalid.
    * @param {Element|string?} value 
    * @param {string=} attributeName
@@ -42,22 +42,22 @@ function evaluateQuery() {
   }
   
   /**
-   * Validates the text content.
+   * Validate the text content.
    * @param {(Element|string)?} value 
-   * @returns {string}
+   * @returns {string|undefined}
    */
   function validate(value) {
     if (typeof value === 'string') {
-      return value.trim().replace(/\s+/g, ' ');
+      return value.trim().replace(/\s+/g, ' ') || undefined;
     } else if (value) {
       return validate(value.textContent);
     } else {
-      return '';
+      return undefined;
     }
   }
 
   /**
-   * Validates the text content.
+   * Validate the text content.
    * @throws If the text content is empty.
    * @param {(Element|string)?} value 
    * @returns {string}
@@ -70,7 +70,7 @@ function evaluateQuery() {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {evaluateQuery};
+  module.exports = {evaluateSearch};
 } else {
-  console.log(evaluateQuery());
+  console.log(evaluateSearch());
 }
