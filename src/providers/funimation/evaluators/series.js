@@ -1,17 +1,17 @@
 /**
- * @typedef {import('../../..').IApiSeries} IApiSeries
- * @typedef {import('../../..').IApiSeriesSeason} IApiSeriesSeason
- * @typedef {import('../../..').IApiSeriesSeasonEpisode} IApiSeriesSeasonEpisode
- * @typedef {import('./typings').ISeries} ISeries
- * @typedef {import('./typings').ISeriesSeason} ISeriesSeason
- * @typedef {import('./typings').ISeriesSeasonEpisode} ISeriesSeasonEpisode
- * @type {ISeries}
+ * @typedef {import('.').PageSeries} PageSeries
+ * @typedef {import('.').PageSeriesSeason} PageSeriesSeason
+ * @typedef {import('.').PageSeriesSeasonEpisode} PageSeriesSeasonEpisode
+ * @typedef {import('../../..').models.RemoteSeries} RemoteSeries
+ * @typedef {import('../../..').models.RemoteSeriesSeason} RemoteSeriesSeason
+ * @typedef {import('../../..').models.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
+ * @type {PageSeries}
  */
 var titleData;
 
 /**
- * Evaluates the series.
- * @returns {Promise<IApiSeries>}
+ * Evaluate the series.
+ * @returns {Promise<RemoteSeries>}
  **/
 async function evaluateSeriesAsync() {
   return {
@@ -24,32 +24,17 @@ async function evaluateSeriesAsync() {
   };
 
   /**
-   * Fetches the season.
+   * Fetch the season.
    * @param {URL} url 
-   * @returns {Promise<ISeriesSeason>}
+   * @returns {Promise<PageSeriesSeason>}
    */
   async function fetchSeasonAsync(url) {
     return await fetch(url.toString()).then(x => x.json());
   }
 
   /**
-   * Maps the season episode.
-   * @param {ISeriesSeasonEpisode} episode
-   * @returns {IApiSeriesSeasonEpisode}
-   **/
-  function mapSeasonEpisode(episode) {
-    const imageUrl = episode.poster;
-    const isPremium = episode.mostRecentSvod.subscriptionRequired;
-    const number = episode.item.episodeNum;
-    const title = episode.item.episodeName;
-    const synopsis = episode.synopsis;
-    const url = new URL(`${episode.item.episodeSlug}/?lang=japanese`, location.href).toString();
-    return {imageUrl, isPremium, number, title, synopsis, url};
-  }
-
-  /**
-   * Retrieves each season.
-   * @returns {Promise<Array<IApiSeriesSeason>>}
+   * Retrieve the seasons.
+   * @returns {Promise<Array<RemoteSeriesSeason>>}
    */
   async function getSeasonAsync() {
     return await Promise.all(titleData.children.map(async (season) => {
@@ -60,14 +45,29 @@ async function evaluateSeriesAsync() {
   }
 
   /**
-   * Retrieves each episode.
+   * Retrieve the season episodes.
    * @param {URL} url 
-   * @returns {Promise<Array<IApiSeriesSeasonEpisode>>}
+   * @returns {Promise<Array<RemoteSeriesSeasonEpisode>>}
    */
   async function getSeasonEpisodeAsync(url) {
     const season = await fetchSeasonAsync(url);
     const episodes = season.items.filter(x => x.audio.includes('Japanese')).map(mapSeasonEpisode);
     return episodes;
+  }
+
+  /**
+   * Map the season episode.
+   * @param {PageSeriesSeasonEpisode} episode
+   * @returns {RemoteSeriesSeasonEpisode}
+   **/
+  function mapSeasonEpisode(episode) {
+    const imageUrl = episode.poster;
+    const isPremium = Boolean(episode.mostRecentSvod.subscriptionRequired);
+    const number = episode.item.episodeNum;
+    const title = episode.item.episodeName;
+    const synopsis = episode.synopsis;
+    const url = new URL(`${episode.item.episodeSlug}/?lang=japanese`, location.href).toString();
+    return {imageUrl, isPremium, number, title, synopsis, url};
   }
 }
 

@@ -1,22 +1,22 @@
 /**
- * Evaluates the stream.
- * @typedef {import('../../..').IApiStream} IApiStream
- * @typedef {import('../../..').IApiStreamSubtitle} IApiStreamSubtitle
- * @typedef {import('./typings').IStreamData} IStreamData
- * @returns {IApiStream}
+ * Evaluate the stream.
+ * @typedef {import('.').PageStream} PageStream
+ * @typedef {import('../../..').models.RemoteStream} RemoteStream
+ * @typedef {import('../../..').models.RemoteStreamSubtitle} RemoteStreamSubtitle
+ * @returns {RemoteStream}
  **/
 function evaluateStream() {
-  const dataSource = getDataSource();
-  const manifestType = 'hls';
-  const manifestUrl = getManifestUrl(dataSource);
-  const subtitles = getSubtitles(dataSource);
-  return {manifestType, manifestUrl, subtitles};
+  const dataSource = extractDataSource();
+  const subtitles = mapSubtitle(dataSource);
+  const type = 'hls';
+  const url = mapStreamUrl(dataSource);
+  return {subtitles, type, url};
 
   /**
-   * Retrieves the data source.
-   * @returns {IStreamData}
+   * Extract the data source.
+   * @returns {PageStream}
    */
-  function getDataSource() {
+  function extractDataSource() {
     const match = document.body.innerHTML.match(/vilos\.config\.media\s*=\s*({.+});/);
     const source = match && JSON.parse(match[1]);
     if (source) return source;
@@ -24,34 +24,35 @@ function evaluateStream() {
   }
 
   /**
-   * Fetches the manifest.
-   * @param {IStreamData} dataSource 
+   * Map the stream.
+   * @param {PageStream} dataSource 
    * @returns {string}
    */
-  function getManifestUrl(dataSource) {
-    const manifest = dataSource.streams.find(x => x.format === 'adaptive_hls' && x.audio_lang === 'jaJP' && !x.hardsub_lang);
-    if (manifest) return manifest.url;
+  function mapStreamUrl(dataSource) {
+    const stream = dataSource.streams.find(x => x.format === 'adaptive_hls' && x.audio_lang === 'jaJP' && !x.hardsub_lang);
+    if (stream) return stream.url;
     throw new Error();
   }
 
   /**
-   * Fetches the subtitle.
-   * @param {IStreamData} dataSource 
-   * @returns {Array<IApiStreamSubtitle>}
+   * Map the subtitles.
+   * @param {PageStream} dataSource 
+   * @returns {Array<RemoteStreamSubtitle>}
    */
-  function getSubtitles(dataSource) {
-    return dataSource.subtitles
-      .filter(x => x.format === 'ass')
-      .map(x => ({language: transform(x.language), type: 'ass', url: x.url}))
-      .filter(x => Boolean(x.language));
+  function mapSubtitle(dataSource) {
+    return dataSource.subtitles.map(x => ({
+      language: mapSubtitleLanguage(x.language),
+      type: mapSubtitleType(x.format),
+      url: x.url
+    }));
   }
 
   /**
-   * Transforms to ISO 639-2.
+   * Map the subtitle language.
    * @param {string} language 
-   * @return {string}
+   * @return {RemoteStreamSubtitle['language']}
    */
-  function transform(language) {
+  function mapSubtitleLanguage(language) {
     if (language === 'arME') return 'ara';
     if (language === 'frFR') return 'fre';
     if (language === 'deDE') return 'ger';
@@ -61,7 +62,17 @@ function evaluateStream() {
     if (language === 'itIT') return 'ita';
     if (language === 'ptBR') return 'por';
     if (language === 'ruRU') return 'rus';
-    return '';
+    throw new Error();
+  }
+  
+  /**
+   * Map the subtitle type.
+   * @param {string} format
+   * @returns {RemoteStreamSubtitle['type']}
+   */
+  function mapSubtitleType(format) {
+    if (format === 'ass') return 'ass';
+    throw new Error();
   }
 }
 

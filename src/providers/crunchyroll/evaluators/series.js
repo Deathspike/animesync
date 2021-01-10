@@ -1,14 +1,14 @@
 /**
- * @typedef {import('../../..').IApiSeries} IApiSeries
- * @typedef {import('../../..').IApiSeriesSeason} IApiSeriesSeason
- * @typedef {import('../../..').IApiSeriesSeasonEpisode} IApiSeriesSeasonEpisode
+ * @typedef {import('../../..').models.RemoteSeries} RemoteSeries
+ * @typedef {import('../../..').models.RemoteSeriesSeason} RemoteSeriesSeason
+ * @typedef {import('../../..').models.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
  * @type any
  */
 var $;
 
 /**
- * Evaluates the series.
- * @returns {IApiSeries}
+ * Evaluate the series.
+ * @returns {RemoteSeries}
  **/
 function evaluateSeries() {
   return {
@@ -21,9 +21,9 @@ function evaluateSeries() {
   };
 
   /**
-   * Maps the season.
+   * Map the seasons.
    * @param {Element?} containerNode
-   * @returns {Array<IApiSeriesSeason>}
+   * @returns {Array<RemoteSeriesSeason>}
    */
   function mapSeason(containerNode) {
     if (!containerNode) throw new Error();
@@ -35,9 +35,9 @@ function evaluateSeries() {
   }
 
   /**
-   * Maps the season episodes.
+   * Map the season episodes.
    * @param {Element?} seasonNode 
-   * @returns {Array<IApiSeriesSeasonEpisode>}
+   * @returns {Array<RemoteSeriesSeasonEpisode>}
    */
   function mapSeasonEpisodes(seasonNode) {
     if (!seasonNode) throw new Error();
@@ -54,7 +54,7 @@ function evaluateSeries() {
   }
 
   /**
-   * Processes the bubble data.
+   * Process the bubble data.
    * @param {{name: string, description: string}} value
    * @returns {{description: string, number: string, title: string}}
    */
@@ -67,7 +67,7 @@ function evaluateSeries() {
   }
 
   /**
-   * Processes the URL.
+   * Process the URL.
    * @throws If the URL is invalid.
    * @param {Element|string?} value 
    * @param {string=} attributeName
@@ -86,22 +86,22 @@ function evaluateSeries() {
   }
 
   /**
-   * Validates the text content.
+   * Validate the text content.
    * @param {(Element|string)?} value 
-   * @returns {string}
+   * @returns {string|undefined}
    */
   function validate(value) {
     if (typeof value === 'string') {
-      return value.trim().replace(/\s+/g, ' ');
+      return value.trim().replace(/\s+/g, ' ') || undefined;
     } else if (value) {
       return validate(value.textContent);
     } else {
-      return '';
+      return undefined;
     }
   }
 
   /**
-   * Validates the text content.
+   * Validate the text content.
    * @throws If the text content is empty.
    * @param {(Element|string)?} value 
    * @returns {string}

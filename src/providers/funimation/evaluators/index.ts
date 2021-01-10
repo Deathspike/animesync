@@ -1,4 +1,4 @@
-export type ISeries = {
+export type PageSeries = {
   children: Array<{number: string, title: string}>;
   genres: Array<{name: string}>;
   id: number;
@@ -7,14 +7,14 @@ export type ISeries = {
   title: string;
 }
 
-export type ISeriesSeason = {
-  items: Array<ISeriesSeasonEpisode>;
+export type PageSeriesSeason = {
+  items: Array<PageSeriesSeasonEpisode>;
 }
 
-export type ISeriesSeasonEpisode = {
+export type PageSeriesSeasonEpisode = {
   audio: Array<string>;
   item: {episodeName: string, episodeNum: string, episodeSlug: string};
-  mostRecentSvod: {subscriptionRequired: boolean};
+  mostRecentSvod: {subscriptionRequired?: boolean};
   poster: string;
   synopsis: string;
 }

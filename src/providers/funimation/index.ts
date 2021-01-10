@@ -1,6 +1,7 @@
 import * as app from '../..';
-import {evaluateQuery} from './evaluators/query';
+import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
+import {rewrite} from '../rewrite';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
@@ -14,9 +15,8 @@ export const funimationProvider = {
     return await app.browserAsync(context, async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const query = await page.evaluate(evaluateQuery);
-      query.series.forEach(x => x.imageUrl = context.rewrite.createEmulateUrl(x.imageUrl, headers));
-      return query;
+      const search = await page.evaluate(evaluateSearch);
+      return rewrite.search(context, search, headers);
     });
   },
 
@@ -25,13 +25,11 @@ export const funimationProvider = {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
-      series.imageUrl = context.rewrite.createEmulateUrl(series.imageUrl, headers);
-      series.seasons.forEach(x => x.episodes.forEach(y => y.imageUrl = context.rewrite.createEmulateUrl(y.imageUrl, headers)));
-      return series;
+      return rewrite.series(context, series, headers);
     });
   },
 
-  async streamAsync(context: app.Context, episodeUrl: string): Promise<app.IApiStream> {
+  async streamAsync(context: app.Context, episodeUrl: string) {
     return await app.browserAsync(context, async (page, userAgent) => {
       const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
@@ -40,11 +38,9 @@ export const funimationProvider = {
       await page.close();
       if (manifestSrc && vttSubtitleSrc) {
         const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-        const manifestType = 'hls';
-        const manifestUrl = context.rewrite.createHlsUrl(manifestSrc, headers);
-        const subtitleUrl = context.rewrite.createEmulateUrl(vttSubtitleSrc, headers);
-        const subtitles = [{language: 'eng', type: 'vtt', url: subtitleUrl}];
-        return {manifestType, manifestUrl, subtitles};
+        const subtitle = new app.models.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
+        const stream = new app.models.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
+        return rewrite.stream(context, stream, headers);
       } else {
         throw new Error();
       }

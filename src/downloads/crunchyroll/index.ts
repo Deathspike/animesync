@@ -6,7 +6,7 @@ export async function crunchyrollAsync(context: app.Context, rootPath: string, s
   const series = await app.provider.seriesAsync(context, seriesUrl);
   const seriesName = sanitizeFilename(series.title);
   const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new app.Series(app.settings.library);
+  const tracker = new app.Tracker(app.settings.library);
   for (const season of series.seasons) {
     const seasonName = sanitizeFilename(season.title);
     for (const episode of season.episodes) {

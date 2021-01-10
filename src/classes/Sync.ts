@@ -16,7 +16,7 @@ export class Sync {
     this._syncPath = path.join(app.settings.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
   }
 
-  async saveAsync(stream: app.IApiStream) {
+  async saveAsync(stream: app.models.RemoteStream) {
     const bestStream = await this._bestStreamAsync(stream);
     const subtitles = await this._subtitlesAsync(stream);
     if (bestStream && subtitles) try {
@@ -49,13 +49,13 @@ export class Sync {
     }
   }
 
-  private async _bestStreamAsync(stream: app.IApiStream) {
-    const manifestData = await fetch(stream.manifestUrl).then(x => x.text());
+  private async _bestStreamAsync(stream: app.models.RemoteStream) {
+    const manifestData = await fetch(stream.url).then(x => x.text());
     const manifest = app.HlsManifest.from(manifestData);
     return manifest.fetchStreams().shift();
   }
   
-  private async _subtitlesAsync(stream: app.IApiStream) {
+  private async _subtitlesAsync(stream: app.models.RemoteStream) {
     await fs.ensureDir(this._syncPath);
     return await Promise.all(stream.subtitles.map(async (x, i) => {
       if (x.type === 'vtt') {
