@@ -19,7 +19,7 @@ export class RemoteSeries {
   readonly genres: Array<string>;
 
   @clv.IsString()
-  @clv.IsUrl()
+  @clv.IsUrl({require_tld: false})
   @swg.ApiProperty()
   readonly imageUrl: string;
 

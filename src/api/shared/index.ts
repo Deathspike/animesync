@@ -1,4 +1,5 @@
 export * from '../..';
-export * from './ContextService';
+export * from './services/AgentService';
+export * from './services/ContextService';
 export * from './ResponseValidator';
 export * from './ResponseValidatorInterceptor';

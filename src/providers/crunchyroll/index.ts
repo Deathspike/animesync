@@ -13,7 +13,7 @@ export const crunchyrollProvider = {
 
   async popularAsync(context: app.Context, pageNumber = 1) {
     const queryUrl = createQueryUrl('popular', pageNumber);
-    return await app.browserAsync(context, async (page, userAgent) => {
+    return await app.browserAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
@@ -22,7 +22,7 @@ export const crunchyrollProvider = {
   },
   
   async seriesAsync(context: app.Context, seriesUrl: string) {
-    return await app.browserAsync(context, async (page, userAgent) => {
+    return await app.browserAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeries);
@@ -31,7 +31,7 @@ export const crunchyrollProvider = {
   },
 
   async streamAsync(context: app.Context, episodeUrl: string) {
-    return await app.browserAsync(context, async (page, userAgent) => {
+    return await app.browserAsync(async (page, userAgent) => {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);

@@ -5,13 +5,19 @@ import * as rxo from 'rxjs/operators';
 import express from 'express';
 
 export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
-  constructor(private responseType: {new (...args: any[]): T}) {}
+  private readonly _cls: {new (...args: any[]): T};
+  private readonly _options?: clt.ClassTransformOptions;
+
+  constructor(cls: {new (...args: any[]): T}, options?: clt.ClassTransformOptions) {
+    this._cls = cls;
+    this._options = options;
+  }
 
   intercept(context: api.ExecutionContext, next: api.CallHandler) {
     return next.handle().pipe(rxo.map(async (value: T) => {
-      const validationErrors = await (value instanceof this.responseType
+      const validationErrors = await (value instanceof this._cls
         ? clv.validate(value)
-        : clv.validate(clt.plainToClass(this.responseType, value)));
+        : clv.validate(clt.plainToClass(this._cls, value, this._options)));
       if (validationErrors.length) {
         const errors = flatten(validationErrors);
         const message = 'Validation failed';

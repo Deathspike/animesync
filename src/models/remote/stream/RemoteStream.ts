@@ -21,7 +21,7 @@ export class RemoteStream {
   readonly type: 'hls';
 
   @clv.IsString()
-  @clv.IsUrl()
+  @clv.IsUrl({require_tld: false})
   @swg.ApiProperty()
   readonly url: string;
 }

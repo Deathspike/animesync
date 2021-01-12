@@ -16,8 +16,13 @@ const defaultSettings = {
   chromeObserverTimeout: 30000,
   chromeViewport: '1920x974',
   proxyServer: '',
+  serverPort: 6583
 };
 
-export const settings = Object.assign(defaultPaths, defaultSettings, fs.readJsonSync(
+const mergedSettings = Object.assign(defaultPaths, defaultSettings, fs.readJsonSync(
   path.join(os.homedir(), 'animesync', 'settings.json'),
   {throws: false}) as {});
+
+export const settings = Object.assign(mergedSettings, {
+  serverUrl: `http://localhost:${mergedSettings.serverPort}/`
+});
