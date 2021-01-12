@@ -1,10 +1,10 @@
 import * as app from '..';
 
 export async function browserAsync() {
-  await app.Context.usingAsync(async (context) => {
+  await app.Server.usingAsync(async () => {
     app.logger.info(`Launching browser ...`);
     app.settings.chromeHeadless = false;
-    await app.browserAsync(context, async (page) => {
+    await app.browserAsync(async (page) => {
       const context = page.context();
       const pages = context.pages();
       if (pages.length > 0) pages[0].goto('https://www.crunchyroll.com/');

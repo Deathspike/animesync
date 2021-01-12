@@ -5,11 +5,11 @@ let browserInstance: Promise<playwright.ChromiumBrowserContext> | undefined;
 let numberOfPages = 0;
 let timeoutHandle = setTimeout(() => undefined, 0);
 
-export async function browserAsync<T>(context: app.Context, handlerAsync: (page: playwright.Page, userAgent: string) => Promise<T>) {
+export async function browserAsync<T>(handlerAsync: (page: playwright.Page, userAgent: string) => Promise<T>) {
   let page: playwright.Page | undefined;
   try {
     numberOfPages++;
-    const browser = await (browserInstance ?? (browserInstance = launchAsync(context)));
+    const browser = await (browserInstance ?? (browserInstance = launchAsync()));
     page = await browser.newPage();
     page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
     const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
@@ -23,13 +23,13 @@ export async function browserAsync<T>(context: app.Context, handlerAsync: (page:
   }
 }
 
-async function launchAsync(context: app.Context) {
+async function launchAsync() {
   const cv = app.settings.chromeViewport.match(/^([0-9]+)x([0-9]+)$/);
   return await playwright.chromium.launchPersistentContext(app.settings.chrome, { 
     args: ['--autoplay-policy=no-user-gesture-required'],
     executablePath: chromeLauncher.Launcher.getFirstInstallation(),
     headless: app.settings.chromeHeadless,
-    proxy: {server: context.address},
+    proxy: {server: app.settings.serverUrl},
     viewport: app.settings.chromeHeadless && cv ? {width: parseInt(cv[1]), height: parseInt(cv[2])} : null
   }) as playwright.ChromiumBrowserContext;
 }

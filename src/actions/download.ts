@@ -1,7 +1,7 @@
 import * as app from '..';
 
 export async function downloadAsync(this: app.ICliOptions, seriesList: Array<string>) {
-  await app.Context.usingAsync(async (context) => {
+  await app.Server.usingAsync(async (context) => {
     await app.migrateAsync();
     if (seriesList.length) {
       app.logger.info(`Sourcing ${app.settings.library}`);

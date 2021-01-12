@@ -1,41 +1,23 @@
-import * as app from '../..';
+import * as app from '..';
 import {SocksClient, SocksProxy, SocksRemoteHost} from 'socks';
 import dns from 'dns';
-import http from 'http';
 import net from 'net';
 import url from 'url';
 import tls from 'tls';
 import util from 'util';
 
-export class Tunnel {
-  private readonly _http: http.Server;
-  private readonly _nordVpn: app.NordVpn;
-
-  constructor(http: http.Server) {
-    this._http = http;
-    this._http.on('connect', this._connectHttp.bind(this));
-    this._nordVpn = new app.NordVpn();
-  }
+export class HttpTunnelService {
+  private _nordvpn?: app.NordVpn;
 
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = url.parse(clientUrl);
     const server = url.parse(app.settings.proxyServer);
     if (server.protocol === 'nordvpn:') {
-      this._nordVpn.getAsync(server)
+      (this._nordvpn ?? (this._nordvpn = new app.NordVpn())).getAsync(server)
         .then(x => this._connectTo(client, clientSocket, x))
         .catch(() => clientSocket.end());
     } else {
       this._connectTo(client, clientSocket, server);
-    }
-  }
-
-  private _connectHttp(request: http.IncomingMessage, socket: net.Socket) {
-    if (request.url) {
-      const clientSocket = socket;
-      const clientUrl = `http://${request.url}`;
-      this.connect(clientSocket, clientUrl);
-    } else {
-      socket.end();
     }
   }
 
@@ -72,7 +54,7 @@ export class Tunnel {
     const serverSocket = net.connect(serverPort, String(client.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('connect', () => clientSocket.write(statusHeader(200, 'OK'), serverTunnel));
-  }
+  } 
 
   private async _socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
     // Initialize the destination.

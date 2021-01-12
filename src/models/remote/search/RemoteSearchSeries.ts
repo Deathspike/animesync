@@ -9,7 +9,7 @@ export class RemoteSearchSeries {
   }
 
   @clv.IsString()
-  @clv.IsUrl()
+  @clv.IsUrl({require_tld: false})
   @swg.ApiProperty()
   readonly imageUrl: string;
 

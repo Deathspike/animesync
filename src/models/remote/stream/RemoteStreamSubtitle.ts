@@ -19,7 +19,7 @@ export class RemoteStreamSubtitle {
   readonly type: 'ass' | 'vtt';
 
   @clv.IsString()
-  @clv.IsUrl()
+  @clv.IsUrl({require_tld: false})
   @swg.ApiProperty()
   readonly url: string;
 }

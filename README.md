@@ -73,15 +73,16 @@ Usage: animesync [options] [command]
 AnimeSync is capable of downloading anime episodes from popular streaming services.
 
 Options:
-  -V, --version            output the version number
-  -h, --help               display help for command
+  -V, --version                      output the version number
+  -h, --help                         display help for command
 
 Commands:
-  browser                  Launch browser.
-  download [seriesUrl...]  Downloads series.
-  series                   Manage series.
-  settings [options]       Manage settings.
-  help [command]           display help for command
+  browser                            Launch browser.
+  download [options] [seriesUrl...]  Downloads series.
+  series                             Manage series.
+  server                             Runs the server.
+  settings [options]                 Manage settings.
+  help [command]                     display help for command
 ```
 
 ## Basic Instructions
@@ -211,6 +212,14 @@ If you have an account with *NordVPN*, you can use:
     animesync settings --proxyServer nordvpn://username:password@us
 
 With this configuration, `animesync` periodically queries the list of proxies provided by *NordVPN* and automatically selects the HTTPS proxy with the least amount of load. That should be the fastest proxy available at that time. The `@us` suffix stands for *USA*, and ensures the proxy server is in that country. You can use whatever country flag you desire, but I recommend *USA* for the best video availability.
+
+## Developers
+
+AnimeSync includes an `OpenAPI` server. You can run independently of downloads:
+
+    animesync server
+
+Then navigate to http://localhost:6583/. Questions? Please ask.
 
 # Contributions
 
