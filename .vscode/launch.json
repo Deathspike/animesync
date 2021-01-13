@@ -1,7 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [{
-    "args": ["dist/app", "download"],
+    "args": ["dist/cli/app", "download"],
     "name": "Launch Program",
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
