@@ -3,6 +3,7 @@ import * as api from '@nestjs/common';
 import * as swg from '@nestjs/swagger';
 import {NestExpressApplication} from '@nestjs/platform-express';
 import {NestFactory} from '@nestjs/core';
+import {ServerLogger} from './ServerLogger';
 import {ServerModule} from './ServerModule';
 
 export class Server {
@@ -14,7 +15,8 @@ export class Server {
   }
 
   static async createAsync() {
-    const server = new Server(await NestFactory.create(ServerModule, {bodyParser: false}));
+    const logger = new ServerLogger();
+    const server = new Server(await NestFactory.create(ServerModule, {bodyParser: false, logger}));
     await server.startAsync();
     return server;
   }
