@@ -3,6 +3,7 @@ import os from 'os';
 import path from 'path';
 
 const defaultPaths = {
+  cache: path.join(os.homedir(), 'animesync', 'cache'),
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
   library: path.join(os.homedir(), 'animesync', 'library'),
   logger: path.join(os.homedir(), 'animesync', 'logger'),
@@ -10,6 +11,9 @@ const defaultPaths = {
 };
 
 const defaultSettings = {
+  cacheRemoteSearchTimeout: 3600000,
+  cacheRemoteSeriesTimeout: 900000,
+  cacheRemoteStreamTimeout: 300000,
   chromeHeadless: true,
   chromeInactiveTimeout: 1000,
   chromeNavigationTimeout: 30000,
