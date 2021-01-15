@@ -38,10 +38,10 @@ export class CacheService {
   private async _addAsync<T>(key: string, timeout: number, valuePromise: Promise<T>) {
     try {
       this._values[key] = valuePromise;
-      const id = Date.now().toString(16) + crypto.randomBytes(24).toString('hex');
+      const id = `${Date.now().toString(16) + crypto.randomBytes(24).toString('hex')}.json`;
       const value = await valuePromise;
       await fs.ensureDir(app.settings.cache);
-      await fs.writeJson(path.join(app.settings.cache, id), value);
+      await fs.writeJson(path.join(app.settings.cache, id), value, {spaces: 2});
       this._timeoutHandles[key] = setTimeout(() => this.expireAsync(key).catch((error) => app.logger.error(error)), timeout);
       this._values[key] = id;
       return value;
