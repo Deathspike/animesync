@@ -27,7 +27,7 @@ export class CoreModule implements api.OnApplicationBootstrap, api.NestModule {
   }
 
   private _onConnect(request: http.IncomingMessage, socket: net.Socket) {
-    if (request.connection.localAddress === request.connection.remoteAddress && request.url) {
+    if (socket.localAddress === socket.remoteAddress && request.url) {
       const clientSocket = socket;
       const clientUrl = `http://${request.url}`;
       this._tunnelService.connect(clientSocket, clientUrl);

@@ -1,26 +1,31 @@
 import * as app from '..';
 import * as api from '@nestjs/common';
-import {HttpsProxyAgent} from 'https-proxy-agent';
 import {HeadersInit, RequestInit} from 'node-fetch';
 import fetch from 'node-fetch';
 import http from 'http';
 import express from 'express';
-import url from 'url';
 
 @api.Injectable()
 export class AgentService {
-  async fetchAsync(requestUrl: string, options?: RequestInit) {
-    const agent = new HttpsProxyAgent(app.settings.serverUrl) as any;
-    const headers = this.getHeaders(options && options.headers ? options.headers : {});
-    const host = url.parse(requestUrl)?.host;
-    headers['host'] = host ?? '';
-    return await fetch(requestUrl, {...options, agent, headers});
+  private readonly _httpAgent: app.AgentHttp;
+  private readonly _httpsAgent: app.AgentHttps;
+  
+  constructor() {
+    this._httpAgent = new app.AgentHttp({keepAlive: true});
+    this._httpsAgent = new app.AgentHttps({keepAlive: true});
   }
 
-  async forwardAsync(requestUrl: string, options: RequestInit & {headers: http.IncomingHttpHeaders}, response: express.Response) {
+  async fetchAsync(url: URL, options?: RequestInit) {
+    const agent = url.protocol === 'https:' ? this._httpsAgent : this._httpAgent;
+    const headers = this.getHeaders(options && options.headers ? options.headers : {});
+    headers['host'] = url.host ?? '';
+    return await fetch(url, {...options, agent, headers});
+  }
+
+  async forwardAsync(url: URL, response: express.Response, options?: RequestInit) {
     const compress = false;
     const redirect = 'manual';
-    const result = await this.fetchAsync(requestUrl, {...options, compress, redirect});
+    const result = await this.fetchAsync(url, {...options, compress, redirect});
     response.status(result.status);
     Object.entries(this.getHeaders(result.headers)).forEach(([k, v]) => response.header(k, v));
     result.body.pipe(response);
