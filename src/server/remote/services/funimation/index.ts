@@ -1,35 +1,40 @@
 import * as app from '../..';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
-import {rewrite} from '../rewrite';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
-export const funimationProvider = {
+export class FunimationProvider {
+  private readonly _composeService: app.ComposeService;
+
+  constructor(composeService: app.ComposeService) {
+    this._composeService = composeService;
+  }
+
   isSupported(url: string) {
     return url.startsWith(baseUrl);
-  },
+  }
 
-  async popularAsync(context: app.Context, pageNumber = 1) {
+  async popularAsync(pageNumber = 1) {
     const queryUrl = createQueryUrl('popularity', pageNumber);
     return await app.browserAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
-      return rewrite.search(context, search, headers);
+      return this._composeService.search(search, headers);
     });
-  },
+  }
 
-  async seriesAsync(context: app.Context, seriesUrl: string) {
+  async seriesAsync(seriesUrl: string) {
     return await app.browserAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
-      return rewrite.series(context, series, headers);
+      return this._composeService.series(series, headers);
     });
-  },
+  }
 
-  async streamAsync(context: app.Context, episodeUrl: string) {
+  async streamAsync(episodeUrl: string) {
     return await app.browserAsync(async (page, userAgent) => {
       const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
@@ -40,13 +45,13 @@ export const funimationProvider = {
         const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
         const subtitle = new app.api.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
         const stream = new app.api.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
-        return rewrite.stream(context, stream, headers);
+        return this._composeService.stream(stream, headers);
       } else {
         throw new Error();
       }
     });
   }
-};
+}
 
 function createQueryUrl(sort: string, pageNumber = 1) {
   const page = pageNumber > 1 ? {p: pageNumber} : undefined;

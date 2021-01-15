@@ -4,7 +4,7 @@ import cors from 'cors'
 
 @api.Module({
   controllers: [app.RewriteController],
-  providers: [app.AgentService, app.ContextService, app.HlsService]})
+  providers: [app.HlsService]})
 export class RewriteModule implements api.NestModule {
   configure(consumer: api.MiddlewareConsumer) {
     consumer.apply(cors()).forRoutes(app.RewriteController);

@@ -24,14 +24,29 @@ export async function browserAsync<T>(handlerAsync: (page: playwright.Page, user
 }
 
 async function launchAsync() {
-  const cv = app.settings.chromeViewport.match(/^([0-9]+)x([0-9]+)$/);
-  return await playwright.chromium.launchPersistentContext(app.settings.chrome, { 
-    args: ['--autoplay-policy=no-user-gesture-required'],
-    executablePath: chromeLauncher.Launcher.getFirstInstallation(),
-    headless: app.settings.chromeHeadless,
-    proxy: {server: app.settings.serverUrl},
-    viewport: app.settings.chromeHeadless && cv ? {width: parseInt(cv[1]), height: parseInt(cv[2])} : null
-  }) as playwright.ChromiumBrowserContext;
+  try {
+    const args = ['--autoplay-policy=no-user-gesture-required'];
+    const executablePath = chromeLauncher.Launcher.getFirstInstallation();
+    const headless = app.settings.chromeHeadless;
+    const proxy = {server: app.settings.serverUrl};
+    const viewport = app.settings.chromeHeadless ? parseResolution(app.settings.chromeViewport) : undefined;
+    browserInstance = playwright.chromium.launchPersistentContext(app.settings.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
+    return await browserInstance;
+  } catch (error) {
+    browserInstance = undefined;
+    throw error;
+  }
+}
+
+function parseResolution(value?: string) {
+  const match = value?.match(/^([0-9]+)x([0-9]+)$/);
+  if (match) {
+    const width = parseFloat(match[1]);
+    const height = parseFloat(match[2]);
+    return {width, height};
+  } else {
+    return;
+  }
 }
 
 function updateTimeout() {
