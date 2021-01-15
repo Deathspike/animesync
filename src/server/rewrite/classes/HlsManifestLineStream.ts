@@ -1,4 +1,4 @@
-import * as app from '../..';
+import * as app from '..';
 
 export class HlsManifestLineStream {
   private readonly _manifest: app.HlsManifest;

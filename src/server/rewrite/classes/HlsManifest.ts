@@ -1,4 +1,4 @@
-import * as app from '../..';
+import * as app from '..';
 
 export class HlsManifest extends Array<app.HlsManifestLine> {
   static from(manifest: string) {

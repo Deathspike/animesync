@@ -9,6 +9,16 @@ export class HlsService {
     this._contextService = contextService;
   }
 
+  getBestStreamUrl(manifest: string) {
+    const hls = app.HlsManifest.from(manifest);
+    const streams = hls.fetchStreams();
+    if (streams.length) {
+      return streams[0].url;
+    } else {
+      return undefined;
+    }
+  }
+
   rewrite(manifest: string, headers?: Record<string, string>) {
     const context = this._contextService.get();
     const hls = app.HlsManifest.from(manifest);
