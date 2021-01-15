@@ -22,7 +22,7 @@ export class RewriteController {
     @api.Query() query: Record<string, string>,
     @api.Param() params: app.api.RewriteParamEmulate,
     @api.Res() response: express.Response) {
-    await this._agentService.forwardAsync(params.url, {headers: {...headers, ...query}}, response);
+    await this._agentService.forwardAsync(new URL(params.url), response, {headers: {...headers, ...query}});
   }
 
   @api.Get('hls/:url')
@@ -32,7 +32,7 @@ export class RewriteController {
     @api.Param() params: app.api.RewriteParamHls,
     @api.Res() response: express.Response) {
     delete headers['range'];
-    const result = await this._agentService.fetchAsync(params.url, {headers: {...headers, ...query}});
+    const result = await this._agentService.fetchAsync(new URL(params.url), {headers: {...headers, ...query}});
     if (result.status === 200) {
       const manifest = await result.text();
       const streamUrl = this._hlsService.getBestStreamUrl(manifest);
