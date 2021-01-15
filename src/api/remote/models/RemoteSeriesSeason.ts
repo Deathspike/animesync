@@ -1,11 +1,11 @@
-import * as app from '..';
+import * as app from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteSeriesSeason {
-  constructor(source: RemoteSeriesSeason, sourcePatch?: Partial<RemoteSeriesSeason>) {
-    this.episodes = sourcePatch?.episodes ?? source.episodes;
-    this.title = sourcePatch?.title ?? source.title;
+  constructor(source?: RemoteSeriesSeason, sourcePatch?: Partial<RemoteSeriesSeason>) {
+    this.episodes = app.property('episodes', source, sourcePatch, []);
+    this.title = app.property('title', source, sourcePatch, '');
   }
 
   @clv.IsArray()

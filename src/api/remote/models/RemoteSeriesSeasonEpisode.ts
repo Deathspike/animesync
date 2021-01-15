@@ -1,14 +1,15 @@
+import * as app from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteSeriesSeasonEpisode {
-  constructor(source: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
-    this.imageUrl = sourcePatch?.imageUrl ?? source.imageUrl;
-    this.isPremium = sourcePatch?.isPremium ?? source.isPremium;
-    this.number = sourcePatch?.number ?? source.number;
-    this.title = sourcePatch?.title ?? source.title;
-    this.synopsis = sourcePatch?.synopsis ?? source.synopsis;
-    this.url = sourcePatch?.url ?? source.url;
+  constructor(source?: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
+    this.imageUrl = app.property('imageUrl', source, sourcePatch, '');
+    this.isPremium = app.property('isPremium', source, sourcePatch, false);
+    this.number = app.property('number', source, sourcePatch, '');
+    this.title = app.property('title', source, sourcePatch, '');
+    this.synopsis = app.property('synopsis', source, sourcePatch, '');
+    this.url = app.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()

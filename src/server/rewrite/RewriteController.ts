@@ -20,7 +20,7 @@ export class RewriteController {
   async emulateAsync(
     @api.Headers() headers: Record<string, string>,
     @api.Query() query: Record<string, string>,
-    @api.Param() params: app.RewriteParamEmulate,
+    @api.Param() params: app.api.RewriteParamEmulate,
     @api.Res() response: express.Response) {
     await this._agentService.forwardAsync(params.url, {headers: {...headers, ...query}}, response);
   }
@@ -29,7 +29,7 @@ export class RewriteController {
   async hlsAsync(
     @api.Headers() headers: Record<string, string>,
     @api.Query() query: Record<string, string>,
-    @api.Param() params: app.RewriteParamHls,
+    @api.Param() params: app.api.RewriteParamHls,
     @api.Res() response: express.Response) {
     const result = await this._agentService.fetchAsync(params.url, {headers: {...headers, ...query}});
     if (result.status >= 200 && result.status < 300) {

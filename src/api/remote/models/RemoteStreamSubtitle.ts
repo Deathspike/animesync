@@ -1,11 +1,12 @@
+import * as app from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteStreamSubtitle {
-  constructor(source: RemoteStreamSubtitle, sourcePatch?: Partial<RemoteStreamSubtitle>) {
-    this.language = sourcePatch?.language ?? source.language;
-    this.type = sourcePatch?.type ?? source.type;
-    this.url = sourcePatch?.url ?? source.url;
+  constructor(source?: RemoteStreamSubtitle, sourcePatch?: Partial<RemoteStreamSubtitle>) {
+    this.language = app.property('language', source, sourcePatch, 'eng');
+    this.type = app.property('type', source, sourcePatch, 'vtt');
+    this.url = app.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()

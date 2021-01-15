@@ -1,11 +1,11 @@
-import * as app from '..';
+import * as app from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteSearch {
-  constructor(source: RemoteSearch, sourcePatch?: Partial<RemoteSearch>) {
-    this.hasMorePages = sourcePatch?.hasMorePages ?? source.hasMorePages;
-    this.series = sourcePatch?.series ?? source.series;
+  constructor(source?: RemoteSearch, sourcePatch?: Partial<RemoteSearch>) {
+    this.hasMorePages = app.property('hasMorePages', source, sourcePatch, false);
+    this.series = app.property('series', source, sourcePatch, []);
   }
 
   @clv.IsBoolean()

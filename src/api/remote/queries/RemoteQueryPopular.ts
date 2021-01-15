@@ -1,12 +1,18 @@
+import * as app from '../..';
 import * as clt from 'class-transformer';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteQueryPopular {
+  constructor(source?: RemoteQueryPopular, sourcePatch?: Partial<RemoteQueryPopular>) {
+    this.providerName = app.property('providerName', source, sourcePatch, 'crunchyroll');
+    this.pageNumber = app.property('pageNumber', source, sourcePatch, 1);
+  }
+
   @clv.IsString()
   @clv.IsIn(['crunchyroll', 'funimation'])
   @swg.ApiProperty({enum: ['crunchyroll', 'funimation']})
-  readonly providerName!: 'crunchyroll' | 'funimation';
+  readonly providerName: 'crunchyroll' | 'funimation';
   
   @clv.IsOptional()
   @clv.IsNumber()

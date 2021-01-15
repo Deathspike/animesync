@@ -1,11 +1,12 @@
+import * as app from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteSearchSeries {
-  constructor(source: RemoteSearchSeries, sourcePatch?: Partial<RemoteSearchSeries>) {
-    this.imageUrl = sourcePatch?.imageUrl ?? source.imageUrl;
-    this.title = sourcePatch?.title ?? source.title;
-    this.url = sourcePatch?.url ?? source.url;
+  constructor(source?: RemoteSearchSeries, sourcePatch?: Partial<RemoteSearchSeries>) {
+    this.imageUrl = app.property('imageUrl', source, sourcePatch, '');
+    this.title = app.property('title', source, sourcePatch, '');
+    this.url = app.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()
