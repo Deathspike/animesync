@@ -1,3 +1,4 @@
+import * as app from '.';
 import * as api from '@nestjs/common';
 import * as clt from 'class-transformer';
 import * as clv from 'class-validator';
@@ -24,9 +25,9 @@ export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
         const response = context.switchToHttp().getResponse<express.Response>();
         const statusCode = 500;
         response.status(statusCode);
-        return {statusCode, message, errors};
+        return trace(context, statusCode, {statusCode, message, errors});
       } else {
-        return value;
+        return trace(context, 200, value);
       }
     }));
   }
@@ -42,4 +43,11 @@ function map(error: clv.ValidationError, result: Array<{constraints: Record<stri
   const property = previousProperty ? `${previousProperty}.${error.property}` : error.property;
   if (error.constraints) result.push(({property, constraints: error.constraints}))
   if (error.children) result.push(...flatten(error.children, property));
+}
+
+function trace<T>(context: api.ExecutionContext, statusCode: number, value: T) {
+  const request: express.Request = context.switchToHttp().getRequest();
+  app.logger.debug(`-> ${request.url}`);
+  app.logger.debug(`<- ${statusCode} ${JSON.stringify(value)}`);
+  return value;
 }
