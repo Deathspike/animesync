@@ -17,16 +17,15 @@ export class Sync {
   }
 
   async saveAsync(stream: app.api.RemoteStream) {
-    const bestStream = await this._bestStreamAsync(stream);
-    const subtitles = await this._subtitlesAsync(stream);
-    if (bestStream && subtitles) try {
-      const foreignSubtitles = subtitles
+    try {
+      const allSubtitles = await this._subtitlesAsync(stream);
+      const foreignSubtitles = allSubtitles
         .filter(x => x.language !== 'eng')
         .sort((a, b) => a.language.localeCompare(b.language));
-      const sortedSubtitles = subtitles
+      const sortedSubtitles = allSubtitles
         .filter(x => x.language === 'eng')
         .concat(foreignSubtitles);
-      const inputs = [['-i', bestStream.url]]
+      const inputs = [['-i', stream.url]]
         .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
         .reduce((p, c) => p.concat(c))
       const mappings = [['-map', '0:v', '-map', '0:a']]
@@ -44,17 +43,9 @@ export class Sync {
         .concat(['-c', 'copy', this._episodePath]));
     } finally {
       await fs.remove(this._syncPath);
-    } else {
-      throw new Error();
     }
   }
 
-  private async _bestStreamAsync(stream: app.api.RemoteStream) {
-    const manifestData = await fetch(stream.url).then(x => x.text());
-    const manifest = app.HlsManifest.from(manifestData);
-    return manifest.fetchStreams().shift();
-  }
-  
   private async _subtitlesAsync(stream: app.api.RemoteStream) {
     await fs.ensureDir(this._syncPath);
     return await Promise.all(stream.subtitles.map(async (x, i) => {

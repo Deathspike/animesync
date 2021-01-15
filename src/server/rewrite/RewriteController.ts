@@ -31,10 +31,13 @@ export class RewriteController {
     @api.Query() query: Record<string, string>,
     @api.Param() params: app.api.RewriteParamHls,
     @api.Res() response: express.Response) {
+    delete headers['range'];
     const result = await this._agentService.fetchAsync(params.url, {headers: {...headers, ...query}});
-    if (result.status >= 200 && result.status < 300) {
+    if (result.status === 200) {
       const manifest = await result.text();
-      response.send(this._hlsService.rewrite(manifest, query));
+      const streamUrl = this._hlsService.getBestStreamUrl(manifest);
+      if (streamUrl) await this.hlsAsync(headers, query, {url: streamUrl}, response);
+      else response.send(this._hlsService.rewrite(manifest, query));
     } else {
       response.sendStatus(500);
     }
