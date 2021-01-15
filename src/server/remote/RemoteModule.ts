@@ -4,7 +4,7 @@ import cors from 'cors'
 
 @api.Module({
   controllers: [app.RemoteController],
-  providers: [app.CacheService, app.ContextService]})
+  providers: [app.CacheService, app.ComposeService, app.ProviderService]})
 export class RemoteModule implements api.NestModule {
   configure(consumer: api.MiddlewareConsumer) {
     consumer.apply(cors()).forRoutes(app.RemoteController);

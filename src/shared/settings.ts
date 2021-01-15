@@ -15,7 +15,7 @@ const defaultSettings = {
   cacheRemoteSeriesTimeout: 900000,
   cacheRemoteStreamTimeout: 300000,
   chromeHeadless: true,
-  chromeInactiveTimeout: 1000,
+  chromeInactiveTimeout: 600000,
   chromeNavigationTimeout: 30000,
   chromeObserverTimeout: 30000,
   chromeViewport: '1920x974',

@@ -6,7 +6,7 @@ import net from 'net';
 
 @api.Module({
   controllers: [app.CoreController],
-  providers: [app.AgentService, app.HttpTunnelService]})
+  providers: [app.HttpTunnelService]})
 export class CoreModule implements api.OnApplicationBootstrap, api.NestModule {
   private readonly _adapterHost: HttpAdapterHost;
   private readonly _tunnelService: app.HttpTunnelService;
