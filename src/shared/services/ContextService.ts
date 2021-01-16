@@ -1,13 +1,13 @@
-import * as api from '@nestjs/common';
-import {REQUEST} from '@nestjs/core';
+import * as ncm from '@nestjs/common';
+import * as ncr from '@nestjs/core';
 import express from 'express';
 import querystring from 'querystring';
 
-@api.Injectable()
+@ncm.Injectable()
 export class ContextService {
   private readonly _baseUrl: URL;
 
-  constructor(@api.Inject(REQUEST) request: express.Request) {
+  constructor(@ncm.Inject(ncr.REQUEST) request: express.Request) {
     const host = request.headers['host'] ?? request.hostname;
     const protocol = request.headers['x-forwarded-proto'] ?? request.protocol;
     this._baseUrl = new URL(`${protocol}://${host}/`);

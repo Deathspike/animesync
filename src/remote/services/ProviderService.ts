@@ -1,15 +1,15 @@
-import * as api from '@nestjs/common';
-import * as app from '../..';
-import * as apx from '..';
+import * as ace from '../..';
+import * as acm from '..';
+import * as ncm from '@nestjs/common';
 import {CrunchyRollProvider} from './crunchyroll';
 import {FunimationProvider} from './funimation';
 
-@api.Injectable()
+@ncm.Injectable()
 export class ProviderService {
   private readonly _crunchyrollProvider: CrunchyRollProvider;
   private readonly _funimationProvider: FunimationProvider;
 
-  constructor(browserService: app.shared.BrowserService, composeService: apx.ComposeService) {
+  constructor(browserService: ace.shr.BrowserService, composeService: acm.ComposeService) {
     this._crunchyrollProvider = new CrunchyRollProvider(browserService, composeService);
     this._funimationProvider = new FunimationProvider(browserService, composeService);
   }

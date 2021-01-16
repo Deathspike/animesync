@@ -1,8 +1,8 @@
-import * as app from '../../..';
-import * as apx from '../..';
+import * as ace from '../../..';
+import * as acm from '../..';
 
 export async function seriesListAsync() {
-  console.log(`Fetching ${app.settings.library}`);
-  const seriesList = await apx.Library.listAsync(app.settings.library);
-  seriesList.forEach((series) => console.log(`* ${series.seriesUrl} -> ${series.rootPath ?? app.settings.library}`));
+  console.log(`Fetching ${ace.settings.library}`);
+  const seriesList = await acm.Library.listAsync(ace.settings.library);
+  seriesList.forEach((series) => console.log(`* ${series.seriesUrl} -> ${series.rootPath ?? ace.settings.library}`));
 }

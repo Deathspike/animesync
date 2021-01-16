@@ -1,16 +1,16 @@
-import * as api from '@nestjs/common';
-import * as app from '../..';
+import * as ace from '../..';
+import * as ncm from '@nestjs/common';
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import path from 'path';
 
-@api.Injectable()
+@ncm.Injectable()
 export class CacheService {
-  private readonly _loggerService: app.shared.LoggerService;
+  private readonly _loggerService: ace.shr.LoggerService;
   private readonly _timeoutHandles: {[key: string]: NodeJS.Timeout};
   private readonly _values: {[key: string]: Promise<any> | string};
 
-  constructor(loggerService: app.shared.LoggerService) {
+  constructor(loggerService: ace.shr.LoggerService) {
     this._loggerService = loggerService;
     this._timeoutHandles = {};
     this._values = {};
@@ -24,7 +24,7 @@ export class CacheService {
     } else if (value) {
       delete this._timeoutHandles[key];
       delete this._values[key];
-      await fs.remove(path.join(app.settings.cache, value));
+      await fs.remove(path.join(ace.settings.cache, value));
     }
   }
 
@@ -33,7 +33,7 @@ export class CacheService {
     if (value instanceof Promise) {
       return await value as T;
     } else if (value) {
-      return await fs.readJson(path.join(app.settings.cache, value)) as T;
+      return await fs.readJson(path.join(ace.settings.cache, value)) as T;
     } else {
       return await this._addAsync(key, timeout, valueFactory());
     }
@@ -44,8 +44,8 @@ export class CacheService {
       this._values[key] = valuePromise;
       const id = `${Date.now().toString(16) + crypto.randomBytes(24).toString('hex')}.json`;
       const value = await valuePromise;
-      await fs.ensureDir(app.settings.cache);
-      await fs.writeJson(path.join(app.settings.cache, id), value, {spaces: 2});
+      await fs.ensureDir(ace.settings.cache);
+      await fs.writeJson(path.join(ace.settings.cache, id), value, {spaces: 2});
       this._timeoutHandles[key] = setTimeout(() => this.expireAsync(key).catch((error) => this._loggerService.error(error)), timeout);
       this._values[key] = id;
       return value;

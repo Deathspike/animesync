@@ -1,26 +1,26 @@
-import * as apx from '../..';
+import * as acm from '../..';
 import * as clv from 'class-validator';
-import * as swg from '@nestjs/swagger';
+import * as nsg from '@nestjs/swagger';
 
 export class RemoteSearchSeries {
   constructor(source?: RemoteSearchSeries, sourcePatch?: Partial<RemoteSearchSeries>) {
-    this.imageUrl = apx.property('imageUrl', source, sourcePatch, '');
-    this.title = apx.property('title', source, sourcePatch, '');
-    this.url = apx.property('url', source, sourcePatch, '');
+    this.imageUrl = acm.property('imageUrl', source, sourcePatch, '');
+    this.title = acm.property('title', source, sourcePatch, '');
+    this.url = acm.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()
   @clv.IsUrl({require_tld: false})
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly imageUrl: string;
 
   @clv.IsString()
   @clv.IsNotEmpty()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly title: string;
 
   @clv.IsString()
   @clv.IsUrl()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly url: string;
 }

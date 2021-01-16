@@ -1,4 +1,4 @@
-import * as apx from '..';
+import * as acm from '..';
 import https from 'https';
 import net from 'net';
 
@@ -9,7 +9,7 @@ export class AgentHttps extends https.Agent {
   }
 
   createConnection(options: net.TcpSocketConnectOpts, callback: (error?: Error, socket?: net.Socket) => void) {
-    apx.AgentConnector.createAsync(String(options.host), options.port)
+    acm.AgentConnector.createAsync(String(options.host), options.port)
       .then((socket) => callback(undefined, this._createConnection(options, socket)))
       .catch((error) => callback(error))
   }

@@ -1,8 +1,8 @@
-import * as app from '../../..';
-import * as apx from '../..';
+import * as ace from '../../..';
+import * as acm from '../..';
 
 export async function seriesAddAsync(seriesUrl: string, rootPath?: string) {
-  const library = await apx.Library.loadAsync(app.settings.library);
+  const library = await acm.Library.loadAsync(ace.settings.library);
   const success = await library.addAsync(seriesUrl, rootPath);
   console.log(`Series '${seriesUrl}' ${success ? 'has been added' : 'exists'}.`)
 }

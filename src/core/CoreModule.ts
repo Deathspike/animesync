@@ -1,23 +1,23 @@
-import * as api from '@nestjs/common';
-import * as apx from '.';
-import {HttpAdapterHost} from '@nestjs/core';
+import * as acm from '.';
+import * as ncm from '@nestjs/common';
+import * as ncr from '@nestjs/core';
 import http from 'http';
 import net from 'net';
 
-@api.Module({
-  controllers: [apx.CoreController],
-  providers: [apx.HttpTunnelService]})
-export class CoreModule implements api.OnApplicationBootstrap, api.NestModule {
-  private readonly _adapterHost: HttpAdapterHost;
-  private readonly _tunnelService: apx.HttpTunnelService;
+@ncm.Module({
+  controllers: [acm.CoreController],
+  providers: [acm.HttpTunnelService]})
+export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
+  private readonly _adapterHost: ncr.HttpAdapterHost;
+  private readonly _tunnelService: acm.HttpTunnelService;
 
-  constructor(adapterHost: HttpAdapterHost, tunnelService: apx.HttpTunnelService) {
+  constructor(adapterHost: ncr.HttpAdapterHost, tunnelService: acm.HttpTunnelService) {
     this._adapterHost = adapterHost;
     this._tunnelService = tunnelService;
   }
 
-  configure(consumer: api.MiddlewareConsumer) {
-    consumer.apply(apx.HttpProxyMiddleware).forRoutes({path: '*', method: api.RequestMethod.ALL});
+  configure(consumer: ncm.MiddlewareConsumer) {
+    consumer.apply(acm.HttpProxyMiddleware).forRoutes({path: '*', method: ncm.RequestMethod.ALL});
   }
 
   onApplicationBootstrap() {

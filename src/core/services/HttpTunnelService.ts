@@ -1,6 +1,6 @@
-import * as app from '../..';
-import * as apx from '..';
-import * as socks from 'socks';
+import * as ace from '../..';
+import * as acm from '..';
+import * as sks from 'socks';
 import dns from 'dns';
 import net from 'net';
 import url from 'url';
@@ -8,13 +8,13 @@ import tls from 'tls';
 import util from 'util';
 
 export class HttpTunnelService {
-  private _nordvpn?: apx.NordVpn;
+  private _nordvpn?: acm.NordVpn;
 
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = url.parse(clientUrl);
-    const server = url.parse(app.settings.proxyServer);
+    const server = url.parse(ace.settings.proxyServer);
     if (server.protocol === 'nordvpn:') {
-      (this._nordvpn ?? (this._nordvpn = new apx.NordVpn())).getAsync(server)
+      (this._nordvpn ?? (this._nordvpn = new acm.NordVpn())).getAsync(server)
         .then(x => this._connectTo(client, clientSocket, x))
         .catch(() => clientSocket.end());
     } else {
@@ -59,15 +59,15 @@ export class HttpTunnelService {
 
   private async _socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
     // Initialize the destination.
-    const destination: socks.SocksRemoteHost = {host: String(client.hostname), port: Number(client.port ?? 80)};
-    const proxy: socks.SocksProxy = {host: String(server.hostname), port: Number(server.port ?? 1080), type: socks4 ? 4 :5};
+    const destination: sks.SocksRemoteHost = {host: String(client.hostname), port: Number(client.port ?? 80)};
+    const proxy: sks.SocksProxy = {host: String(server.hostname), port: Number(server.port ?? 1080), type: socks4 ? 4 :5};
     
     // Initialize the options.
     if (server.auth) [proxy.userId, proxy.password] = server.auth.split(':', 2);
     if (socks4) destination.host = (await util.promisify(dns.lookup)(destination.host)).address;
 
     // Initialize the tunnel.
-    const serverInfo = await socks.SocksClient.createConnection({command: 'connect', destination, proxy});
+    const serverInfo = await sks.SocksClient.createConnection({command: 'connect', destination, proxy});
     const serverSocket = serverInfo.socket;
     const serverTunnel = tunnel(clientSocket, serverSocket);
     clientSocket.write(statusHeader(200, 'OK'), serverTunnel);

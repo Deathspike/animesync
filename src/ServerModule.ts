@@ -1,15 +1,18 @@
-import * as app from '.';
-import * as api from '@nestjs/common';
+import * as ace from '.';
+import * as ncm from '@nestjs/common';
+import {CoreModule} from './core';
+import {RemoteModule} from './remote';
+import {RewriteModule} from './rewrite';
 import fs from 'fs-extra';
 
-@api.Global()
-@api.Module({
-  imports: [app.core.CoreModule, app.remote.RemoteModule, app.rewrite.RewriteModule],
-  providers: [app.shared.AgentService, app.shared.BrowserService, app.shared.ContextService, app.shared.LoggerService],
-  exports: [app.shared.AgentService, app.shared.BrowserService, app.shared.ContextService, app.shared.LoggerService]})
-export class ServerModule implements api.OnApplicationBootstrap {
+@ncm.Global()
+@ncm.Module({
+  imports: [CoreModule, RemoteModule, RewriteModule],
+  providers: [ace.shr.AgentService, ace.shr.BrowserService, ace.shr.ContextService, ace.shr.LoggerService],
+  exports: [ace.shr.AgentService, ace.shr.BrowserService, ace.shr.ContextService, ace.shr.LoggerService]})
+export class ServerModule implements ncm.OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await fs.remove(app.settings.cache);
-    await fs.remove(app.settings.sync);
+    await fs.remove(ace.settings.cache);
+    await fs.remove(ace.settings.sync);
   }
 }

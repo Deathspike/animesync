@@ -1,23 +1,23 @@
-import * as apx from '../..';
+import * as acm from '../..';
 import * as clt from 'class-transformer';
 import * as clv from 'class-validator';
-import * as swg from '@nestjs/swagger';
+import * as nsg from '@nestjs/swagger';
 
 export class RemoteQueryPopular {
   constructor(source?: RemoteQueryPopular, sourcePatch?: Partial<RemoteQueryPopular>) {
-    this.providerName = apx.property('providerName', source, sourcePatch, 'crunchyroll');
-    this.pageNumber = apx.property('pageNumber', source, sourcePatch, 1);
+    this.providerName = acm.property('providerName', source, sourcePatch, 'crunchyroll');
+    this.pageNumber = acm.property('pageNumber', source, sourcePatch, 1);
   }
 
   @clv.IsString()
   @clv.IsIn(['crunchyroll', 'funimation'])
-  @swg.ApiProperty({enum: ['crunchyroll', 'funimation']})
+  @nsg.ApiProperty({enum: ['crunchyroll', 'funimation']})
   readonly providerName: 'crunchyroll' | 'funimation';
   
   @clv.IsOptional()
   @clv.IsNumber()
   @clv.Min(1)
   @clt.Type(() => Number)
-  @swg.ApiPropertyOptional()
+  @nsg.ApiPropertyOptional()
   readonly pageNumber?: number;
 }

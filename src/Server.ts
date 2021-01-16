@@ -1,29 +1,24 @@
-import * as app from '.';
-import * as api from '@nestjs/common';
-import * as swg from '@nestjs/swagger';
-import {NestExpressApplication} from '@nestjs/platform-express';
-import {NestFactory} from '@nestjs/core';
-import {ServerModule} from './ServerModule';
+import * as ace from '.';
+import * as ncm from '@nestjs/common';
+import * as ncr from '@nestjs/core';
+import * as npe from '@nestjs/platform-express';
+import * as nsg from '@nestjs/swagger';
 
-export class Server extends app.api.ServerApi {
-  private readonly _browserService: app.shared.BrowserService;
-  private readonly _loggerService: app.shared.LoggerService;
-  private readonly _server: NestExpressApplication;
+export class Server extends ace.api.ServerApi {
+  private readonly _server: npe.NestExpressApplication;
 
-  private constructor(server: NestExpressApplication) {
-    super(app.settings.serverUrl);
-    this._browserService = server.get(app.shared.BrowserService);
-    this._loggerService = server.get(app.shared.LoggerService);
+  private constructor(server: npe.NestExpressApplication) {
+    super(ace.settings.serverUrl);
     this._server = server;
     this._server.disable('x-powered-by');
-    this._server.useLogger(this._loggerService);
+    this._server.useLogger(this.get(ace.shr.LoggerService));
   }
 
   static async createAsync() {
-    const server = await NestFactory.create<NestExpressApplication>(ServerModule, {bodyParser: false, logger: false});
+    const server = await ncr.NestFactory.create<npe.NestExpressApplication>(ace.ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
     attachRequestValidation(server);
-    await server.listen(app.settings.serverPort);
+    await server.listen(ace.settings.serverPort);
     return new Server(server);
   }
 
@@ -32,12 +27,12 @@ export class Server extends app.api.ServerApi {
     await handlerAsync(server).finally(() => server.disposeAsync());
   }
 
-  get browser() {
-    return this._browserService;
+  get logger() {
+    return this.get(ace.shr.LoggerService);
   }
 
-  get logger() {
-    return this._loggerService;
+  get<T>(cls: ncm.Type<T>) {
+    return this._server.get(cls);
   }
 
   async disposeAsync() {
@@ -45,16 +40,16 @@ export class Server extends app.api.ServerApi {
   }
 }
 
-function attachDocumentation(server: api.INestApplication) {
-  swg.SwaggerModule.setup('api', server, swg.SwaggerModule.createDocument(server, new swg.DocumentBuilder()
+function attachDocumentation(server: ncm.INestApplication) {
+  nsg.SwaggerModule.setup('api', server, nsg.SwaggerModule.createDocument(server, new nsg.DocumentBuilder()
     .setDescription(require('../package').description)
     .setTitle(require('../package').name)
     .setVersion(require('../package').version)
     .build()));
 }
 
-function attachRequestValidation(server: api.INestApplication) {
-  server.useGlobalPipes(new api.ValidationPipe({
+function attachRequestValidation(server: ncm.INestApplication) {
+  server.useGlobalPipes(new ncm.ValidationPipe({
     forbidNonWhitelisted: true,
     forbidUnknownValues: true,
     transform: true

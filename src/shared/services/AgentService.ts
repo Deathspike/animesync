@@ -1,28 +1,28 @@
-import * as api from '@nestjs/common';
-import * as apx from '..';
-import {HeadersInit, RequestInit} from 'node-fetch';
+import * as acm from '..';
+import * as ncm from '@nestjs/common';
+import * as fch from 'node-fetch';
 import fetch from 'node-fetch';
 import http from 'http';
 import express from 'express';
 
-@api.Injectable()
+@ncm.Injectable()
 export class AgentService {
-  private readonly _httpAgent: apx.AgentHttp;
-  private readonly _httpsAgent: apx.AgentHttps;
+  private readonly _httpAgent: acm.AgentHttp;
+  private readonly _httpsAgent: acm.AgentHttps;
   
   constructor() {
-    this._httpAgent = new apx.AgentHttp({keepAlive: true});
-    this._httpsAgent = new apx.AgentHttps({keepAlive: true});
+    this._httpAgent = new acm.AgentHttp({keepAlive: true});
+    this._httpsAgent = new acm.AgentHttps({keepAlive: true});
   }
 
-  async fetchAsync(url: URL, options?: RequestInit) {
+  async fetchAsync(url: URL, options?: fch.RequestInit) {
     const agent = url.protocol === 'https:' ? this._httpsAgent : this._httpAgent;
     const headers = this.getHeaders(options && options.headers ? options.headers : {});
     headers['host'] = url.host ?? '';
     return await fetch(url, {...options, agent, headers});
   }
 
-  async forwardAsync(url: URL, response: express.Response, options?: RequestInit) {
+  async forwardAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
     const compress = false;
     const redirect = 'manual';
     const result = await this.fetchAsync(url, {...options, compress, redirect});
@@ -31,7 +31,7 @@ export class AgentService {
     result.body.pipe(response);
   }
 
-  getHeaders(headers: HeadersInit | http.IncomingHttpHeaders) {
+  getHeaders(headers: fch.HeadersInit | http.IncomingHttpHeaders) {
     const result: Record<string, string> = {};
     if (!isIterable(headers)) Object.entries(headers).forEach(([k, v]) => result[k] = Array.isArray(v) ? v.join(',') : v ?? '');
     else if (!Array.isArray(headers)) Array.from(headers).forEach(([k, v]) => result[k] = v);

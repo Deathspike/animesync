@@ -1,37 +1,37 @@
-import * as app from '..';
-import * as apx from '.';
-import * as api from '@nestjs/common';
-import * as swg from '@nestjs/swagger';
+import * as ace from '..';
+import * as acm from '.';
+import * as ncm from '@nestjs/common';
+import * as nsg from '@nestjs/swagger';
 import express from 'express';
 
-@api.Controller('api/rewrite')
-@swg.ApiTags('rewrite')
-@swg.ApiBadRequestResponse()
-@swg.ApiInternalServerErrorResponse()
+@ncm.Controller('api/rewrite')
+@nsg.ApiTags('rewrite')
+@nsg.ApiBadRequestResponse()
+@nsg.ApiInternalServerErrorResponse()
 export class RewriteController {
-  private readonly _agentService: app.shared.AgentService;
-  private readonly _hlsService: apx.HlsService;
+  private readonly _agentService: ace.shr.AgentService;
+  private readonly _hlsService: acm.HlsService;
 
-  constructor(agentService: app.shared.AgentService, hlsService: apx.HlsService) {
+  constructor(agentService: ace.shr.AgentService, hlsService: acm.HlsService) {
     this._agentService = agentService;
     this._hlsService = hlsService;
   }
   
-  @api.Get(':url')
+  @ncm.Get(':url')
   async emulateAsync(
-    @api.Headers() headers: Record<string, string>,
-    @api.Query() query: Record<string, string>,
-    @api.Param() params: app.api.RewriteParamEmulate,
-    @api.Res() response: express.Response) {
+    @ncm.Headers() headers: Record<string, string>,
+    @ncm.Query() query: Record<string, string>,
+    @ncm.Param() params: ace.api.RewriteParamEmulate,
+    @ncm.Res() response: express.Response) {
     await this._agentService.forwardAsync(new URL(params.url), response, {headers: {...headers, ...query}});
   }
 
-  @api.Get('hls/:url')
+  @ncm.Get('hls/:url')
   async hlsAsync(
-    @api.Headers() headers: Record<string, string>,
-    @api.Query() query: Record<string, string>,
-    @api.Param() params: app.api.RewriteParamHls,
-    @api.Res() response: express.Response) {
+    @ncm.Headers() headers: Record<string, string>,
+    @ncm.Query() query: Record<string, string>,
+    @ncm.Param() params: ace.api.RewriteParamHls,
+    @ncm.Res() response: express.Response) {
     delete headers['range'];
     const result = await this._agentService.fetchAsync(new URL(params.url), {headers: {...headers, ...query}});
     if (result.status === 200) {

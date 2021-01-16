@@ -1,10 +1,10 @@
-import * as apx from '..';
+import * as acm from '..';
 
 export class HlsManifestLineStream {
-  private readonly _manifest: apx.HlsManifest;
-  private readonly _line: apx.HlsManifestLine;
+  private readonly _manifest: acm.HlsManifest;
+  private readonly _line: acm.HlsManifestLine;
 
-  constructor(manifest: apx.HlsManifest, line: apx.HlsManifestLine) {
+  constructor(manifest: acm.HlsManifest, line: acm.HlsManifestLine) {
     this._manifest = manifest;
     this._line = line;
   }

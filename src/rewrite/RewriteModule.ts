@@ -1,12 +1,12 @@
-import * as apx from '.';
-import * as api from '@nestjs/common';
+import * as acm from '.';
+import * as ncm from '@nestjs/common';
 import cors from 'cors'
 
-@api.Module({
-  controllers: [apx.RewriteController],
-  providers: [apx.HlsService]})
-export class RewriteModule implements api.NestModule {
-  configure(consumer: api.MiddlewareConsumer) {
-    consumer.apply(cors()).forRoutes(apx.RewriteController);
+@ncm.Module({
+  controllers: [acm.RewriteController],
+  providers: [acm.HlsService]})
+export class RewriteModule implements ncm.NestModule {
+  configure(consumer: ncm.MiddlewareConsumer) {
+    consumer.apply(cors()).forRoutes(acm.RewriteController);
   }
 }
