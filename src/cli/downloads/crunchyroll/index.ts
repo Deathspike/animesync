@@ -1,23 +1,23 @@
-import * as app from '../../..';
-import * as apx from '../..';
+import * as ace from '../../..';
+import * as acm from '../..';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
-export async function crunchyrollAsync(api: app.Server, rootPath: string, url: string, options?: apx.IOptions) {
+export async function crunchyrollAsync(api: ace.Server, rootPath: string, url: string, options?: acm.IOptions) {
   const series = await api.remote.seriesAsync({url});
   if (!series.value) throw new Error(`Invalid series: ${url}`);
   await seriesAsync(api, rootPath, series.value, options);
 }
 
-async function seriesAsync(api: app.Server, rootPath: string, series: app.api.RemoteSeries, options?: apx.IOptions) {
+async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.RemoteSeries, options?: acm.IOptions) {
   const seriesName = sanitizeFilename(series.title);
   const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new apx.Tracker(app.settings.library);
+  const tracker = new acm.Tracker(ace.settings.library);
   for (const season of series.seasons) {
     const seasonName = sanitizeFilename(season.title);
     for (const episode of season.episodes) {
       const episodeNumber = parseFloat(episode.number);
-      const elapsedTime = new apx.Timer();
+      const elapsedTime = new acm.Timer();
       const episodeName = `${seasonName} ${String(episodeNumber).padStart(2, '0')} [CrunchyRoll]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       if (!isFinite(episodeNumber)) {
@@ -40,9 +40,9 @@ async function seriesAsync(api: app.Server, rootPath: string, series: app.api.Re
   }
 }
 
-async function saveAsync(api: app.Server, episodePath: string, url: string) {
+async function saveAsync(api: ace.Server, episodePath: string, url: string) {
   const stream = await api.remote.streamAsync({url});
   if (!stream.value) throw new Error(`Invalid stream: ${url}`);
-  const sync = new apx.Sync(api, episodePath);
+  const sync = new acm.Sync(api, episodePath);
   await sync.saveAsync(stream.value);
 }

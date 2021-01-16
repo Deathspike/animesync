@@ -1,7 +1,7 @@
-import * as api from '@nestjs/common';
-import * as apx from '.';
+import * as acm from '.';
 import * as clt from 'class-transformer';
+import * as ncm from '@nestjs/common';
 
-export function ResponseValidator<T>(cls: api.Type<T>, options?: clt.ClassTransformOptions) {
-  return api.UseInterceptors(new apx.ResponseValidatorInterceptor(cls, options));
+export function ResponseValidator<T>(cls: ncm.Type<T>, options?: clt.ClassTransformOptions) {
+  return ncm.UseInterceptors(new acm.ResponseValidatorInterceptor(cls, options));
 }

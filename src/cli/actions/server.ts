@@ -1,7 +1,7 @@
-import * as app from '../..';
-import * as apx from '..';
+import * as ace from '../..';
+import * as acm from '..';
 
-export async function serverAsync(this: apx.IOptions) {
-  console.log(`Starting ${app.settings.serverUrl}`);
-  await app.Server.createAsync();
+export async function serverAsync(this: acm.IOptions) {
+  console.log(`Starting ${ace.settings.serverUrl}`);
+  await ace.Server.createAsync();
 }

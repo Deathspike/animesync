@@ -1,20 +1,20 @@
-import * as api from '@nestjs/common';
 import * as clt from 'class-transformer';
 import * as clv from 'class-validator';
-import * as rxo from 'rxjs/operators';
+import * as ncm from '@nestjs/common';
+import * as rop from 'rxjs/operators';
 import express from 'express';
 
-export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
-  private readonly _cls: api.Type<T>;
+export class ResponseValidatorInterceptor<T> implements ncm.NestInterceptor {
+  private readonly _cls: ncm.Type<T>;
   private readonly _options?: clt.ClassTransformOptions;
 
-  constructor(cls: api.Type<T>, options?: clt.ClassTransformOptions) {
+  constructor(cls: ncm.Type<T>, options?: clt.ClassTransformOptions) {
     this._cls = cls;
     this._options = options;
   }
 
-  intercept(context: api.ExecutionContext, next: api.CallHandler) {
-    return next.handle().pipe(rxo.map(async (value: T) => {
+  intercept(context: ncm.ExecutionContext, next: ncm.CallHandler) {
+    return next.handle().pipe(rop.map(async (value: T) => {
       const validationErrors = await (value instanceof this._cls
         ? clv.validate(value)
         : clv.validate(clt.plainToClass(this._cls, value, this._options)));

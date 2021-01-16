@@ -1,9 +1,9 @@
-import * as api from '@nestjs/common';
-import * as app from '../..';
+import * as ace from '../..';
+import * as ncm from '@nestjs/common';
 import winston from 'winston';
 import 'winston-daily-rotate-file';
 
-export class LoggerService implements api.LoggerService {
+export class LoggerService implements ncm.LoggerService {
   private readonly _logger: winston.Logger;
 
   constructor() {
@@ -39,7 +39,7 @@ function createLogger() {
         level: 'info'
       }),
       new winston.transports.DailyRotateFile({
-        dirname: app.settings.logger,
+        dirname: ace.settings.logger,
         filename: '%DATE%.log',
         format: winston.format.combine(winston.format.timestamp(), winston.format.printf(x => `[${x.timestamp}] ${x.level.toUpperCase().padEnd(7)} ${x.message}`)),
         level: 'debug',

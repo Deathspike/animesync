@@ -1,46 +1,46 @@
-import * as app from '..';
-import * as apx from '.';
-import * as api from '@nestjs/common';
-import * as swg from '@nestjs/swagger';
+import * as ace from '..';
+import * as acm from '.';
+import * as ncm from '@nestjs/common';
+import * as nsg from '@nestjs/swagger';
 
-@api.Controller('api/remote')
-@api.UseInterceptors(app.shared.ResponseLoggerInterceptor)
-@swg.ApiTags('remote')
-@swg.ApiBadRequestResponse()
-@swg.ApiInternalServerErrorResponse()
+@ncm.Controller('api/remote')
+@ncm.UseInterceptors(ace.shr.ResponseLoggerInterceptor)
+@nsg.ApiTags('remote')
+@nsg.ApiBadRequestResponse()
+@nsg.ApiInternalServerErrorResponse()
 export class RemoteController {
-  private readonly _cacheService: apx.CacheService;
-  private readonly _providerService: apx.ProviderService;
+  private readonly _cacheService: acm.CacheService;
+  private readonly _providerService: acm.ProviderService;
 
-  constructor(cacheService: apx.CacheService, providerService: apx.ProviderService) {
+  constructor(cacheService: acm.CacheService, providerService: acm.ProviderService) {
     this._cacheService = cacheService;
     this._providerService = providerService;
   }
 
-  @api.Get('popular')
-  @app.shared.ResponseValidator(app.api.RemoteSearch)
-  @swg.ApiResponse({status: 200, type: app.api.RemoteSearch})
-  async popularAsync(@api.Query() model: app.api.RemoteQueryPopular) {
+  @ace.shr.ResponseValidator(ace.api.RemoteSearch)
+  @ncm.Get('popular')
+  @nsg.ApiResponse({status: 200, type: ace.api.RemoteSearch})
+  async popularAsync(@ncm.Query() model: ace.api.RemoteQueryPopular) {
     const cacheKey = `popular/${model.providerName}/${model.pageNumber || 1}`;
-    const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
+    const cacheTimeout = ace.settings.cacheRemoteSearchTimeout;
     return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.popularAsync(model.providerName, model.pageNumber));
   }
 
-  @api.Get('series')
-  @app.shared.ResponseValidator(app.api.RemoteSeries)
-  @swg.ApiResponse({status: 200, type: app.api.RemoteSeries})
-  async seriesAsync(@api.Query() model: app.api.RemoteQuerySeries) {
+  @ace.shr.ResponseValidator(ace.api.RemoteSeries)
+  @ncm.Get('series')
+  @nsg.ApiResponse({status: 200, type: ace.api.RemoteSeries})
+  async seriesAsync(@ncm.Query() model: ace.api.RemoteQuerySeries) {
     const cacheKey = `series/${model.url}`;
-    const cacheTimeout = app.settings.cacheRemoteSeriesTimeout;
+    const cacheTimeout = ace.settings.cacheRemoteSeriesTimeout;
     return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.seriesAsync(model.url));
   }
 
-  @api.Get('stream')
-  @app.shared.ResponseValidator(app.api.RemoteStream)
-  @swg.ApiResponse({status: 200, type: app.api.RemoteStream})
-  async streamAsync(@api.Query() model: app.api.RemoteQueryStream) {
+  @ace.shr.ResponseValidator(ace.api.RemoteStream)
+  @ncm.Get('stream')
+  @nsg.ApiResponse({status: 200, type: ace.api.RemoteStream})
+  async streamAsync(@ncm.Query() model: ace.api.RemoteQueryStream) {
     const cacheKey = `stream/${model.url}`;
-    const cacheTimeout = app.settings.cacheRemoteStreamTimeout;
+    const cacheTimeout = ace.settings.cacheRemoteStreamTimeout;
     return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.streamAsync(model.url));
   }
 }

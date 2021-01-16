@@ -1,37 +1,37 @@
-import * as api from '@nestjs/common';
-import * as app from '../..';
+import * as ace from '../..';
+import * as ncm from '@nestjs/common';
 
-@api.Injectable()
+@ncm.Injectable()
 export class ComposeService {
-  private readonly _contextService: app.shared.ContextService;
+  private readonly _contextService: ace.shr.ContextService;
 
-  constructor(contextService: app.shared.ContextService) {
+  constructor(contextService: ace.shr.ContextService) {
     this._contextService = contextService;
   }
 
-  search(search: app.api.RemoteSearch, headers?: Record<string, string>) {
-    return new app.api.RemoteSearch(search, {
-      series: search.series.map(series => new app.api.RemoteSearchSeries(series, {
+  search(search: ace.api.RemoteSearch, headers?: Record<string, string>) {
+    return new ace.api.RemoteSearch(search, {
+      series: search.series.map(series => new ace.api.RemoteSearchSeries(series, {
         imageUrl: this._contextService.emulateUrl(series.imageUrl, headers)
       }))
     });
   }
 
-  series(series: app.api.RemoteSeries, headers?: Record<string, string>) {
-    return new app.api.RemoteSeries(series, {
+  series(series: ace.api.RemoteSeries, headers?: Record<string, string>) {
+    return new ace.api.RemoteSeries(series, {
       imageUrl: this._contextService.emulateUrl(series.imageUrl, headers),
-      seasons: series.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
-        episodes: season.episodes.map(episode => new app.api.RemoteSeriesSeasonEpisode(episode, {
+      seasons: series.seasons.map(season => new ace.api.RemoteSeriesSeason(season, {
+        episodes: season.episodes.map(episode => new ace.api.RemoteSeriesSeasonEpisode(episode, {
           imageUrl: this._contextService.emulateUrl(episode.imageUrl, headers)
         }))
       }))
     });
   }
 
-  stream(stream: app.api.RemoteStream, headers?: Record<string, string>) {
-    return new app.api.RemoteStream(stream, {
+  stream(stream: ace.api.RemoteStream, headers?: Record<string, string>) {
+    return new ace.api.RemoteStream(stream, {
       url: this._contextService.hlsUrl(stream.url, headers),
-      subtitles: stream.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
+      subtitles: stream.subtitles.map(subtitle => new ace.api.RemoteStreamSubtitle(subtitle, {
         url: this._contextService.emulateUrl(subtitle.url, headers)
       }))
     });

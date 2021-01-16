@@ -1,43 +1,43 @@
-import * as apx from '../..';
+import * as acm from '../..';
 import * as clv from 'class-validator';
-import * as swg from '@nestjs/swagger';
+import * as nsg from '@nestjs/swagger';
 
 export class RemoteSeriesSeasonEpisode {
   constructor(source?: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
-    this.imageUrl = apx.property('imageUrl', source, sourcePatch, '');
-    this.isPremium = apx.property('isPremium', source, sourcePatch, false);
-    this.number = apx.property('number', source, sourcePatch, '');
-    this.title = apx.property('title', source, sourcePatch, '');
-    this.synopsis = apx.property('synopsis', source, sourcePatch, '');
-    this.url = apx.property('url', source, sourcePatch, '');
+    this.imageUrl = acm.property('imageUrl', source, sourcePatch, '');
+    this.isPremium = acm.property('isPremium', source, sourcePatch, false);
+    this.number = acm.property('number', source, sourcePatch, '');
+    this.title = acm.property('title', source, sourcePatch, '');
+    this.synopsis = acm.property('synopsis', source, sourcePatch, '');
+    this.url = acm.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()
   @clv.IsUrl({require_tld: false})
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly imageUrl: string;
 
   @clv.IsBoolean()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly isPremium: boolean;
 
   @clv.IsString()
   @clv.IsNotEmpty()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly number: string;
 
   @clv.IsOptional()
   @clv.IsString()
-  @swg.ApiPropertyOptional()
+  @nsg.ApiPropertyOptional()
   readonly title?: string;
 
   @clv.IsOptional()
   @clv.IsString()
-  @swg.ApiPropertyOptional()
+  @nsg.ApiPropertyOptional()
   readonly synopsis?: string;
 
   @clv.IsString()
   @clv.IsUrl()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly url: string;
 }

@@ -1,19 +1,19 @@
-import * as api from '@nestjs/common';
-import * as apx from '.';
-import * as rxo from 'rxjs/operators';
+import * as acm from '.';
+import * as ncm from '@nestjs/common';
+import * as rop from 'rxjs/operators';
 import express from 'express';
 
-@api.Injectable()
-export class ResponseLoggerInterceptor<T> implements api.NestInterceptor {
-  private readonly _loggerService: apx.LoggerService;
+@ncm.Injectable()
+export class ResponseLoggerInterceptor<T> implements ncm.NestInterceptor {
+  private readonly _loggerService: acm.LoggerService;
 
-  constructor(loggerService: apx.LoggerService) {
+  constructor(loggerService: acm.LoggerService) {
     this._loggerService = loggerService;
   }
 
-  intercept(context: api.ExecutionContext, next: api.CallHandler) {
+  intercept(context: ncm.ExecutionContext, next: ncm.CallHandler) {
     this._traceRequest(context);
-    return next.handle().pipe(rxo.map((value: T) => {
+    return next.handle().pipe(rop.map((value: T) => {
       if (value instanceof Promise) {
         value.then((value) => this._traceResponse(context, value));
         return value;
@@ -24,12 +24,12 @@ export class ResponseLoggerInterceptor<T> implements api.NestInterceptor {
     }));
   }
 
-  private _traceRequest(context: api.ExecutionContext) {
+  private _traceRequest(context: ncm.ExecutionContext) {
     const request: express.Request = context.switchToHttp().getRequest();
     this._loggerService.debug(`HTTP/${request.httpVersion} ${request.method} ${request.url}`);
   }
 
-  private _traceResponse<T>(context: api.ExecutionContext, value: T) {
+  private _traceResponse<T>(context: ncm.ExecutionContext, value: T) {
     const request: express.Request = context.switchToHttp().getRequest();
     const response: express.Response = context.switchToHttp().getResponse();
     this._loggerService.debug(`HTTP/${request.httpVersion} ${response.statusCode} ${JSON.stringify(value)}`);

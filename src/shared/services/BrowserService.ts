@@ -1,5 +1,5 @@
-import * as app from '../..';
-import * as chromeLauncher from 'chrome-launcher';
+import * as ace from '../..';
+import * as clr from 'chrome-launcher';
 import playwright from 'playwright-core';
 
 export class BrowserService {
@@ -18,7 +18,7 @@ export class BrowserService {
       this._numberOfPages++;
       const browser = await (this._browser ?? this._launchAsync());
       page = await browser.newPage();
-      page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
+      page.setDefaultNavigationTimeout(ace.settings.chromeNavigationTimeout);
       const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
       const session = await browser.newCDPSession(page);
       await session.send('Emulation.setUserAgentOverride', {userAgent});
@@ -33,11 +33,11 @@ export class BrowserService {
   private async _launchAsync() {
     try {
       const args = ['--autoplay-policy=no-user-gesture-required'];
-      const executablePath = chromeLauncher.Launcher.getFirstInstallation();
-      const headless = app.settings.chromeHeadless;
-      const proxy = {server: app.settings.serverUrl};
-      const viewport = app.settings.chromeHeadless ? parseResolution(app.settings.chromeViewport) : undefined;
-      this._browser = playwright.chromium.launchPersistentContext(app.settings.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
+      const executablePath = clr.Launcher.getFirstInstallation();
+      const headless = ace.settings.chromeHeadless;
+      const proxy = {server: ace.settings.serverUrl};
+      const viewport = ace.settings.chromeHeadless ? parseResolution(ace.settings.chromeViewport) : undefined;
+      this._browser = playwright.chromium.launchPersistentContext(ace.settings.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
       return await this._browser;
     } catch (error) {
       delete this._browser;
@@ -52,7 +52,7 @@ export class BrowserService {
       if (this._numberOfPages) return;
       delete this._browser;
       browser?.close().catch(() => undefined);
-    }, app.settings.chromeInactiveTimeout);
+    }, ace.settings.chromeInactiveTimeout);
   }
 }
 

@@ -1,10 +1,10 @@
-import * as api from '@nestjs/common';
-import * as swg from '@nestjs/swagger';
+import * as ncm from '@nestjs/common';
+import * as nsg from '@nestjs/swagger';
 
-@api.Controller()
+@ncm.Controller()
 export class CoreController {
-  @api.Get()
-  @api.Redirect('/api/')
-  @swg.ApiExcludeEndpoint()
+  @ncm.Get()
+  @ncm.Redirect('/api/')
+  @nsg.ApiExcludeEndpoint()
   get() {}
 }

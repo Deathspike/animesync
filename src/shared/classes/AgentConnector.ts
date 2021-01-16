@@ -1,5 +1,5 @@
-import * as app from '../..';
-import * as apx from '..';
+import * as ace from '../..';
+import * as acm from '..';
 import net from 'net';
 
 export class AgentConnector {
@@ -7,7 +7,7 @@ export class AgentConnector {
   private readonly _endListener: () => void;
   private readonly _errorListener: (error: Error) => void;
   private readonly _dataListener: (chunk: Buffer) => void;
-  private readonly _resolver: apx.Future<net.Socket>;
+  private readonly _resolver: acm.Future<net.Socket>;
   private readonly _socket: net.Socket;
   
   constructor(socket: net.Socket) {
@@ -15,12 +15,12 @@ export class AgentConnector {
     this._endListener = this._onSocketEnd.bind(this);
     this._errorListener = this._onSocketError.bind(this);
     this._dataListener = this._onSocketData.bind(this);
-    this._resolver = new apx.Future();
+    this._resolver = new acm.Future();
     this._socket = socket;
   }
   
   static async createAsync(hostname: string, port: number) {
-    const socket = net.connect(app.settings.serverPort, '127.0.0.1');
+    const socket = net.connect(ace.settings.serverPort, '127.0.0.1');
     return await new AgentConnector(socket).getAsync(hostname, port);
   }
 

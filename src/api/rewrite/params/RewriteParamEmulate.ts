@@ -1,14 +1,14 @@
-import * as apx from '../..';
+import * as acm from '../..';
 import * as clv from 'class-validator';
-import * as swg from '@nestjs/swagger';
+import * as nsg from '@nestjs/swagger';
 
 export class RewriteParamEmulate {
   constructor(source?: RewriteParamEmulate, sourcePatch?: Partial<RewriteParamEmulate>) {
-    this.url = apx.property('url', source, sourcePatch, '');
+    this.url = acm.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()
   @clv.IsUrl()
-  @swg.ApiProperty()
+  @nsg.ApiProperty()
   readonly url: string;
 }
