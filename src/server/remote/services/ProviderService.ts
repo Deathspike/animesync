@@ -8,9 +8,9 @@ export class ProviderService {
   private readonly _crunchyrollProvider: CrunchyRollProvider;
   private readonly _funimationProvider: FunimationProvider;
 
-  constructor(composeService: app.ComposeService) {
-    this._crunchyrollProvider = new CrunchyRollProvider(composeService);
-    this._funimationProvider = new FunimationProvider(composeService);
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
+    this._crunchyrollProvider = new CrunchyRollProvider(browserService, composeService);
+    this._funimationProvider = new FunimationProvider(browserService, composeService);
   }
 
   async popularAsync(providerName: string, pageNumber?: number) {

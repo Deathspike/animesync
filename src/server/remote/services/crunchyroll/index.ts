@@ -6,9 +6,11 @@ import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
 export class CrunchyRollProvider {
+  private readonly _browserService: app.BrowserService;
   private readonly _composeService: app.ComposeService;
 
-  constructor(composeService: app.ComposeService) {
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
+    this._browserService = browserService;
     this._composeService = composeService;
   }
 
@@ -18,7 +20,7 @@ export class CrunchyRollProvider {
 
   async popularAsync(pageNumber = 1) {
     const queryUrl = createQueryUrl('popular', pageNumber);
-    return await app.browserAsync(async (page, userAgent) => {
+    return await this._browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
@@ -27,7 +29,7 @@ export class CrunchyRollProvider {
   }
   
   async seriesAsync(seriesUrl: string) {
-    return await app.browserAsync(async (page, userAgent) => {
+    return await this._browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeries);
@@ -36,7 +38,7 @@ export class CrunchyRollProvider {
   }
 
   async streamAsync(episodeUrl: string) {
-    return await app.browserAsync(async (page, userAgent) => {
+    return await this._browserService.pageAsync(async (page, userAgent) => {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
