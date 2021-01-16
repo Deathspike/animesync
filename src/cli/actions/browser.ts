@@ -1,9 +1,10 @@
 import * as app from '..';
 
 export async function browserAsync() {
+  console.log(`Starting ${app.settings.serverUrl}`);
   await app.Server.usingAsync(async () => {
-    app.logger.info(`Launching browser ...`);
     app.settings.chromeHeadless = false;
+    console.log('Spawning browser ...');
     await app.browserAsync(async (page) => {
       const context = page.context();
       const pages = context.pages();

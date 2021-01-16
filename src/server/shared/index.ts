@@ -5,5 +5,7 @@ export * from './classes/AgentHttps';
 export * from './classes/Future';
 export * from './services/AgentService';
 export * from './services/ContextService';
+export * from './services/LoggerService';
+export * from './ResponseLoggerInterceptor';
 export * from './ResponseValidator';
 export * from './ResponseValidatorInterceptor';

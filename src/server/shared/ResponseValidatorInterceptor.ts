@@ -1,4 +1,3 @@
-import * as app from '.';
 import * as api from '@nestjs/common';
 import * as clt from 'class-transformer';
 import * as clv from 'class-validator';
@@ -6,10 +5,10 @@ import * as rxo from 'rxjs/operators';
 import express from 'express';
 
 export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
-  private readonly _cls: {new (...args: any[]): T};
+  private readonly _cls: api.Type<T>;
   private readonly _options?: clt.ClassTransformOptions;
 
-  constructor(cls: {new (...args: any[]): T}, options?: clt.ClassTransformOptions) {
+  constructor(cls: api.Type<T>, options?: clt.ClassTransformOptions) {
     this._cls = cls;
     this._options = options;
   }
@@ -25,9 +24,9 @@ export class ResponseValidatorInterceptor<T> implements api.NestInterceptor {
         const response = context.switchToHttp().getResponse<express.Response>();
         const statusCode = 500;
         response.status(statusCode);
-        return trace(context, statusCode, {statusCode, message, errors});
+        return {statusCode, message, errors, value};
       } else {
-        return trace(context, 200, value);
+        return value;
       }
     }));
   }
@@ -43,11 +42,4 @@ function map(error: clv.ValidationError, result: Array<{constraints: Record<stri
   const property = previousProperty ? `${previousProperty}.${error.property}` : error.property;
   if (error.constraints) result.push(({property, constraints: error.constraints}))
   if (error.children) result.push(...flatten(error.children, property));
-}
-
-function trace<T>(context: api.ExecutionContext, statusCode: number, value: T) {
-  const request: express.Request = context.switchToHttp().getRequest();
-  app.logger.debug(`-> ${request.url}`);
-  app.logger.debug(`<- ${statusCode} ${JSON.stringify(value)}`);
-  return value;
 }

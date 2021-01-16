@@ -1,4 +1,3 @@
-import * as app from '..';
 import fetch from 'node-fetch';
 import url from 'url';
 
@@ -48,7 +47,6 @@ export class NordVpn {
       this._url = this._fetchAsync(server);
       return await this._url;
     } catch (err) {
-      app.logger.debug(err);
       this._refreshTime = 0;
       throw err;
     } finally {
