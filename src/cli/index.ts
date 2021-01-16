@@ -6,4 +6,3 @@ export * from './classes/Timer';
 export * from './downloads/migrate';
 export * from './downloads/series';
 export * from './typings';
-export * from '..';

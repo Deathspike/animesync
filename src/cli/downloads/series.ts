@@ -1,8 +1,9 @@
-import * as app from '..';
+import * as app from '../..';
+import * as apx from '..';
 import {crunchyrollAsync} from './crunchyroll';
 import {funimationAsync} from './funimation';
 
-export async function seriesAsync(api: app.Server, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
+export async function seriesAsync(api: app.Server, rootPath: string, seriesUrl: string, options?: apx.IOptions) {
   try {
     if (seriesUrl.toLowerCase().startsWith('https://www.crunchyroll.com/')) {
       api.logger.log(`Fetching ${seriesUrl}`);

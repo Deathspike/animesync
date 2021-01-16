@@ -1,8 +1,8 @@
-export type ICliOptions = {
-  skipDownload?: true;
-};
-
-export type ILibrarySource = {
+export type ILibrary = {
   version: number;
   entries: Record<string, {rootPath?: string}>;
-}
+};
+
+export type IOptions = {
+  skipDownload?: true;
+};
