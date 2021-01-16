@@ -3,6 +3,7 @@ import * as api from '@nestjs/common';
 import * as swg from '@nestjs/swagger';
 
 @api.Controller('api/remote')
+@api.UseInterceptors(app.ResponseLoggerInterceptor)
 @swg.ApiTags('remote')
 @swg.ApiBadRequestResponse()
 @swg.ApiInternalServerErrorResponse()

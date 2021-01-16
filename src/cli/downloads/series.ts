@@ -2,21 +2,21 @@ import * as app from '..';
 import {crunchyrollAsync} from './crunchyroll';
 import {funimationAsync} from './funimation';
 
-export async function seriesAsync(api: app.api.ServerApi, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
+export async function seriesAsync(api: app.Server, rootPath: string, seriesUrl: string, options?: app.ICliOptions) {
   try {
     if (seriesUrl.toLowerCase().startsWith('https://www.crunchyroll.com/')) {
-      app.logger.info(`Fetching ${seriesUrl}`);
+      api.logger.log(`Fetching ${seriesUrl}`);
       await crunchyrollAsync(api, rootPath, seriesUrl, options);
-      app.logger.info(`Finished ${seriesUrl}`);
+      api.logger.log(`Finished ${seriesUrl}`);
     } else if (seriesUrl.toLowerCase().startsWith('https://www.funimation.com/')) {
-      app.logger.info(`Fetching ${seriesUrl}`);
+      api.logger.log(`Fetching ${seriesUrl}`);
       await funimationAsync(api, rootPath, seriesUrl, options);
-      app.logger.info(`Finished ${seriesUrl}`);
+      api.logger.log(`Finished ${seriesUrl}`);
     } else {
-      app.logger.info(`Skipping ${seriesUrl}`);
+      api.logger.log(`Skipping ${seriesUrl}`);
     }
   } catch (error) {
-    app.logger.info(`Rejected ${seriesUrl}`);
-    app.logger.error(error);
+    api.logger.log(`Rejected ${seriesUrl}`);
+    api.logger.error(error);
   }
 }

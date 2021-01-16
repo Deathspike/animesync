@@ -1,55 +1,56 @@
-import * as app from '..';
+import * as app from './shared';
 import * as api from '@nestjs/common';
 import * as swg from '@nestjs/swagger';
 import {NestExpressApplication} from '@nestjs/platform-express';
 import {NestFactory} from '@nestjs/core';
-import {ServerLogger} from './ServerLogger';
 import {ServerModule} from './ServerModule';
 
-export class Server {
+export class Server extends app.api.ServerApi {
+  private readonly _loggerService: app.LoggerService;
   private readonly _server: NestExpressApplication;
 
   private constructor(server: NestExpressApplication) {
+    super(app.settings.serverUrl);
+    this._loggerService = server.get(app.LoggerService);
     this._server = server;
     this._server.disable('x-powered-by');
+    this._server.useLogger(this._loggerService);
   }
 
   static async createAsync() {
-    const logger = new ServerLogger();
-    const server = new Server(await NestFactory.create(ServerModule, {bodyParser: false, logger}));
-    await server.startAsync();
-    return server;
+    const server = await NestFactory.create<NestExpressApplication>(ServerModule, {bodyParser: false, logger: false});
+    attachDocumentation(server);
+    attachRequestValidation(server);
+    await server.listen(app.settings.serverPort);
+    return new Server(server);
   }
 
-  static async usingAsync(handlerAsync: (api: app.api.ServerApi) => Promise<void>) {
-    const api = new app.api.ServerApi(app.settings.serverUrl);
+  static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
     const server = await this.createAsync();
-    await handlerAsync(api).finally(() => server.disposeAsync());
+    await handlerAsync(server).finally(() => server.disposeAsync());
+  }
+
+  get logger() {
+    return this._loggerService;
   }
 
   async disposeAsync() {
     await this._server.close();
   }
+}
 
-  async startAsync() {
-    this._attachDocumentation();
-    this._attachRequestValidation();
-    await this._server.listen(app.settings.serverPort);
-  }
+function attachDocumentation(server: api.INestApplication) {
+  swg.SwaggerModule.setup('api', server, swg.SwaggerModule.createDocument(server, new swg.DocumentBuilder()
+    .setDescription(require('../../package').description)
+    .setTitle(require('../../package').name)
+    .setVersion(require('../../package').version)
+    .build()));
+}
 
-  private _attachDocumentation() {
-    swg.SwaggerModule.setup('api', this._server, swg.SwaggerModule.createDocument(this._server, new swg.DocumentBuilder()
-      .setDescription(require('../../package').description)
-      .setTitle(require('../../package').name)
-      .setVersion(require('../../package').version)
-      .build()));
-  }
-
-  private _attachRequestValidation() {
-    this._server.useGlobalPipes(new api.ValidationPipe({
-      forbidNonWhitelisted: true,
-      forbidUnknownValues: true,
-      transform: true
-    }));
-  }
+function attachRequestValidation(server: api.INestApplication) {
+  server.useGlobalPipes(new api.ValidationPipe({
+    forbidNonWhitelisted: true,
+    forbidUnknownValues: true,
+    transform: true
+  }));
 }

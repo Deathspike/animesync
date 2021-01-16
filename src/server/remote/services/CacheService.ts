@@ -1,13 +1,17 @@
 import * as app from '..';
+import * as api from '@nestjs/common';
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import path from 'path';
 
+@api.Injectable()
 export class CacheService {
+  private readonly _loggerService: app.LoggerService;
   private readonly _timeoutHandles: {[key: string]: NodeJS.Timeout};
   private readonly _values: {[key: string]: Promise<any> | string};
 
-  constructor() {
+  constructor(loggerService: app.LoggerService) {
+    this._loggerService = loggerService;
     this._timeoutHandles = {};
     this._values = {};
   }
@@ -15,7 +19,7 @@ export class CacheService {
   async expireAsync(key: string) {
     const value = this._values[key];
     if (value instanceof Promise) {
-      const continueWith = () => this.expireAsync(key).catch((error) => app.logger.error(error));
+      const continueWith = () => this.expireAsync(key).catch((error) => this._loggerService.error(error));
       value.then(continueWith, continueWith);
     } else if (value) {
       delete this._timeoutHandles[key];
@@ -42,7 +46,7 @@ export class CacheService {
       const value = await valuePromise;
       await fs.ensureDir(app.settings.cache);
       await fs.writeJson(path.join(app.settings.cache, id), value, {spaces: 2});
-      this._timeoutHandles[key] = setTimeout(() => this.expireAsync(key).catch((error) => app.logger.error(error)), timeout);
+      this._timeoutHandles[key] = setTimeout(() => this.expireAsync(key).catch((error) => this._loggerService.error(error)), timeout);
       this._values[key] = id;
       return value;
     } catch (error) {

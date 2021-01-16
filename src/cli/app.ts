@@ -49,7 +49,6 @@ commander.createCommand()
 function checkStart(fn: Function) {
   return function(this: app.ICliOptions) {
     if ((process.version.match(/^v(\d+)\.\d+\.\d$/)?.pop() ?? 0) < 12) throw new Error(`Invalid node version: Must be >= 12`);
-    app.logger.debug(`commander ${JSON.stringify(process.argv)}`);
     return fn.apply(this, arguments);
   };
 }

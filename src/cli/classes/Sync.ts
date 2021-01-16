@@ -8,17 +8,19 @@ import os from 'os';
 import path from 'path';
 
 export class Sync {
+  private readonly _api: app.Server;
   private readonly _episodePath: string;
   private readonly _syncPath: string;
 
-  constructor(episodePath: string) {
+  constructor(api: app.Server, episodePath: string) {
+    this._api = api;
     this._episodePath = episodePath;
     this._syncPath = path.join(app.settings.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
   }
 
   async saveAsync(stream: app.api.RemoteStream) {
     try {
-      const allSubtitles = await this._subtitlesAsync(stream);
+      const allSubtitles = await this._prepareAsync(stream);
       const foreignSubtitles = allSubtitles
         .filter(x => x.language !== 'eng')
         .sort((a, b) => a.language.localeCompare(b.language));
@@ -35,7 +37,7 @@ export class Sync {
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
         .reduce((p, c) => p.concat(c));
       await fs.ensureDir(path.dirname(this._episodePath));
-      await spawnAsync(ffmpeg(), ['-y']
+      await this._spawnAsync(ffmpeg(), ['-y']
         .concat(inputs)
         .concat(mappings)
         .concat(['-metadata:s:a:0', 'language=jpn'])
@@ -46,7 +48,7 @@ export class Sync {
     }
   }
 
-  private async _subtitlesAsync(stream: app.api.RemoteStream) {
+  private async _prepareAsync(stream: app.api.RemoteStream) {
     await fs.ensureDir(this._syncPath);
     return await Promise.all(stream.subtitles.map(async (x, i) => {
       if (x.type === 'vtt') {
@@ -62,20 +64,20 @@ export class Sync {
       }
     }));
   }
+
+  async _spawnAsync(command: string, args: Array<string>) {
+    this._api.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
+    return await new Promise<void>((resolve, reject) => {
+      const process = childProcess.spawn(command, args);
+      process.stdout.on('data', (chunk: Buffer) => this._api.logger.debug(chunk.toString('utf-8').trim()));
+      process.stderr.on('data', (chunk: Buffer) => this._api.logger.debug(chunk.toString('utf-8').trim()));
+      process.on('error', reject);
+      process.on('exit', resolve);
+    });
+  }  
 }
 
 function ffmpeg() {
   if (os.platform() !== 'win32') return 'ffmpeg';
   return path.join(__dirname, `../../../dep/ffmpeg.exe`)
-}
-
-async function spawnAsync(command: string, args: Array<string>) {
-  app.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
-  return await new Promise<void>((resolve, reject) => {
-    const process = childProcess.spawn(command, args);
-    process.stdout.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8').trim()));
-    process.stderr.on('data', (chunk: Buffer) => app.logger.debug(chunk.toString('utf-8').trim()));
-    process.on('error', reject);
-    process.on('exit', resolve);
-  });
 }
