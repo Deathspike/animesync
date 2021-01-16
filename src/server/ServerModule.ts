@@ -8,8 +8,8 @@ import fs from 'fs-extra';
 @api.Global()
 @api.Module({
   imports: [CoreModule, RemoteModule, RewriteModule],
-  providers: [app.AgentService, app.ContextService, app.LoggerService],
-  exports: [app.AgentService, app.ContextService, app.LoggerService]})
+  providers: [app.AgentService, app.BrowserService, app.ContextService, app.LoggerService],
+  exports: [app.AgentService, app.BrowserService, app.ContextService, app.LoggerService]})
 export class ServerModule implements api.OnApplicationBootstrap {
   async onApplicationBootstrap() {
     await fs.remove(app.settings.cache);

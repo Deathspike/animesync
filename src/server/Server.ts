@@ -6,11 +6,13 @@ import {NestFactory} from '@nestjs/core';
 import {ServerModule} from './ServerModule';
 
 export class Server extends app.api.ServerApi {
+  private readonly _browserService: app.BrowserService;
   private readonly _loggerService: app.LoggerService;
   private readonly _server: NestExpressApplication;
 
   private constructor(server: NestExpressApplication) {
     super(app.settings.serverUrl);
+    this._browserService = server.get(app.BrowserService);
     this._loggerService = server.get(app.LoggerService);
     this._server = server;
     this._server.disable('x-powered-by');
@@ -28,6 +30,10 @@ export class Server extends app.api.ServerApi {
   static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
     const server = await this.createAsync();
     await handlerAsync(server).finally(() => server.disposeAsync());
+  }
+
+  get browser() {
+    return this._browserService;
   }
 
   get logger() {
