@@ -1,12 +1,12 @@
-import * as app from '..';
+import * as apx from '..';
 import fs from 'fs-extra';
 import path from 'path';
 
 export class Library {
   private readonly _filePath: string;
-  private readonly _source: app.ILibrarySource;
+  private readonly _source: apx.ILibrary;
 
-  private constructor(filePath: string, source: app.ILibrarySource) {
+  private constructor(filePath: string, source: apx.ILibrary) {
     this._filePath = filePath;
     this._source = source;
   }

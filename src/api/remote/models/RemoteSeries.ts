@@ -1,15 +1,15 @@
-import * as app from '../..';
+import * as apx from '../..';
 import * as clv from 'class-validator';
 import * as swg from '@nestjs/swagger';
 
 export class RemoteSeries {
   constructor(source?: RemoteSeries, sourcePatch?: Partial<RemoteSeries>) {
-    this.genres = app.property('genres', source, sourcePatch, []);
-    this.imageUrl = app.property('imageUrl', source, sourcePatch, '');
-    this.seasons = app.property('seasons', source, sourcePatch, []);
-    this.synopsis = app.property('synopsis', source, sourcePatch, '');
-    this.title = app.property('title', source, sourcePatch, '');
-    this.url = app.property('url', source, sourcePatch, '');
+    this.genres = apx.property('genres', source, sourcePatch, []);
+    this.imageUrl = apx.property('imageUrl', source, sourcePatch, '');
+    this.seasons = apx.property('seasons', source, sourcePatch, []);
+    this.synopsis = apx.property('synopsis', source, sourcePatch, '');
+    this.title = apx.property('title', source, sourcePatch, '');
+    this.url = apx.property('url', source, sourcePatch, '');
   }
 
   @clv.IsArray()
@@ -26,8 +26,8 @@ export class RemoteSeries {
   @clv.IsArray()
   @clv.ArrayNotEmpty()
   @clv.ValidateNested()
-  @swg.ApiProperty({type: [app.RemoteSeriesSeason]})
-  readonly seasons: Array<app.RemoteSeriesSeason>;
+  @swg.ApiProperty({type: [apx.RemoteSeriesSeason]})
+  readonly seasons: Array<apx.RemoteSeriesSeason>;
 
   @clv.IsOptional()
   @clv.IsString()

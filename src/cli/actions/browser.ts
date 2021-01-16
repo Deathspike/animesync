@@ -1,4 +1,4 @@
-import * as app from '..';
+import * as app from '../..';
 
 export async function browserAsync() {
   console.log(`Starting ${app.settings.serverUrl}`);

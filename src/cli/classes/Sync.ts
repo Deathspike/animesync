@@ -1,4 +1,4 @@
-import * as app from '..';
+import * as app from '../..';
 import * as subtitle from 'subtitle';
 import childProcess from 'child_process';
 import crypto from 'crypto';

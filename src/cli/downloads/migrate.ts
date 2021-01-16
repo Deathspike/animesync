@@ -1,4 +1,5 @@
-import * as app from '..';
+import * as app from '../..';
+import * as apx from '..';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -12,7 +13,7 @@ async function v1LibraryAsync() {
   const oldPath = path.join(app.settings.library, '.library');
   if (await fs.pathExists(oldPath)) {
     const oldSource = await fs.readJson(oldPath) as Record<string, string>;
-    const newSource = {version: 1, entries: {}} as app.ILibrarySource;
+    const newSource = {version: 1, entries: {}} as apx.ILibrary;
     Object.keys(oldSource).forEach((seriesUrl) => newSource.entries[seriesUrl] = {rootPath: oldSource[seriesUrl] === app.settings.library ? undefined : oldSource[seriesUrl]});
     await fs.ensureDir(path.dirname(newPath));
     await fs.writeJson(newPath, newSource, {spaces: 2});
