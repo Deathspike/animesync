@@ -25,8 +25,8 @@ export class AgentConnector {
   }
 
   async getAsync(hostname: string, port: number) {
-    this._socket.once('end', this._endListener);
-    this._socket.once('error', this._errorListener);
+    this._socket.on('end', this._endListener);
+    this._socket.on('error', this._errorListener);
     this._socket.on('data', this._dataListener);
     this._socket.write([`CONNECT ${hostname}:${port} HTTP/1.1`, '', ''].join('\r\n'));
     return this._resolver.getAsync();
