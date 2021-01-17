@@ -32,7 +32,7 @@ export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
       const clientUrl = `http://${request.url}`;
       this._tunnelService.connect(clientSocket, clientUrl);
     } else {
-      socket.end();
+      socket.destroy();
     }
   }
 }

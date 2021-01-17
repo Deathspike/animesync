@@ -16,7 +16,7 @@ export class HttpTunnelService {
     if (server.protocol === 'nordvpn:') {
       (this._nordvpn ?? (this._nordvpn = new acm.NordVpn())).getAsync(server)
         .then(x => this._connectTo(client, clientSocket, x))
-        .catch(() => clientSocket.end());
+        .catch(() => clientSocket.destroy());
     } else {
       this._connectTo(client, clientSocket, server);
     }
@@ -28,9 +28,9 @@ export class HttpTunnelService {
     } else if (server.protocol === 'https:') {
       this._httpsProxy(client, clientSocket, server);
     } else if (server.protocol === 'socks4:') {
-      this._socksProxyAsync(client, clientSocket, server, true).catch(() => clientSocket.end());
+      this._socksProxyAsync(client, clientSocket, server, true).catch(() => clientSocket.destroy());
     } else if (server.protocol === 'socks5:' || server.protocol === 'socks:') {
-      this._socksProxyAsync(client, clientSocket, server, false).catch(() => clientSocket.end());
+      this._socksProxyAsync(client, clientSocket, server, false).catch(() => clientSocket.destroy());
     } else {
       this._noProxy(client, clientSocket);
     }
@@ -88,9 +88,9 @@ function statusHeader(statusCode: number, statusText: string) {
 }
 
 function tunnel(clientSocket: net.Socket, serverSocket: net.Socket) {
-  clientSocket.on('error', () => clientSocket.end());
-  clientSocket.on('end', () => serverSocket.end());
-  serverSocket.on('error', () => serverSocket.end());
-  serverSocket.on('end', () => clientSocket.end());
+  clientSocket.on('error', () => serverSocket.destroy());
+  clientSocket.on('end', () => serverSocket.destroy());
+  serverSocket.on('error', () => clientSocket.destroy());
+  serverSocket.on('end', () => clientSocket.destroy());
   return () => clientSocket.pipe(serverSocket) && serverSocket.pipe(clientSocket);
 }

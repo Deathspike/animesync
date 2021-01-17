@@ -37,7 +37,6 @@ export class AgentConnector {
     const match = data.match(/^HTTP\/1\.1 (\d*)/);
     if (!match || match[1] !== '200') {
       this._resolver.reject(new Error(data));
-      this._socket.end();
       this._socket.destroy();
     } else {
       this._resolver.resolve(this._socket);
@@ -46,7 +45,6 @@ export class AgentConnector {
 
   private _onSocketError(error: Error) {
     this._resolver.reject(error);
-    this._socket.end();
     this._socket.destroy();
   }
 
