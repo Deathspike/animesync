@@ -15,7 +15,7 @@ function evaluateSearch() {
    */
   function mapSeries() {
     return Array.from(document.querySelectorAll('li')).map((containerNode) => {
-      const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src').replace(/_thumb\.jpg$/,  '_full.jpg');
+      const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
       const title = validateStrict(containerNode.querySelector('span[itemprop=name]'));
       const url = processUrl(containerNode.querySelector('a'));
       return {imageUrl, title, url};
