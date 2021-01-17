@@ -72,5 +72,5 @@ function evaluateSearch() {
 if (typeof module !== 'undefined') {
   module.exports = {evaluateSearch};
 } else {
-  console.log(evaluateSearch());
+  console.info(evaluateSearch());
 }

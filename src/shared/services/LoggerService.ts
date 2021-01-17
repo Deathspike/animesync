@@ -10,24 +10,34 @@ export class LoggerService implements ncm.LoggerService {
     this._logger = createLogger();
   }
 
-  debug(message: string) {
-    this._logger.debug(message);
+  debug(value: string) {
+    this._logger.debug(value);
   }
   
-  error(message: string, trace?: string) {
-    this._logger.error(message, trace);
+  error(value: Error | string, trace?: string) {
+    if (value instanceof Error) {
+      this._logger.error(formatError(value.stack ?? value.message));
+    } else if (trace) {
+      this._logger.error(formatError(trace));
+    } else {
+      this._logger.error(formatError(value));
+    }
   }
 
-  log(message: string) {
-    this._logger.info(message);
+  info(value: string) {
+    this._logger.info(value);
+  }
+
+  log(value: string) {
+    this._logger.debug(value);
   }
   
-  verbose(message: string) {
-    this._logger.verbose(message);
+  verbose(value: string) {
+    this._logger.debug(value);
   }
 
-  warn(message: string) {
-    this._logger.warn(message);
+  warn(value: string) {
+    this._logger.debug(value);
   }
 }
 
@@ -41,11 +51,19 @@ function createLogger() {
       new winston.transports.DailyRotateFile({
         dirname: ace.settings.logger,
         filename: '%DATE%.log',
-        format: winston.format.combine(winston.format.timestamp(), winston.format.printf(x => `[${x.timestamp}] ${x.level.toUpperCase().padEnd(7)} ${x.message}`)),
+        format: winston.format.combine(winston.format.timestamp(), winston.format.printf(x => `[${x.timestamp}] ${x.level.toUpperCase().padEnd(5)} ${x.message}`)),
         level: 'debug',
         maxFiles: 5,
         maxSize: '20MB'
       })
     ]
   });
+}
+
+function formatError(value: string) {
+  if (/^Error:\s/i.test(value)) {
+    return value;
+  } else {
+    return `Error: ${value}`;
+  }
 }

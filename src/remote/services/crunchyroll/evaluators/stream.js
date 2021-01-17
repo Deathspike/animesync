@@ -79,5 +79,5 @@ function evaluateStream() {
 if (typeof module !== 'undefined') {
   module.exports = {evaluateStream};
 } else {
-  console.log(evaluateStream());
+  console.info(evaluateStream());
 }

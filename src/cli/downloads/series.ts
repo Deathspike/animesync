@@ -6,18 +6,18 @@ import {funimationAsync} from './funimation';
 export async function seriesAsync(api: ace.Server, rootPath: string, seriesUrl: string, options?: acm.IOptions) {
   try {
     if (seriesUrl.toLowerCase().startsWith('https://www.crunchyroll.com/')) {
-      api.logger.log(`Fetching ${seriesUrl}`);
+      api.logger.info(`Fetching ${seriesUrl}`);
       await crunchyrollAsync(api, rootPath, seriesUrl, options);
-      api.logger.log(`Finished ${seriesUrl}`);
+      api.logger.info(`Finished ${seriesUrl}`);
     } else if (seriesUrl.toLowerCase().startsWith('https://www.funimation.com/')) {
-      api.logger.log(`Fetching ${seriesUrl}`);
+      api.logger.info(`Fetching ${seriesUrl}`);
       await funimationAsync(api, rootPath, seriesUrl, options);
-      api.logger.log(`Finished ${seriesUrl}`);
+      api.logger.info(`Finished ${seriesUrl}`);
     } else {
-      api.logger.log(`Skipping ${seriesUrl}`);
+      api.logger.info(`Skipping ${seriesUrl}`);
     }
   } catch (error) {
-    api.logger.log(`Rejected ${seriesUrl}`);
     api.logger.error(error);
+    api.logger.info(`Rejected ${seriesUrl}`);
   }
 }
