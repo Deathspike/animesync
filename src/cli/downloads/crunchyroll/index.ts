@@ -18,7 +18,7 @@ async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.Re
     const seasonName = sanitizeFilename(season.title);
     for (const episode of season.episodes) {
       const elapsedTime = new acm.Timer();
-      const episodeData = clv.isNumberString(episode.number) ? episode.number.padStart(2, '0') : episode.number;
+      const episodeData = clv.isNumberString(episode.name) ? episode.name.padStart(2, '0') : episode.name;
       const episodeName = `${seasonName} ${episodeData} [CrunchyRoll]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       if (await tracker.existsAsync(seasonName, episodeName) || await tracker.existsAsync(seriesName, episodeName)) {

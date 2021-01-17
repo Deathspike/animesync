@@ -6,7 +6,7 @@ export class RemoteSeriesSeasonEpisode {
   constructor(source?: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
     this.imageUrl = acm.property('imageUrl', source, sourcePatch, '');
     this.isPremium = acm.property('isPremium', source, sourcePatch, false);
-    this.number = acm.property('number', source, sourcePatch, '');
+    this.name = acm.property('name', source, sourcePatch, '');
     this.title = acm.property('title', source, sourcePatch, '');
     this.synopsis = acm.property('synopsis', source, sourcePatch, '');
     this.url = acm.property('url', source, sourcePatch, '');
@@ -24,7 +24,7 @@ export class RemoteSeriesSeasonEpisode {
   @clv.IsString()
   @clv.IsNotEmpty()
   @nsg.ApiProperty()
-  readonly number: string;
+  readonly name: string;
 
   @clv.IsOptional()
   @clv.IsString()

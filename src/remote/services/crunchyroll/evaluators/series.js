@@ -45,11 +45,11 @@ function evaluateSeries() {
       const data = processBubbleData($(episodeNode).data('bubble_data'));
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
-      const number = processName(episodeNode.querySelector('.series-title'));
+      const name = processName(episodeNode.querySelector('.series-title'));
       const synopsis = validate(data.description);
       const title = validate(data.title);
       const url = processUrl(episodeNode.querySelector('a'));
-      return {imageUrl, isPremium, number, synopsis, title, url};
+      return {imageUrl, isPremium, name, synopsis, title, url};
     });
   }
 

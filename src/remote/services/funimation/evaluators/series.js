@@ -63,11 +63,11 @@ async function evaluateSeriesAsync() {
   function mapSeasonEpisode(episode) {
     const imageUrl = episode.poster;
     const isPremium = Boolean(episode.mostRecentSvod.subscriptionRequired);
-    const number = episode.item.episodeNum;
+    const name = episode.item.episodeNum;
     const title = episode.item.episodeName;
     const synopsis = episode.synopsis;
     const url = new URL(`${episode.item.episodeSlug}/?lang=japanese`, location.href).toString();
-    return {imageUrl, isPremium, number, title, synopsis, url};
+    return {imageUrl, isPremium, name, title, synopsis, url};
   }
 }
 
