@@ -45,7 +45,7 @@ function evaluateSeries() {
       const data = processBubbleData($(episodeNode).data('bubble_data'));
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
-      const number = validateStrict(data.number);
+      const number = processName(episodeNode.querySelector('.series-title'));
       const synopsis = validate(data.description);
       const title = validate(data.title);
       const url = processUrl(episodeNode.querySelector('a'));
@@ -56,14 +56,25 @@ function evaluateSeries() {
   /**
    * Process the bubble data.
    * @param {{name: string, description: string}} value
-   * @returns {{description: string, number: string, title: string}}
+   * @returns {{description: string, title: string}}
    */
   function processBubbleData(value) {
     const description = value.description;
-    const match = value.name.match(/^Episode\s(.+?)(?:\s-\s(.*))?$/);
-    const number = (match && match[1]) ?? value.name;
+    const match = value.name.match(/^(?:Episode\s(.*)\s-\s)?(.*)?$/);
     const title = (match && match[2]) ?? '';
-    return {description, number, title};
+    return {description, title};
+  }
+
+  /**
+   * Process the name.
+   * @param {Element?} nameNode
+   * @returns {string}
+   */
+  function processName(nameNode) {
+    const value = validate(nameNode);
+    const match = value?.match(/^(?:Episode\s)?(.*)$/);
+    if (match) return match[1];
+    throw new Error();
   }
 
   /**
