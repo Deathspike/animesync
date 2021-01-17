@@ -3,7 +3,7 @@ import * as clr from 'chrome-launcher';
 import * as ncm from '@nestjs/common';
 import playwright from 'playwright-core';
 
-export class BrowserService implements ncm.OnApplicationShutdown {
+export class BrowserService implements ncm.OnModuleDestroy {
   private _browser?: Promise<playwright.ChromiumBrowserContext>;
   private _numberOfPages: number;
   private _timeoutHandle: NodeJS.Timeout;
@@ -31,9 +31,10 @@ export class BrowserService implements ncm.OnApplicationShutdown {
     }
   }
 
-  async onApplicationShutdown() {
+  async onModuleDestroy() {
+    const browser = await this._browser;
     clearTimeout(this._timeoutHandle);
-    this._browser?.then(x => x.close()).catch(() => undefined);
+    await browser?.close().catch(() => undefined);
   }
 
   private async _launchAsync() {

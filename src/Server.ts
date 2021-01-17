@@ -20,19 +20,15 @@ export class Server extends ace.api.ServerApi {
     attachDocumentation(app);
     attachRequestValidation(app);
     await app.listen(ace.settings.serverPort);
-    await handlerAsync(server).finally(() => server.disposeAsync());
+    await handlerAsync(server).finally(() => app.close());
   }
 
+  get browser() {
+    return this._app.get(ace.shr.BrowserService);
+  }
+  
   get logger() {
-    return this.get(ace.shr.LoggerService);
-  }
-
-  get<T>(cls: ncm.Type<T>) {
-    return this._app.get(cls);
-  }
-
-  async disposeAsync() {
-    await this._app.close();
+    return this._app.get(ace.shr.LoggerService);
   }
 }
 

@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 @ncm.Injectable()
-export class CacheService {
+export class CacheService implements ncm.OnModuleDestroy {
   private readonly _loggerService: ace.shr.LoggerService;
   private readonly _timeoutHandles: {[key: string]: NodeJS.Timeout};
   private readonly _values: {[key: string]: Promise<any> | string};
@@ -22,6 +22,7 @@ export class CacheService {
       const continueWith = () => this.expireAsync(key).catch((error) => this._loggerService.error(error));
       value.then(continueWith, continueWith);
     } else if (value) {
+      clearTimeout(this._timeoutHandles[key]);
       delete this._timeoutHandles[key];
       delete this._values[key];
       await fs.remove(path.join(ace.settings.cache, value));
@@ -37,6 +38,12 @@ export class CacheService {
     } else {
       return await this._addAsync(key, timeout, valueFactory());
     }
+  }
+
+  async onModuleDestroy() {
+    const keys = Object.keys(this._timeoutHandles);
+    const expires = keys.map(x => this.expireAsync(x));
+    await Promise.all(expires);
   }
 
   private async _addAsync<T>(key: string, timeout: number, valuePromise: Promise<T>) {
