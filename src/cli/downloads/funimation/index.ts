@@ -18,7 +18,7 @@ async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.Re
     const seasonNumber = seasonMatch ? parseFloat(seasonMatch[1]) : NaN;
     for (const episode of season.episodes) {
       const elapsedTime = new acm.Timer();
-      const episodeData = parseFloat(episode.number);
+      const episodeData = parseFloat(episode.name);
       const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeData).padStart(2, '0')} [Funimation]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       if (!isFinite(seasonNumber) || !isFinite(episodeData)) {
