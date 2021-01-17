@@ -10,7 +10,6 @@ export class RemoteStream {
   }
 
   @clv.IsArray()
-  @clv.ArrayNotEmpty()
   @clv.ValidateNested()
   @nsg.ApiProperty({type: [acm.RemoteStreamSubtitle]})
   readonly subtitles: Array<acm.RemoteStreamSubtitle>;
