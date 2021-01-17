@@ -60,7 +60,7 @@ function evaluateSeries() {
    */
   function processBubbleData(value) {
     const description = value.description;
-    const match = value.name.match(/^Episode\s(.+?)\s-\s(.*)$/);
+    const match = value.name.match(/^Episode\s(.+?)(?:\s-\s(.*))?$/);
     const number = (match && match[1]) ?? value.name;
     const title = (match && match[2]) ?? '';
     return {description, number, title};
