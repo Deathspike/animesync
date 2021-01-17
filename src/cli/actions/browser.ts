@@ -5,7 +5,7 @@ export async function browserAsync() {
   await ace.Server.usingAsync(async (api) => {
     ace.settings.chromeHeadless = false;
     console.info('Spawning browser ...');
-    await api.get(ace.shr.BrowserService).pageAsync(async (page) => {
+    await api.browser.pageAsync(async (page) => {
       const context = page.context();
       const pages = context.pages();
       if (pages.length > 0) pages[0].goto('https://www.crunchyroll.com/').catch(() => undefined);

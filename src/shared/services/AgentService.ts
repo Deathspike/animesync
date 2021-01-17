@@ -6,7 +6,7 @@ import http from 'http';
 import express from 'express';
 
 @ncm.Injectable()
-export class AgentService {
+export class AgentService implements ncm.OnModuleDestroy {
   private readonly _httpAgent: acm.AgentHttp;
   private readonly _httpsAgent: acm.AgentHttps;
   
@@ -37,6 +37,11 @@ export class AgentService {
     else if (!Array.isArray(headers)) Array.from(headers).forEach(([k, v]) => result[k] = v);
     else headers.forEach(([k, v]) => result[k] = v);
     return result;
+  }
+  
+  onModuleDestroy() {
+    this._httpAgent.destroy();
+    this._httpsAgent.destroy();
   }
 }
 
