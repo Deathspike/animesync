@@ -1,5 +1,6 @@
 import * as ace from '../../..';
 import * as acm from '../..';
+import * as clv from 'class-validator';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
@@ -16,13 +17,11 @@ async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.Re
   for (const season of series.seasons) {
     const seasonName = sanitizeFilename(season.title);
     for (const episode of season.episodes) {
-      const episodeNumber = parseFloat(episode.number);
       const elapsedTime = new acm.Timer();
-      const episodeName = `${seasonName} ${String(episodeNumber).padStart(2, '0')} [CrunchyRoll]`;
+      const episodeData = clv.isNumberString(episode.number) ? episode.number.padStart(2, '0') : episode.number;
+      const episodeName = `${seasonName} ${episodeData} [CrunchyRoll]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
-      if (!isFinite(episodeNumber)) {
-        api.logger.info(`Ignoring ${episodeName}`);
-      } else if (await tracker.existsAsync(seasonName, episodeName) || await tracker.existsAsync(seriesName, episodeName)) {
+      if (await tracker.existsAsync(seasonName, episodeName) || await tracker.existsAsync(seriesName, episodeName)) {
         api.logger.info(`Skipping ${episodeName}`);
       } else if (options && options.skipDownload) {
         api.logger.info(`Tracking ${episodeName}`);
