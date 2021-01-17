@@ -74,5 +74,5 @@ async function evaluateSeriesAsync() {
 if (typeof module !== 'undefined') {
   module.exports = {evaluateSeriesAsync};
 } else {
-  evaluateSeriesAsync().then(console.log.bind(console));
+  evaluateSeriesAsync().then(console.info.bind(console));
 }

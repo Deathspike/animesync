@@ -116,5 +116,5 @@ function evaluateSeries() {
 if (typeof module !== 'undefined') {
   module.exports = {evaluateSeries};
 } else {
-  console.log(evaluateSeries());
+  console.info(evaluateSeries());
 }

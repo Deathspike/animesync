@@ -1,10 +1,10 @@
 import * as ace from '../..';
 
 export async function browserAsync() {
-  console.log(`Starting ${ace.settings.serverUrl}`);
+  console.info(`Starting ${ace.settings.serverUrl}`);
   await ace.Server.usingAsync(async (api) => {
     ace.settings.chromeHeadless = false;
-    console.log('Spawning browser ...');
+    console.info('Spawning browser ...');
     await api.get(ace.shr.BrowserService).pageAsync(async (page) => {
       const context = page.context();
       const pages = context.pages();

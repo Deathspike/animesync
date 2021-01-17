@@ -22,20 +22,20 @@ async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.Re
       const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeNumber).padStart(2, '0')} [Funimation]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       if (!isFinite(seasonNumber) || !isFinite(episodeNumber)) {
-        api.logger.log(`Ignoring ${episodeName}`);
+        api.logger.info(`Ignoring ${episodeName}`);
       } else if (await tracker.existsAsync(seriesName, episodeName)) {
-        api.logger.log(`Skipping ${episodeName}`);
+        api.logger.info(`Skipping ${episodeName}`);
       } else if (options && options.skipDownload) {
-        api.logger.log(`Tracking ${episodeName}`);
+        api.logger.info(`Tracking ${episodeName}`);
         await tracker.trackAsync(seriesName, episodeName);
       } else try {
-        api.logger.log(`Fetching ${episodeName}`);
+        api.logger.info(`Fetching ${episodeName}`);
         await saveAsync(api, episodePath, episode.url);
         await tracker.trackAsync(seriesName, episodeName);
-        api.logger.log(`Finished ${episodeName} (${elapsedTime})`);
+        api.logger.info(`Finished ${episodeName} (${elapsedTime})`);
       } catch (error) {
-        api.logger.log(`Rejected ${episodeName} (${elapsedTime})`);
         api.logger.error(error);
+        api.logger.info(`Rejected ${episodeName} (${elapsedTime})`);
       }
     }
   }
