@@ -1,8 +1,9 @@
 import * as ace from '../..';
 import * as clr from 'chrome-launcher';
+import * as ncm from '@nestjs/common';
 import playwright from 'playwright-core';
 
-export class BrowserService {
+export class BrowserService implements ncm.OnApplicationShutdown {
   private _browser?: Promise<playwright.ChromiumBrowserContext>;
   private _numberOfPages: number;
   private _timeoutHandle: NodeJS.Timeout;
@@ -29,7 +30,12 @@ export class BrowserService {
       await page?.close().catch(() => undefined);
     }
   }
-  
+
+  async onApplicationShutdown() {
+    clearTimeout(this._timeoutHandle);
+    this._browser?.then(x => x.close()).catch(() => undefined);
+  }
+
   private async _launchAsync() {
     try {
       const args = ['--autoplay-policy=no-user-gesture-required'];

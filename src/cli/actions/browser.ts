@@ -4,7 +4,6 @@ export async function browserAsync() {
   console.log(`Starting ${ace.settings.serverUrl}`);
   await ace.Server.usingAsync(async (api) => {
     ace.settings.chromeHeadless = false;
-    ace.settings.chromeInactiveTimeout = 1000;
     console.log('Spawning browser ...');
     await api.get(ace.shr.BrowserService).pageAsync(async (page) => {
       const context = page.context();
