@@ -1,3 +1,8 @@
+<p align="center">
+  <i>AnimeSync</i> will be rebranded to <i>AnimeLoyalty</i> in the future.<br />
+  None of the features will be lost.
+</p>
+
 # animesync
 
 AnimeSync is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
