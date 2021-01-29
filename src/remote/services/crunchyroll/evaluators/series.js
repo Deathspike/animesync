@@ -21,6 +21,17 @@ function evaluateSeries() {
   };
 
   /**
+   * Determines whether the season has Japanese audio.
+   * @param {RemoteSeriesSeason} season 
+   * @returns {boolean}
+   */
+  function hasJapaneseAudio(season) {
+    const languages = ['Arabic', 'English', 'French', 'German', 'Italian', 'Portuguese', 'Russian', 'Spanish'];
+    const expression = new RegExp(`\((?:${languages.join('|')})(?:\s*Dub)?\)`, 'i');
+    return !expression.test(season.title);
+  }
+
+  /**
    * Map the seasons.
    * @param {Element?} containerNode
    * @returns {Array<RemoteSeriesSeason>}
@@ -31,7 +42,7 @@ function evaluateSeries() {
       const episodes = mapSeasonEpisodes(seasonNode.querySelector('ul')) ?? [];
       const title = validateStrict(seasonNode.querySelector(':scope > a') ?? document.querySelector('#template_container h1'));
       return {episodes, title};
-    }).filter(x => !/\(.+\)/.test(x.title));
+    }).filter(hasJapaneseAudio);
   }
 
   /**
