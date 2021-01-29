@@ -1,8 +1,8 @@
 /**
  * Evaluate the stream.
  * @typedef {import('.').PageStream} PageStream
- * @typedef {import('../../../..').api.RemoteStream} RemoteStream
- * @typedef {import('../../../..').api.RemoteStreamSubtitle} RemoteStreamSubtitle
+ * @typedef {import('../../..').api.RemoteStream} RemoteStream
+ * @typedef {import('../../..').api.RemoteStreamSubtitle} RemoteStreamSubtitle
  * @returns {RemoteStream}
  **/
 function evaluateStream() {

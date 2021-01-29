@@ -1,5 +1,4 @@
-import * as ace from '../..';
-import * as acm from '..';
+import * as app from '..';
 import * as sks from 'socks';
 import dns from 'dns';
 import net from 'net';
@@ -8,13 +7,13 @@ import tls from 'tls';
 import util from 'util';
 
 export class HttpTunnelService {
-  private _nordvpn?: acm.NordVpn;
+  private _nordvpn?: app.NordVpn;
 
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = url.parse(clientUrl);
-    const server = url.parse(ace.settings.proxyServer);
+    const server = url.parse(app.settings.proxyServer);
     if (server.protocol === 'nordvpn:') {
-      (this._nordvpn ?? (this._nordvpn = new acm.NordVpn())).getAsync(server)
+      (this._nordvpn ?? (this._nordvpn = new app.NordVpn())).getAsync(server)
         .then(x => this._connectTo(client, clientSocket, x))
         .catch(() => clientSocket.destroy());
     } else {

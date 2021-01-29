@@ -1,12 +1,12 @@
-import * as ace from '../..';
+import * as app from '..';
 import * as ncm from '@nestjs/common';
 import express from 'express';
 
 @ncm.Injectable()
 export class HttpProxyMiddleware implements ncm.NestMiddleware {
-  private readonly _agentService: ace.shr.AgentService;
+  private readonly _agentService: app.AgentService;
   
-  constructor(agentService: ace.shr.AgentService) {
+  constructor(agentService: app.AgentService) {
     this._agentService = agentService;
   }
 

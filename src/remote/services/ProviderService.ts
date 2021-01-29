@@ -1,5 +1,4 @@
-import * as ace from '../..';
-import * as acm from '..';
+import * as app from '..';
 import * as ncm from '@nestjs/common';
 import {CrunchyRollProvider} from './crunchyroll';
 import {FunimationProvider} from './funimation';
@@ -9,7 +8,7 @@ export class ProviderService {
   private readonly _crunchyrollProvider: CrunchyRollProvider;
   private readonly _funimationProvider: FunimationProvider;
 
-  constructor(browserService: ace.shr.BrowserService, composeService: acm.ComposeService) {
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
     this._crunchyrollProvider = new CrunchyRollProvider(browserService, composeService);
     this._funimationProvider = new FunimationProvider(browserService, composeService);
   }

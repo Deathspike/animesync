@@ -1,10 +1,10 @@
-import * as acm from '../..';
+import * as api from '../..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
 export class RewriteParamHls {
   constructor(source?: RewriteParamHls, sourcePatch?: Partial<RewriteParamHls>) {
-    this.url = acm.property('url', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()

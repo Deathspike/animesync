@@ -1,13 +1,13 @@
-import * as acm from '.';
+import * as app from '.';
 import * as ncm from '@nestjs/common';
 import * as rop from 'rxjs/operators';
 import express from 'express';
 
 @ncm.Injectable()
 export class ResponseLoggerInterceptor<T> implements ncm.NestInterceptor {
-  private readonly _loggerService: acm.LoggerService;
+  private readonly _loggerService: app.LoggerService;
 
-  constructor(loggerService: acm.LoggerService) {
+  constructor(loggerService: app.LoggerService) {
     this._loggerService = loggerService;
   }
 

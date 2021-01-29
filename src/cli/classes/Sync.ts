@@ -1,4 +1,4 @@
-import * as ace from '../..';
+import * as app from '../..';
 import * as sub from 'subtitle';
 import childProcess from 'child_process';
 import crypto from 'crypto';
@@ -8,17 +8,17 @@ import os from 'os';
 import path from 'path';
 
 export class Sync {
-  private readonly _api: ace.Server;
+  private readonly _api: app.Server;
   private readonly _episodePath: string;
   private readonly _syncPath: string;
 
-  constructor(api: ace.Server, episodePath: string) {
+  constructor(api: app.Server, episodePath: string) {
     this._api = api;
     this._episodePath = episodePath;
-    this._syncPath = path.join(ace.settings.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
+    this._syncPath = path.join(app.settings.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
   }
 
-  async saveAsync(stream: ace.api.RemoteStream) {
+  async saveAsync(stream: app.api.RemoteStream) {
     try {
       const allSubtitles = await this._prepareAsync(stream);
       const foreignSubtitles = allSubtitles
@@ -48,7 +48,7 @@ export class Sync {
     }
   }
 
-  private async _prepareAsync(stream: ace.api.RemoteStream) {
+  private async _prepareAsync(stream: app.api.RemoteStream) {
     await fs.ensureDir(this._syncPath);
     return await Promise.all(stream.subtitles.map(async (subtitle, i) => {
       if (subtitle.type === 'vtt') {

@@ -1,4 +1,4 @@
-import * as acm from '..';
+import * as app from '..';
 import http from 'http';
 import net from 'net';
 
@@ -9,7 +9,7 @@ export class AgentHttp extends http.Agent {
   }
 
   createConnection(options: net.TcpSocketConnectOpts, callback: (error?: Error, socket?: net.Socket) => void) {
-    acm.AgentConnector.createAsync(String(options.host), options.port)
+    app.AgentConnector.createAsync(String(options.host), options.port)
       .then((socket) => callback(undefined, this._createConnection(options, socket)))
       .catch((error) => callback(error))
   }

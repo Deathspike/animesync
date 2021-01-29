@@ -1,23 +1,23 @@
-import * as ace from '../../..';
-import * as acm from '../..';
+import * as app from '../../..';
+import * as cli from '../..';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
-export async function funimationAsync(api: ace.Server, rootPath: string, url: string, options?: acm.IOptions) {
+export async function funimationAsync(api: app.Server, rootPath: string, url: string, options?: cli.IOptions) {
   const series = await api.remote.seriesAsync({url});
   if (!series.value) throw new Error(`Invalid series: ${url}`);
   await seriesAsync(api, rootPath, series.value, options);
 }
 
-async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.RemoteSeries, options?: acm.IOptions) {
+async function seriesAsync(api: app.Server, rootPath: string, series: app.api.RemoteSeries, options?: cli.IOptions) {
   const seriesName = sanitizeFilename(series.title);
   const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new acm.Tracker(ace.settings.library);
+  const tracker = new cli.Tracker(app.settings.library);
   for (const season of series.seasons) {
     const seasonMatch = season.title.match(/([0-9\.]+)/);
     const seasonNumber = seasonMatch ? parseFloat(seasonMatch[1]) : NaN;
     for (const episode of season.episodes) {
-      const elapsedTime = new acm.Timer();
+      const elapsedTime = new cli.Timer();
       const episodeData = parseFloat(episode.name);
       const episodeName = `${seriesName} ${String(seasonNumber).padStart(2, '0')}x${String(episodeData).padStart(2, '0')} [Funimation]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
@@ -41,9 +41,9 @@ async function seriesAsync(api: ace.Server, rootPath: string, series: ace.api.Re
   }
 }
 
-async function saveAsync(api: ace.Server, episodePath: string, url: string) {
+async function saveAsync(api: app.Server, episodePath: string, url: string) {
   const stream = await api.remote.streamAsync({url});
   if (!stream.value) throw new Error(`Invalid stream: ${url}`);
-  const sync = new acm.Sync(api, episodePath);
+  const sync = new cli.Sync(api, episodePath);
   await sync.saveAsync(stream.value);
 }

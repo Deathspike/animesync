@@ -1,47 +1,47 @@
-import * as ace from '.';
+import * as app from '.';
+import * as ash from './shared';
 import * as ncm from '@nestjs/common';
 import * as ncr from '@nestjs/core';
 import * as npe from '@nestjs/platform-express';
 import * as nsg from '@nestjs/swagger';
 
-export class Server extends ace.api.ServerApi {
-  private readonly _app: npe.NestExpressApplication;
+export class Server extends app.api.ServerApi {
+  private readonly server: npe.NestExpressApplication;
 
-  private constructor(app: npe.NestExpressApplication) {
-    super(ace.settings.serverUrl);
-    this._app = app;
-    this._app.disable('x-powered-by');
-    this._app.useLogger(this.logger);
+  private constructor(server: npe.NestExpressApplication) {
+    super(app.settings.serverUrl);
+    this.server = server;
+    this.server.disable('x-powered-by');
+    this.server.useLogger(this.logger);
   }
 
   static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
-    const app = await ncr.NestFactory.create<npe.NestExpressApplication>(ace.ServerModule, {bodyParser: false, logger: false});
-    const server = new Server(app);
-    attachDocumentation(app);
-    attachRequestValidation(app);
-    await app.listen(ace.settings.serverPort);
-    await handlerAsync(server).finally(() => app.close());
+    const server = await ncr.NestFactory.create<npe.NestExpressApplication>(app.ServerModule, {bodyParser: false, logger: false});
+    attachDocumentation(server);
+    attachRequestValidation(server);
+    await server.listen(app.settings.serverPort);
+    await handlerAsync(new Server(server)).finally(() => server.close());
   }
 
   get browser() {
-    return this._app.get(ace.shr.BrowserService);
+    return this.server.get(ash.BrowserService);
   }
   
   get logger() {
-    return this._app.get(ace.shr.LoggerService);
+    return this.server.get(ash.LoggerService);
   }
 }
 
-function attachDocumentation(server: ncm.INestApplication) {
-  nsg.SwaggerModule.setup('api', server, nsg.SwaggerModule.createDocument(server, new nsg.DocumentBuilder()
+function attachDocumentation(serverApp: ncm.INestApplication) {
+  nsg.SwaggerModule.setup('api', serverApp, nsg.SwaggerModule.createDocument(serverApp, new nsg.DocumentBuilder()
     .setDescription(require('../package').description)
     .setTitle(require('../package').name)
     .setVersion(require('../package').version)
     .build()));
 }
 
-function attachRequestValidation(server: ncm.INestApplication) {
-  server.useGlobalPipes(new ncm.ValidationPipe({
+function attachRequestValidation(serverApp: ncm.INestApplication) {
+  serverApp.useGlobalPipes(new ncm.ValidationPipe({
     forbidNonWhitelisted: true,
     forbidUnknownValues: true,
     transform: true

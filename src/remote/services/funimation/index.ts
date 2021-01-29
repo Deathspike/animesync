@@ -1,15 +1,14 @@
-import * as ace from '../../..';
-import * as acm from '../..';
+import * as app from '../..';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
 export class FunimationProvider {
-  private readonly _browserService: ace.shr.BrowserService;
-  private readonly _composeService: acm.ComposeService;
+  private readonly _browserService: app.BrowserService;
+  private readonly _composeService: app.ComposeService;
 
-  constructor(browserService: ace.shr.BrowserService, composeService: acm.ComposeService) {
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
     this._browserService = browserService;
     this._composeService = composeService;
   }
@@ -39,15 +38,15 @@ export class FunimationProvider {
 
   async streamAsync(episodeUrl: string) {
     return await this._browserService.pageAsync(async (page, userAgent) => {
-      const [manifestPromise, vttSubtitlePromise] = new acm.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
+      const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const manifestSrc = await manifestPromise.then(x => x.url());
       const vttSubtitleSrc = await vttSubtitlePromise.then(x => x.url());
       await page.close();
       if (manifestSrc && vttSubtitleSrc) {
         const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-        const subtitle = new ace.api.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
-        const stream = new ace.api.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
+        const subtitle = new app.api.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
+        const stream = new app.api.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
         return this._composeService.stream(stream, headers);
       } else {
         throw new Error();

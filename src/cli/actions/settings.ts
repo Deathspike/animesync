@@ -1,4 +1,4 @@
-import * as ace from '../..';
+import * as app from '../..';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
@@ -15,7 +15,7 @@ export async function settingsAsync(values: Record<string, boolean | string | un
 }
 
 function mergeSettings(values: Record<string, boolean | string | undefined>, settings: Record<string, boolean | number | string>) {
-  return Object.keys(ace.settings).reduce((p, key) => {
+  return Object.keys(app.settings).reduce((p, key) => {
     const value = values[key];
     if (value === true) {
       delete settings[key];

@@ -1,9 +1,9 @@
-import * as ace from '../..';
-import * as acm from '..';
+import * as app from '../..';
+import * as cli from '..';
 import {crunchyrollAsync} from './crunchyroll';
 import {funimationAsync} from './funimation';
 
-export async function seriesAsync(api: ace.Server, rootPath: string, seriesUrl: string, options?: acm.IOptions) {
+export async function seriesAsync(api: app.Server, rootPath: string, seriesUrl: string, options?: cli.IOptions) {
   try {
     if (seriesUrl.toLowerCase().startsWith('https://www.crunchyroll.com/')) {
       api.logger.info(`Fetching ${seriesUrl}`);

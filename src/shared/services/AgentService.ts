@@ -1,4 +1,4 @@
-import * as acm from '..';
+import * as app from '..';
 import * as ncm from '@nestjs/common';
 import * as fch from 'node-fetch';
 import fetch from 'node-fetch';
@@ -7,12 +7,12 @@ import express from 'express';
 
 @ncm.Injectable()
 export class AgentService implements ncm.OnModuleDestroy {
-  private readonly _httpAgent: acm.AgentHttp;
-  private readonly _httpsAgent: acm.AgentHttps;
+  private readonly _httpAgent: app.AgentHttp;
+  private readonly _httpsAgent: app.AgentHttps;
   
   constructor() {
-    this._httpAgent = new acm.AgentHttp({keepAlive: true});
-    this._httpsAgent = new acm.AgentHttps({keepAlive: true});
+    this._httpAgent = new app.AgentHttp({keepAlive: true});
+    this._httpsAgent = new app.AgentHttps({keepAlive: true});
   }
 
   async fetchAsync(url: URL, options?: fch.RequestInit) {

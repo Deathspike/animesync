@@ -1,4 +1,4 @@
-import * as acm from '..';
+import * as api from '..';
 import fetch from 'node-fetch';
 import querystring from 'querystring';
 
@@ -9,13 +9,13 @@ export class RewriteApi {
     this._baseUrl = baseUrl;
   }
 
-  async emulateAsync(model: acm.RewriteParamEmulate, headers?: Record<string, string>) {
+  async emulateAsync(model: api.RewriteParamEmulate, headers?: Record<string, string>) {
     const query = querystring.stringify(headers);
     const url = new URL(`/api/rewrite/${encodeURIComponent(model.url)}?${query}`, this._baseUrl);
     return await fetch(url);
   }
 
-  async hlsAsync(model: acm.RewriteParamHls, headers?: Record<string, string>) {
+  async hlsAsync(model: api.RewriteParamHls, headers?: Record<string, string>) {
     const query = querystring.stringify(headers);
     const url = new URL(`/api/rewrite/${encodeURIComponent(model.url)}?${query}`, this._baseUrl);
     return await fetch(url);

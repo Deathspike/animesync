@@ -1,12 +1,12 @@
-import * as acm from '..';
+import * as cli from '..';
 import fs from 'fs-extra';
 import path from 'path';
 
 export class Library {
   private readonly _filePath: string;
-  private readonly _source: acm.ILibrary;
+  private readonly _source: cli.ILibrary;
 
-  private constructor(filePath: string, source: acm.ILibrary) {
+  private constructor(filePath: string, source: cli.ILibrary) {
     this._filePath = filePath;
     this._source = source;
   }

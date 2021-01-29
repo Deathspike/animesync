@@ -1,10 +1,10 @@
-import * as acm from '../..';
+import * as api from '../..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
 export class RemoteQueryStream {
   constructor(source?: RemoteQueryStream, sourcePatch?: Partial<RemoteQueryStream>) {
-    this.url = acm.property('url', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, '');
   }
   
   @clv.IsString()

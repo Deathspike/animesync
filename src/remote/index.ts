@@ -1,3 +1,4 @@
+export * from '../shared';
 export * from './classes/Observer';
 export * from './services/CacheService';
 export * from './services/ComposeService';

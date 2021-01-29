@@ -1,15 +1,15 @@
-import * as acm from '../..';
+import * as api from '../..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
 export class RemoteSeriesSeasonEpisode {
   constructor(source?: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
-    this.imageUrl = acm.property('imageUrl', source, sourcePatch, '');
-    this.isPremium = acm.property('isPremium', source, sourcePatch, false);
-    this.name = acm.property('name', source, sourcePatch, '');
-    this.title = acm.property('title', source, sourcePatch, '');
-    this.synopsis = acm.property('synopsis', source, sourcePatch, '');
-    this.url = acm.property('url', source, sourcePatch, '');
+    this.imageUrl = api.property('imageUrl', source, sourcePatch, '');
+    this.isPremium = api.property('isPremium', source, sourcePatch, false);
+    this.name = api.property('name', source, sourcePatch, '');
+    this.title = api.property('title', source, sourcePatch, '');
+    this.synopsis = api.property('synopsis', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()

@@ -1,23 +1,23 @@
-import * as acm from '.';
+import * as app from '.';
 import * as ncm from '@nestjs/common';
 import * as ncr from '@nestjs/core';
 import http from 'http';
 import net from 'net';
 
 @ncm.Module({
-  controllers: [acm.CoreController],
-  providers: [acm.HttpTunnelService]})
+  controllers: [app.CoreController],
+  providers: [app.HttpTunnelService]})
 export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
   private readonly _adapterHost: ncr.HttpAdapterHost;
-  private readonly _tunnelService: acm.HttpTunnelService;
+  private readonly _tunnelService: app.HttpTunnelService;
 
-  constructor(adapterHost: ncr.HttpAdapterHost, tunnelService: acm.HttpTunnelService) {
+  constructor(adapterHost: ncr.HttpAdapterHost, tunnelService: app.HttpTunnelService) {
     this._adapterHost = adapterHost;
     this._tunnelService = tunnelService;
   }
 
   configure(consumer: ncm.MiddlewareConsumer) {
-    consumer.apply(acm.HttpProxyMiddleware).forRoutes({path: '*', method: ncm.RequestMethod.ALL});
+    consumer.apply(app.HttpProxyMiddleware).forRoutes({path: '*', method: ncm.RequestMethod.ALL});
   }
 
   onApplicationBootstrap() {

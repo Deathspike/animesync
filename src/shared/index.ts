@@ -1,3 +1,4 @@
+export * from '..';
 export * from './classes/AgentConnector';
 export * from './classes/AgentHttp';
 export * from './classes/AgentHttps';

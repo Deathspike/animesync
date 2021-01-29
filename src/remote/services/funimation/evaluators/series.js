@@ -2,9 +2,9 @@
  * @typedef {import('.').PageSeries} PageSeries
  * @typedef {import('.').PageSeriesSeason} PageSeriesSeason
  * @typedef {import('.').PageSeriesSeasonEpisode} PageSeriesSeasonEpisode
- * @typedef {import('../../../..').api.RemoteSeries} RemoteSeries
- * @typedef {import('../../../..').api.RemoteSeriesSeason} RemoteSeriesSeason
- * @typedef {import('../../../..').api.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
+ * @typedef {import('../../..').api.RemoteSeries} RemoteSeries
+ * @typedef {import('../../..').api.RemoteSeriesSeason} RemoteSeriesSeason
+ * @typedef {import('../../..').api.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
  * @type {PageSeries}
  */
 var titleData;
