@@ -15,8 +15,8 @@ export class Server extends app.api.ServerApi {
     this.server.useLogger(this.logger);
   }
 
-  static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
-    const server = await ncr.NestFactory.create<npe.NestExpressApplication>(app.ServerModule, {bodyParser: false, logger: false});
+  static async usingAsync(handlerAsync: (server: Server) => Promise<void>, module?: ncm.NestModule) {
+    const server = await ncr.NestFactory.create<npe.NestExpressApplication>(module ?? app.ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
     attachRequestValidation(server);
     await server.listen(app.settings.serverPort);
