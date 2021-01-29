@@ -1,5 +1,4 @@
-import * as ace from '../../..';
-import * as acm from '../..';
+import * as app from '../..';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeries} from './evaluators/series';
 import {evaluateStream} from './evaluators/stream';
@@ -7,10 +6,10 @@ import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
 export class CrunchyRollProvider {
-  private readonly _browserService: ace.shr.BrowserService;
-  private readonly _composeService: acm.ComposeService;
+  private readonly _browserService: app.BrowserService;
+  private readonly _composeService: app.ComposeService;
 
-  constructor(browserService: ace.shr.BrowserService, composeService: acm.ComposeService) {
+  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
     this._browserService = browserService;
     this._composeService = composeService;
   }

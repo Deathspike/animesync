@@ -1,9 +1,9 @@
-import * as ace from '../..';
+import * as app from '../..';
 
 export async function browserAsync() {
-  console.info(`Starting ${ace.settings.serverUrl}`);
-  await ace.Server.usingAsync(async (api) => {
-    ace.settings.chromeHeadless = false;
+  console.info(`Starting ${app.settings.serverUrl}`);
+  await app.Server.usingAsync(async (api) => {
+    app.settings.chromeHeadless = false;
     console.info('Spawning browser ...');
     await api.browser.pageAsync(async (page) => {
       const context = page.context();

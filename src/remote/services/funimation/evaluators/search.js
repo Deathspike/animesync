@@ -1,7 +1,7 @@
 /**
  * Evaluate the search.
- * @typedef {import('../../../..').api.RemoteSearch} RemoteSearch
- * @typedef {import('../../../..').api.RemoteSearchSeries} RemoteSearchSeries
+ * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
+ * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
  * @returns {RemoteSearch}
  **/
 function evaluateSearch() {

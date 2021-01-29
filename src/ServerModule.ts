@@ -1,4 +1,4 @@
-import * as ace from '.';
+import * as app from './shared';
 import * as ncm from '@nestjs/common';
 import {CoreModule} from './core';
 import {RemoteModule} from './remote';
@@ -8,11 +8,11 @@ import fs from 'fs-extra';
 @ncm.Global()
 @ncm.Module({
   imports: [CoreModule, RemoteModule, RewriteModule],
-  providers: [ace.shr.AgentService, ace.shr.BrowserService, ace.shr.ContextService, ace.shr.LoggerService],
-  exports: [ace.shr.AgentService, ace.shr.BrowserService, ace.shr.ContextService, ace.shr.LoggerService]})
+  providers: [app.AgentService, app.BrowserService, app.ContextService, app.LoggerService],
+  exports: [app.AgentService, app.BrowserService, app.ContextService, app.LoggerService]})
 export class ServerModule implements ncm.OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await fs.remove(ace.settings.cache);
-    await fs.remove(ace.settings.sync);
+    await fs.remove(app.settings.cache);
+    await fs.remove(app.settings.sync);
   }
 }

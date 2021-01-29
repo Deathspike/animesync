@@ -1,9 +1,9 @@
-import * as ace from '../..';
+import * as app from '..';
 import playwright from 'playwright-core';
 import url from 'url';
 
 export class Observer {
-  private readonly _responses: Array<{expression: RegExp, future: ace.shr.Future<playwright.Request>}>;
+  private readonly _responses: Array<{expression: RegExp, future: app.Future<playwright.Request>}>;
 
   constructor(page: playwright.Page) {
     page.on('request', this._onRequest.bind(this));
@@ -12,7 +12,7 @@ export class Observer {
 
   getAsync(...expression: Array<RegExp>) {
     return expression.map((expression) => {
-      const future = new ace.shr.Future<playwright.Request>(ace.settings.chromeObserverTimeout);
+      const future = new app.Future<playwright.Request>(app.settings.chromeObserverTimeout);
       this._responses.push({expression, future});
       return future.getAsync();
     });

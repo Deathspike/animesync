@@ -1,7 +1,7 @@
 /**
- * @typedef {import('../../../..').api.RemoteSeries} RemoteSeries
- * @typedef {import('../../../..').api.RemoteSeriesSeason} RemoteSeriesSeason
- * @typedef {import('../../../..').api.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
+ * @typedef {import('../../..').api.RemoteSeries} RemoteSeries
+ * @typedef {import('../../..').api.RemoteSeriesSeason} RemoteSeriesSeason
+ * @typedef {import('../../..').api.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
  * @type any
  */
 var $;

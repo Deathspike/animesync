@@ -1,12 +1,12 @@
-import * as acm from '../..';
+import * as api from '../..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
 export class RemoteStreamSubtitle {
   constructor(source?: RemoteStreamSubtitle, sourcePatch?: Partial<RemoteStreamSubtitle>) {
-    this.language = acm.property('language', source, sourcePatch, 'eng');
-    this.type = acm.property('type', source, sourcePatch, 'vtt');
-    this.url = acm.property('url', source, sourcePatch, '');
+    this.language = api.property('language', source, sourcePatch, 'eng');
+    this.type = api.property('type', source, sourcePatch, 'vtt');
+    this.url = api.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()

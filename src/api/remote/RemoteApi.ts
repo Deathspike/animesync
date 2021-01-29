@@ -1,4 +1,4 @@
-import * as acm from '..';
+import * as api from '..';
 import fetch from 'node-fetch';
 import querystring from 'querystring';
 
@@ -9,22 +9,22 @@ export class RemoteApi {
     this._baseUrl = baseUrl;
   }
 
-  async popularAsync(model: acm.RemoteQueryPopular) {
+  async popularAsync(model: api.RemoteQueryPopular) {
     const query = querystring.stringify(model as any);
     const url = new URL(`/api/remote/popular?${query}`, this._baseUrl);
-    return await fetchJsonAsync<acm.RemoteSearch>(url, 200);
+    return await fetchJsonAsync<api.RemoteSearch>(url, 200);
   }
 
-  async seriesAsync(model: acm.RemoteQuerySeries) {
+  async seriesAsync(model: api.RemoteQuerySeries) {
     const query = querystring.stringify(model as any);
     const url = new URL(`/api/remote/series?${query}`, this._baseUrl);
-    return await fetchJsonAsync<acm.RemoteSeries>(url, 200);
+    return await fetchJsonAsync<api.RemoteSeries>(url, 200);
   }
 
-  async streamAsync(model: acm.RemoteQueryStream) {
+  async streamAsync(model: api.RemoteQueryStream) {
     const query = querystring.stringify(model as any);
     const url = new URL(`/api/remote/stream?${query}`, this._baseUrl);
-    return await fetchJsonAsync<acm.RemoteStream>(url, 200);
+    return await fetchJsonAsync<api.RemoteStream>(url, 200);
   }
 }
 

@@ -1,11 +1,11 @@
-import * as acm from '.';
+import * as api from '.';
 
 export class ServerApi {
   constructor(baseUrl: string) {
-    this.remote = new acm.RemoteApi(baseUrl);
-    this.rewrite = new acm.RewriteApi(baseUrl);
+    this.remote = new api.RemoteApi(baseUrl);
+    this.rewrite = new api.RewriteApi(baseUrl);
   }
 
-  readonly remote: acm.RemoteApi;
-  readonly rewrite: acm.RewriteApi;
+  readonly remote: api.RemoteApi;
+  readonly rewrite: api.RewriteApi;
 }

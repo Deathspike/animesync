@@ -1,5 +1,5 @@
-import * as ace from '..';
-import * as acm from '.';
+import * as app from '..';
+import * as cli from '.';
 import commander from 'commander';
 import fs from 'fs-extra';
 import path from 'path';
@@ -11,44 +11,44 @@ commander.createCommand()
   .version(require('../../package').version)
   .addCommand(commander.createCommand('browser')
     .description('Launch browser.')
-    .action(checkStart(acm.actions.browserAsync)))
+    .action(checkStart(cli.actions.browserAsync)))
   .addCommand(commander.createCommand('download')
     .arguments('[seriesUrl...]')
     .description('Downloads series.')
     .option('--skipDownload', 'Generate tracking files but skip downloads.')
-    .action(checkStart(acm.actions.downloadAsync)))
+    .action(checkStart(cli.actions.downloadAsync)))
   .addCommand(commander.createCommand('series')
     .description('Manage series.')
     .addCommand(commander.createCommand('add')
       .arguments('<seriesUrl> [rootPath]')
       .description('Adds the series.')
-      .action(checkStart(acm.actions.seriesAddAsync)))
+      .action(checkStart(cli.actions.seriesAddAsync)))
     .addCommand(commander.createCommand('list')
       .description('Lists each series.')
-      .action(checkStart(acm.actions.seriesListAsync)))
+      .action(checkStart(cli.actions.seriesListAsync)))
     .addCommand(commander.createCommand('remove')
       .arguments('<seriesUrl>')
       .description('Removes the series.')
-      .action(checkStart(acm.actions.seriesRemoveAsync))))
+      .action(checkStart(cli.actions.seriesRemoveAsync))))
   .addCommand(commander.createCommand('server')
     .description('Runs the server.')
-    .action(checkStart(acm.actions.serverAsync)))
+    .action(checkStart(cli.actions.serverAsync)))
   .addCommand(commander.createCommand('settings')
     .description('Manage settings.')
-    .option('--chrome [string]', withCurrent('Path to chrome-data.', ace.settings.chrome), validatePath)
-    .option('--library [string]', withCurrent('Path to library. Video files are stored here.', ace.settings.library), validatePath)
-    .option('--sync [string]', withCurrent('Path to sync. Temporary files are stored here.', ace.settings.sync), validatePath)
-    .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', ace.settings.chromeHeadless), primitiveBoolean)
-    .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', ace.settings.chromeInactiveTimeout), primitiveNumber)
-    .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', ace.settings.chromeNavigationTimeout), primitiveNumber)
-    .option('--chromeObserverTimeout [number]', withCurrent('Chrome observation timeout in milliseconds.', ace.settings.chromeObserverTimeout), primitiveNumber)
-    .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', ace.settings.chromeViewport), validateViewport)
-    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', ace.settings.proxyServer), validateProxyServer)
-    .action((command) => acm.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
+    .option('--chrome [string]', withCurrent('Path to chrome-data.', app.settings.chrome), validatePath)
+    .option('--library [string]', withCurrent('Path to library. Video files are stored here.', app.settings.library), validatePath)
+    .option('--sync [string]', withCurrent('Path to sync. Temporary files are stored here.', app.settings.sync), validatePath)
+    .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', app.settings.chromeHeadless), primitiveBoolean)
+    .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', app.settings.chromeInactiveTimeout), primitiveNumber)
+    .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.chromeNavigationTimeout), primitiveNumber)
+    .option('--chromeObserverTimeout [number]', withCurrent('Chrome observation timeout in milliseconds.', app.settings.chromeObserverTimeout), primitiveNumber)
+    .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.chromeViewport), validateViewport)
+    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.proxyServer), validateProxyServer)
+    .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
   .parse();
 
 function checkStart(fn: Function) {
-  return function(this: acm.IOptions) {
+  return function(this: cli.IOptions) {
     if ((process.version.match(/^v(\d+)\.\d+\.\d$/)?.pop() ?? 0) < 12) throw new Error(`Invalid node version: Must be >= 12`);
     return fn.apply(this, arguments);
   };

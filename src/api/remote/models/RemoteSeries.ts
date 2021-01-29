@@ -1,15 +1,15 @@
-import * as acm from '../..';
+import * as api from '../..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
 export class RemoteSeries {
   constructor(source?: RemoteSeries, sourcePatch?: Partial<RemoteSeries>) {
-    this.genres = acm.property('genres', source, sourcePatch, []);
-    this.imageUrl = acm.property('imageUrl', source, sourcePatch, '');
-    this.seasons = acm.property('seasons', source, sourcePatch, []);
-    this.synopsis = acm.property('synopsis', source, sourcePatch, '');
-    this.title = acm.property('title', source, sourcePatch, '');
-    this.url = acm.property('url', source, sourcePatch, '');
+    this.genres = api.property('genres', source, sourcePatch, []);
+    this.imageUrl = api.property('imageUrl', source, sourcePatch, '');
+    this.seasons = api.property('seasons', source, sourcePatch, []);
+    this.synopsis = api.property('synopsis', source, sourcePatch, '');
+    this.title = api.property('title', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, '');
   }
 
   @clv.IsArray()
@@ -26,8 +26,8 @@ export class RemoteSeries {
   @clv.IsArray()
   @clv.ArrayNotEmpty()
   @clv.ValidateNested()
-  @nsg.ApiProperty({type: [acm.RemoteSeriesSeason]})
-  readonly seasons: Array<acm.RemoteSeriesSeason>;
+  @nsg.ApiProperty({type: [api.RemoteSeriesSeason]})
+  readonly seasons: Array<api.RemoteSeriesSeason>;
 
   @clv.IsOptional()
   @clv.IsString()

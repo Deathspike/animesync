@@ -1,5 +1,4 @@
-import * as ace from '..';
-import * as acm from '.';
+import * as app from '.';
 import * as ncm from '@nestjs/common';
 import * as nsg from '@nestjs/swagger';
 import express from 'express';
@@ -9,10 +8,10 @@ import express from 'express';
 @nsg.ApiBadRequestResponse()
 @nsg.ApiInternalServerErrorResponse()
 export class RewriteController {
-  private readonly _agentService: ace.shr.AgentService;
-  private readonly _hlsService: acm.HlsService;
+  private readonly _agentService: app.AgentService;
+  private readonly _hlsService: app.HlsService;
 
-  constructor(agentService: ace.shr.AgentService, hlsService: acm.HlsService) {
+  constructor(agentService: app.AgentService, hlsService: app.HlsService) {
     this._agentService = agentService;
     this._hlsService = hlsService;
   }
@@ -21,7 +20,7 @@ export class RewriteController {
   async emulateAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: ace.api.RewriteParamEmulate,
+    @ncm.Param() params: app.api.RewriteParamEmulate,
     @ncm.Res() response: express.Response) {
     await this._agentService.forwardAsync(new URL(params.url), response, {headers: {...headers, ...query}});
   }
@@ -30,7 +29,7 @@ export class RewriteController {
   async hlsAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: ace.api.RewriteParamHls,
+    @ncm.Param() params: app.api.RewriteParamHls,
     @ncm.Res() response: express.Response) {
     delete headers['range'];
     const result = await this._agentService.fetchAsync(new URL(params.url), {headers: {...headers, ...query}});
