@@ -8,7 +8,6 @@ export class RemoteSeriesSeasonEpisode {
     this.isPremium = api.property('isPremium', source, sourcePatch, false);
     this.name = api.property('name', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
-    this.synopsis = api.property('synopsis', source, sourcePatch, '');
     this.url = api.property('url', source, sourcePatch, '');
   }
 
@@ -30,11 +29,6 @@ export class RemoteSeriesSeasonEpisode {
   @clv.IsString()
   @nsg.ApiPropertyOptional()
   readonly title?: string;
-
-  @clv.IsOptional()
-  @clv.IsString()
-  @nsg.ApiPropertyOptional()
-  readonly synopsis?: string;
 
   @clv.IsString()
   @clv.IsUrl()

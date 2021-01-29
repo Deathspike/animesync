@@ -42,27 +42,25 @@ function evaluateSeries() {
   function mapSeasonEpisodes(seasonNode) {
     if (!seasonNode) throw new Error();
     return Array.from(seasonNode.querySelectorAll('li')).reverse().map((episodeNode) => {
-      const data = processBubbleData($(episodeNode).data('bubble_data'));
+      const bubbleData = processBubbleData($(episodeNode).data('bubble_data'));
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
       const name = processName(episodeNode.querySelector('.series-title'));
-      const synopsis = validate(data.description);
-      const title = validate(data.title);
+      const title = validate(bubbleData.title);
       const url = processUrl(episodeNode.querySelector('a'));
-      return {imageUrl, isPremium, name, synopsis, title, url};
+      return {imageUrl, isPremium, name, title, url};
     });
   }
 
   /**
    * Process the bubble data.
-   * @param {{name: string, description: string}} value
-   * @returns {{description: string, title: string}}
+   * @param {{name: string}} value
+   * @returns {{title: string}}
    */
   function processBubbleData(value) {
-    const description = value.description;
     const match = value.name.match(/^(?:Episode\s(.*)\s-\s)?(.*)?$/);
     const title = (match && match[2]) ?? '';
-    return {description, title};
+    return {title};
   }
 
   /**
