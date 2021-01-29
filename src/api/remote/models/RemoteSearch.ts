@@ -1,5 +1,6 @@
 import * as api from '../..';
 import * as clv from 'class-validator';
+import * as clt from 'class-transformer';
 import * as nsg from '@nestjs/swagger';
 
 export class RemoteSearch {
@@ -15,6 +16,7 @@ export class RemoteSearch {
   @clv.IsArray()
   @clv.ArrayNotEmpty()
   @clv.ValidateNested()
+  @clt.Type(() => api.RemoteSearchSeries)
   @nsg.ApiProperty({type: [api.RemoteSearchSeries]})
   readonly series: Array<api.RemoteSearchSeries>;
 }
