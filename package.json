@@ -6,7 +6,7 @@
   "name": "animesync",
   "repository": "git://github.com/animeloyalty/animesync",
   "types": "dist",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "keywords": [
     "animesync",
     "anime",
