@@ -10,7 +10,6 @@ export class RemoteSeriesSeason {
   }
 
   @clv.IsArray()
-  @clv.ArrayNotEmpty()
   @clv.ValidateNested()
   @clt.Type(() => api.RemoteSeriesSeasonEpisode)
   @nsg.ApiProperty({type: [api.RemoteSeriesSeasonEpisode]})
