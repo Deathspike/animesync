@@ -37,7 +37,7 @@ async function evaluateSeriesAsync() {
    * @returns {Promise<Array<RemoteSeriesSeason>>}
    */
   async function getSeasonAsync() {
-    return await Promise.all(titleData.children.map(async (season) => {
+    return await Promise.all(titleData.children.filter(x => x.mediaCategory === 'season').map(async (season) => {
       const episodes = await getSeasonEpisodeAsync(new URL(`/api/episodes/?title_id=${titleData.id}&season=${season.number}&sort=order&sort_direction=ASC`, location.href));
       const title = season.title;
       return {episodes, title};
