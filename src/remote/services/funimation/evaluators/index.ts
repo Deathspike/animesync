@@ -1,5 +1,5 @@
 export type PageSeries = {
-  children: Array<{number: string, title: string}>;
+  children: Array<{mediaCategory: string, number: string, title: string}>;
   genres: Array<{name: string}>;
   id: number;
   poster: string;
