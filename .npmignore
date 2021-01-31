@@ -1,4 +1,5 @@
 /.github
 /.vscode
 /src
+/static
 /tsconfig.json
