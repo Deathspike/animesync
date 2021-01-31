@@ -10,7 +10,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
   
   constructor() {
     this._numberOfPages = 0;
-    this._timeoutHandle = setTimeout(() => undefined, 0);
+    this._timeoutHandle = setTimeout(() => {}, 0);
   }
 
   async pageAsync<T>(handlerAsync: (page: playwright.Page, userAgent: string) => Promise<T>) {
@@ -27,14 +27,14 @@ export class BrowserService implements ncm.OnModuleDestroy {
     } finally {
       this._numberOfPages--;
       this._updateTimeout();
-      await page?.close().catch(() => undefined);
+      await page?.close().catch(() => {});
     }
   }
 
   async onModuleDestroy() {
     const browser = await this._browser;
     clearTimeout(this._timeoutHandle);
-    await browser?.close().catch(() => undefined);
+    await browser?.close().catch(() => {});
   }
 
   private async _launchAsync() {
@@ -58,7 +58,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
       const browser = await this._browser;
       if (this._numberOfPages) return;
       delete this._browser;
-      browser?.close().catch(() => undefined);
+      browser?.close().catch(() => {});
     }, app.settings.chromeInactiveTimeout);
   }
 }

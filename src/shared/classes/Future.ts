@@ -7,7 +7,7 @@ export class Future<T> {
   private _resolver: (error?: any, value?: T) => void;
 
   constructor(timeout = 0) {
-    this._resolver = () => undefined;
+    this._resolver = () => {};
     this._timeout = timeout;
   }
 
