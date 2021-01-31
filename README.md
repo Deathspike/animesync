@@ -32,9 +32,8 @@ This application is not endorsed or affliated with any streaming service. The us
 ## Mac
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Install *Homebrew* following the instructions at http://brew.sh/
-3. Run in *Terminal*: `brew install node`
-4. Run in *Terminal*: `npm install -g animesync`
+2. Install *NodeJS* following the instructions at http://nodejs.org/
+3. Run in *Terminal*: `npm install -g animesync`
 
 ## Linux (Mint, Ubuntu, etc)
 
