@@ -23,41 +23,41 @@ This application is not endorsed or affliated with any streaming service. The us
 
 # Install
 
-## Debian (Mint, Ubuntu, etc)
-
-1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Run in *Terminal*: `sudo apt-get install nodejs npm`
-3. Run in *Terminal*: `sudo npm install -g animesync`
-
-## Mac OS X
-
-1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Install *Homebrew* following the instructions at http://brew.sh/
-3. Run in *Terminal*: `brew install node`
-4. Run in *Terminal*: `npm install -g animesync`
-
 ## Windows
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
 2. Install *NodeJS* following the instructions at http://nodejs.org/
 3. Run in *Command Prompt*: `npm install -g animesync`
 
+## Mac
+
+1. Install *Chrome* following the instructions at https://www.google.com/chrome/
+2. Install *Homebrew* following the instructions at http://brew.sh/
+3. Run in *Terminal*: `brew install node`
+4. Run in *Terminal*: `npm install -g animesync`
+
+## Linux (Mint, Ubuntu, etc)
+
+1. Install *Chrome* following the instructions at https://www.google.com/chrome/
+2. Run in *Terminal*: `sudo apt-get install nodejs npm`
+3. Run in *Terminal*: `sudo npm install -g animesync`
+
 # Update
-
-## Debian (Mint, Ubuntu, etc)
-
-1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Terminal*: `sudo npm install -g animesync`
-
-## Mac OS X
-
-1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Terminal*: `npm install -g animesync`
 
 ## Windows
 
 1. Ensure that `animesync` is [installed](#Install)
 2. Run in *Command Prompt*: `npm install -g animesync`
+
+## Mac
+
+1. Ensure that `animesync` is [installed](#Install)
+2. Run in *Terminal*: `npm install -g animesync`
+
+## Linux (Mint, Ubuntu, etc)
+
+1. Ensure that `animesync` is [installed](#Install)
+2. Run in *Terminal*: `sudo npm install -g animesync`
 
 # Streaming Services
 
