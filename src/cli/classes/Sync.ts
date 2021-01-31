@@ -4,7 +4,6 @@ import childProcess from 'child_process';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
-import os from 'os';
 import path from 'path';
 
 export class Sync {
@@ -78,6 +77,14 @@ export class Sync {
 }
 
 function ffmpeg() {
-  if (os.platform() !== 'win32') return 'ffmpeg';
-  return path.join(__dirname, `../../../dep/ffmpeg.exe`)
+  switch (process.platform) {
+    case 'darwin':
+      return path.join(__dirname, '../../../static/ffmpeg');
+    case 'linux':
+      return path.join(__dirname, '../../../static/ffmpeg');
+    case 'win32':
+      return path.join(__dirname, '../../../static/ffmpeg.exe');
+    default:
+      return 'ffmpeg';
+  }
 }

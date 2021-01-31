@@ -55,6 +55,7 @@
   },
   "scripts": {
     "cli": "node dist/cli/app",
-    "prepare": "rimraf dist && tsc"
+    "prepare": "rimraf dist && tsc",
+    "postinstall": "node postinstall"
   }
 }
