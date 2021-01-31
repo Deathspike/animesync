@@ -7,7 +7,6 @@ import process from 'process';
 
 commander.createCommand()
   .description(require('../../package').description)
-  .name(require('../../package').name)
   .version(require('../../package').version)
   .addCommand(commander.createCommand('browser')
     .description('Launch browser.')
