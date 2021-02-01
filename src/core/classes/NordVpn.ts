@@ -2,24 +2,24 @@ import fetch from 'node-fetch';
 import url from 'url';
 
 export class NordVpn {
-  private _isBusy?: boolean;
-  private _previousServer?: url.UrlWithStringQuery;
-  private _refreshTime: number;
-  private _url?: Promise<url.UrlWithStringQuery>;
+  private isBusy?: boolean;
+  private previousServer?: url.UrlWithStringQuery;
+  private refreshTime: number;
+  private url?: Promise<url.UrlWithStringQuery>;
 
   constructor() {
-    this._refreshTime = 0;
+    this.refreshTime = 0;
   }
 
   async getAsync(server: url.UrlWithStringQuery) {
-    if ((this._previousServer && this._previousServer.toString() !== server.toString()) || this._refreshTime < Date.now() || !this._url) {
-      return await this._tryUpdateAsync(server);
+    if ((this.previousServer && this.previousServer.toString() !== server.toString()) || this.refreshTime < Date.now() || !this.url) {
+      return await this.tryUpdateAsync(server);
     } else {
-      return await this._url;
+      return await this.url;
     }
   }
 
-  private async _fetchAsync(server: url.UrlWithStringQuery) {
+  private async fetchAsync(server: url.UrlWithStringQuery) {
     const allServers = await fetch('https://nordvpn.com/api/server')
       .then(x => x.json())
       .then(x => x as Array<INordVPN>);
@@ -38,19 +38,19 @@ export class NordVpn {
     }
   }
 
-  private async _tryUpdateAsync(server: url.UrlWithStringQuery) {
+  private async tryUpdateAsync(server: url.UrlWithStringQuery) {
     try {
-      if (this._isBusy && this._url) return await this._url;
-      this._isBusy = true;
-      this._previousServer = server;
-      this._refreshTime = Date.now() + 20 * 60000;
-      this._url = this._fetchAsync(server);
-      return await this._url;
+      if (this.isBusy && this.url) return await this.url;
+      this.isBusy = true;
+      this.previousServer = server;
+      this.refreshTime = Date.now() + 20 * 60000;
+      this.url = this.fetchAsync(server);
+      return await this.url;
     } catch (err) {
-      this._refreshTime = 0;
+      this.refreshTime = 0;
       throw err;
     } finally {
-      this._isBusy = false;
+      this.isBusy = false;
     }
   }
 }

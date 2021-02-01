@@ -10,11 +10,11 @@ export class AgentHttp extends http.Agent {
 
   createConnection(options: net.TcpSocketConnectOpts, callback: (error?: Error, socket?: net.Socket) => void) {
     app.AgentConnector.createAsync(String(options.host), options.port)
-      .then((socket) => callback(undefined, this._createConnection(options, socket)))
+      .then((socket) => callback(undefined, this.superCreateConnection(options, socket)))
       .catch((error) => callback(error))
   }
 
-  private _createConnection(options: net.TcpSocketConnectOpts, socket: net.Socket) {
+  private superCreateConnection(options: net.TcpSocketConnectOpts, socket: net.Socket) {
     const unsafeAgent: any = http.Agent.prototype;
     const unsafeOptions = Object.assign(options, {socket});
     return unsafeAgent.createConnection.call(this, unsafeOptions);

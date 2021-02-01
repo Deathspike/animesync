@@ -2,20 +2,20 @@ import * as app from '..';
 import net from 'net';
 
 export class AgentConnector {
-  private readonly _chunks: Buffer[];
-  private readonly _endListener: () => void;
-  private readonly _errorListener: (error: Error) => void;
-  private readonly _dataListener: (chunk: Buffer) => void;
-  private readonly _resolver: app.Future<net.Socket>;
-  private readonly _socket: net.Socket;
+  private readonly chunks: Buffer[];
+  private readonly endListener: () => void;
+  private readonly errorListener: (error: Error) => void;
+  private readonly dataListener: (chunk: Buffer) => void;
+  private readonly resolver: app.Future<net.Socket>;
+  private readonly socket: net.Socket;
   
   constructor(socket: net.Socket) {
-    this._chunks = [];
-    this._endListener = this._onSocketEnd.bind(this);
-    this._errorListener = this._onSocketError.bind(this);
-    this._dataListener = this._onSocketData.bind(this);
-    this._resolver = new app.Future();
-    this._socket = socket;
+    this.chunks = [];
+    this.endListener = this.onSocketEnd.bind(this);
+    this.errorListener = this.onSocketError.bind(this);
+    this.dataListener = this.onSocketData.bind(this);
+    this.resolver = new app.Future();
+    this.socket = socket;
   }
   
   static async createAsync(hostname: string, port: number) {
@@ -24,35 +24,35 @@ export class AgentConnector {
   }
 
   async getAsync(hostname: string, port: number) {
-    this._socket.on('end', this._endListener);
-    this._socket.on('error', this._errorListener);
-    this._socket.on('data', this._dataListener);
-    this._socket.write([`CONNECT ${hostname}:${port} HTTP/1.1`, '', ''].join('\r\n'));
-    return this._resolver.getAsync();
+    this.socket.on('end', this.endListener);
+    this.socket.on('error', this.errorListener);
+    this.socket.on('data', this.dataListener);
+    this.socket.write([`CONNECT ${hostname}:${port} HTTP/1.1`, '', ''].join('\r\n'));
+    return this.resolver.getAsync();
   }
 
-  private _onSocketEnd() {
-    const data = Buffer.concat(this._chunks).toString();
+  private onSocketEnd() {
+    const data = Buffer.concat(this.chunks).toString();
     const match = data.match(/^HTTP\/1\.1 (\d*)/);
     if (!match || match[1] !== '200') {
-      this._resolver.reject(new Error(data));
-      this._socket.destroy();
+      this.resolver.reject(new Error(data));
+      this.socket.destroy();
     } else {
-      this._resolver.resolve(this._socket);
+      this.resolver.resolve(this.socket);
     }
   }
 
-  private _onSocketError(error: Error) {
-    this._resolver.reject(error);
-    this._socket.destroy();
+  private onSocketError(error: Error) {
+    this.resolver.reject(error);
+    this.socket.destroy();
   }
 
-  private _onSocketData(chunk: Buffer) {
-    this._chunks.push(chunk);
-    if (!Buffer.concat(this._chunks).toString().endsWith('\r\n\r\n')) return;
-    this._socket.removeListener('end', this._endListener);
-    this._socket.removeListener('error', this._errorListener);
-    this._socket.removeListener('data', this._dataListener);
-    this._onSocketEnd();
+  private onSocketData(chunk: Buffer) {
+    this.chunks.push(chunk);
+    if (!Buffer.concat(this.chunks).toString().endsWith('\r\n\r\n')) return;
+    this.socket.removeListener('end', this.endListener);
+    this.socket.removeListener('error', this.errorListener);
+    this.socket.removeListener('data', this.dataListener);
+    this.onSocketEnd();
   }
 }

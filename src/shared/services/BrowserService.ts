@@ -4,20 +4,20 @@ import * as ncm from '@nestjs/common';
 import playwright from 'playwright-core';
 
 export class BrowserService implements ncm.OnModuleDestroy {
-  private _browser?: Promise<playwright.ChromiumBrowserContext>;
-  private _numberOfPages: number;
-  private _timeoutHandle: NodeJS.Timeout;
+  private browser?: Promise<playwright.ChromiumBrowserContext>;
+  private numberOfPages: number;
+  private timeoutHandle: NodeJS.Timeout;
   
   constructor() {
-    this._numberOfPages = 0;
-    this._timeoutHandle = setTimeout(() => {}, 0);
+    this.numberOfPages = 0;
+    this.timeoutHandle = setTimeout(() => {}, 0);
   }
 
   async pageAsync<T>(handlerAsync: (page: playwright.Page, userAgent: string) => Promise<T>) {
     let page: playwright.Page | undefined;
     try {
-      this._numberOfPages++;
-      const browser = await (this._browser ?? this._launchAsync());
+      this.numberOfPages++;
+      const browser = await (this.browser ?? this.launchAsync());
       page = await browser.newPage();
       page.setDefaultNavigationTimeout(app.settings.chromeNavigationTimeout);
       const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
@@ -25,39 +25,39 @@ export class BrowserService implements ncm.OnModuleDestroy {
       await session.send('Emulation.setUserAgentOverride', {userAgent});
       return await handlerAsync(page, userAgent);
     } finally {
-      this._numberOfPages--;
-      this._updateTimeout();
+      this.numberOfPages--;
+      this.updateTimeout();
       await page?.close().catch(() => {});
     }
   }
 
   async onModuleDestroy() {
-    const browser = await this._browser;
-    clearTimeout(this._timeoutHandle);
+    const browser = await this.browser;
+    clearTimeout(this.timeoutHandle);
     await browser?.close().catch(() => {});
   }
 
-  private async _launchAsync() {
+  private async launchAsync() {
     try {
       const args = ['--autoplay-policy=no-user-gesture-required'];
       const executablePath = clr.Launcher.getFirstInstallation();
       const headless = app.settings.chromeHeadless;
       const proxy = {server: app.settings.serverUrl};
       const viewport = app.settings.chromeHeadless ? parseResolution(app.settings.chromeViewport) : undefined;
-      this._browser = playwright.chromium.launchPersistentContext(app.settings.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
-      return await this._browser;
+      this.browser = playwright.chromium.launchPersistentContext(app.settings.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
+      return await this.browser;
     } catch (error) {
-      delete this._browser;
+      delete this.browser;
       throw error;
     }
   }
   
-  private _updateTimeout() {
-    clearTimeout(this._timeoutHandle);
-    this._timeoutHandle = setTimeout(async () => {
-      const browser = await this._browser;
-      if (this._numberOfPages) return;
-      delete this._browser;
+  private updateTimeout() {
+    clearTimeout(this.timeoutHandle);
+    this.timeoutHandle = setTimeout(async () => {
+      const browser = await this.browser;
+      if (this.numberOfPages) return;
+      delete this.browser;
       browser?.close().catch(() => {});
     }, app.settings.chromeInactiveTimeout);
   }

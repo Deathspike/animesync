@@ -7,16 +7,16 @@ import express from 'express';
 
 @ncm.Injectable()
 export class AgentService implements ncm.OnModuleDestroy {
-  private readonly _httpAgent: app.AgentHttp;
-  private readonly _httpsAgent: app.AgentHttps;
+  private readonly httpAgent: app.AgentHttp;
+  private readonly httpsAgent: app.AgentHttps;
   
   constructor() {
-    this._httpAgent = new app.AgentHttp({keepAlive: true});
-    this._httpsAgent = new app.AgentHttps({keepAlive: true});
+    this.httpAgent = new app.AgentHttp({keepAlive: true});
+    this.httpsAgent = new app.AgentHttps({keepAlive: true});
   }
 
   async fetchAsync(url: URL, options?: fch.RequestInit) {
-    const agent = url.protocol === 'https:' ? this._httpsAgent : this._httpAgent;
+    const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
     const headers = this.getHeaders(options && options.headers ? options.headers : {});
     headers['host'] = url.host ?? '';
     return await fetch(url, {...options, agent, headers});
@@ -40,8 +40,8 @@ export class AgentService implements ncm.OnModuleDestroy {
   }
   
   onModuleDestroy() {
-    this._httpAgent.destroy();
-    this._httpsAgent.destroy();
+    this.httpAgent.destroy();
+    this.httpsAgent.destroy();
   }
 }
 

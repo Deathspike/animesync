@@ -5,12 +5,12 @@ import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
 export class FunimationProvider {
-  private readonly _browserService: app.BrowserService;
-  private readonly _composeService: app.ComposeService;
+  private readonly browserService: app.BrowserService;
+  private readonly composeService: app.ComposeService;
 
   constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
-    this._browserService = browserService;
-    this._composeService = composeService;
+    this.browserService = browserService;
+    this.composeService = composeService;
   }
 
   isSupported(url: string) {
@@ -19,25 +19,25 @@ export class FunimationProvider {
 
   async popularAsync(pageNumber = 1) {
     const queryUrl = createQueryUrl('popularity', pageNumber);
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
-      return this._composeService.search(search, headers);
+      return this.composeService.search(search, headers);
     });
   }
 
   async seriesAsync(seriesUrl: string) {
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
-      return this._composeService.series(series, headers);
+      return this.composeService.series(series, headers);
     });
   }
 
   async streamAsync(episodeUrl: string) {
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const manifestSrc = await manifestPromise.then(x => x.url());
@@ -47,7 +47,7 @@ export class FunimationProvider {
         const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
         const subtitle = new app.api.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
         const stream = new app.api.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
-        return this._composeService.stream(stream, headers);
+        return this.composeService.stream(stream, headers);
       } else {
         throw new Error();
       }

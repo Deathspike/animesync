@@ -7,56 +7,56 @@ import tls from 'tls';
 import util from 'util';
 
 export class HttpTunnelService {
-  private _nordvpn?: app.NordVpn;
+  private nordvpn?: app.NordVpn;
 
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = url.parse(clientUrl);
     const server = url.parse(app.settings.proxyServer);
     if (server.protocol === 'nordvpn:') {
-      (this._nordvpn ?? (this._nordvpn = new app.NordVpn())).getAsync(server)
-        .then(x => this._connectTo(client, clientSocket, x))
+      (this.nordvpn ?? (this.nordvpn = new app.NordVpn())).getAsync(server)
+        .then(x => this.connectTo(client, clientSocket, x))
         .catch(() => clientSocket.destroy());
     } else {
-      this._connectTo(client, clientSocket, server);
+      this.connectTo(client, clientSocket, server);
     }
   }
 
-  private _connectTo(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private connectTo(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
     if (server.protocol === 'http:') {
-      this._httpProxy(client, clientSocket, server);
+      this.httpProxy(client, clientSocket, server);
     } else if (server.protocol === 'https:') {
-      this._httpsProxy(client, clientSocket, server);
+      this.httpsProxy(client, clientSocket, server);
     } else if (server.protocol === 'socks4:') {
-      this._socksProxyAsync(client, clientSocket, server, true).catch(() => clientSocket.destroy());
+      this.socksProxyAsync(client, clientSocket, server, true).catch(() => clientSocket.destroy());
     } else if (server.protocol === 'socks5:' || server.protocol === 'socks:') {
-      this._socksProxyAsync(client, clientSocket, server, false).catch(() => clientSocket.destroy());
+      this.socksProxyAsync(client, clientSocket, server, false).catch(() => clientSocket.destroy());
     } else {
-      this._noProxy(client, clientSocket);
+      this.noProxy(client, clientSocket);
     }
   }
 
-  private _httpProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private httpProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
     const serverPort = Number(server.port ?? 80);
     const serverSocket = net.connect(serverPort, String(server.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('connect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
 
-  private _httpsProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private httpsProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
     const serverPort = Number(server.port ?? 443);
     const serverSocket = tls.connect(serverPort, String(server.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('secureConnect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
   
-  private _noProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket) {
+  private noProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket) {
     const serverPort = Number(client.port ?? 80);
     const serverSocket = net.connect(serverPort, String(client.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('connect', () => clientSocket.write(statusHeader(200, 'OK'), serverTunnel));
   } 
 
-  private async _socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
+  private async socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
     // Initialize the destination.
     const destination: sks.SocksRemoteHost = {host: String(client.hostname), port: Number(client.port ?? 80)};
     const proxy: sks.SocksProxy = {host: String(server.hostname), port: Number(server.port ?? 1080), type: socks4 ? 4 :5};

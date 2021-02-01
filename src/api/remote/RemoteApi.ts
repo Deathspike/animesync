@@ -3,27 +3,27 @@ import fetch from 'node-fetch';
 import querystring from 'querystring';
 
 export class RemoteApi {
-  private readonly _baseUrl: string;
+  private readonly baseUrl: string;
 
   constructor(baseUrl: string) {
-    this._baseUrl = baseUrl;
+    this.baseUrl = baseUrl;
   }
 
   async popularAsync(model: api.RemoteQueryPopular) {
     const query = querystring.stringify(model as any);
-    const url = new URL(`/api/remote/popular?${query}`, this._baseUrl);
+    const url = new URL(`/api/remote/popular?${query}`, this.baseUrl);
     return await fetchJsonAsync<api.RemoteSearch>(url);
   }
 
   async seriesAsync(model: api.RemoteQuerySeries) {
     const query = querystring.stringify(model as any);
-    const url = new URL(`/api/remote/series?${query}`, this._baseUrl);
+    const url = new URL(`/api/remote/series?${query}`, this.baseUrl);
     return await fetchJsonAsync<api.RemoteSeries>(url);
   }
 
   async streamAsync(model: api.RemoteQueryStream) {
     const query = querystring.stringify(model as any);
-    const url = new URL(`/api/remote/stream?${query}`, this._baseUrl);
+    const url = new URL(`/api/remote/stream?${query}`, this.baseUrl);
     return await fetchJsonAsync<api.RemoteStream>(url);
   }
 }
