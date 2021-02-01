@@ -3,12 +3,12 @@ import fs from 'fs-extra';
 import path from 'path';
 
 export class Library {
-  private readonly _filePath: string;
-  private readonly _source: cli.ILibrary;
+  private readonly filePath: string;
+  private readonly source: cli.ILibrary;
 
   private constructor(filePath: string, source: cli.ILibrary) {
-    this._filePath = filePath;
-    this._source = source;
+    this.filePath = filePath;
+    this.source = source;
   }
 
   static async loadAsync(libraryPath: string) {
@@ -19,26 +19,26 @@ export class Library {
 
   static async listAsync(libraryPath: string) {
     const library = await this.loadAsync(libraryPath);
-    const entries = library._source.entries;
+    const entries = library.source.entries;
     return Object.keys(entries).map((seriesUrl) => Object.assign({}, entries[seriesUrl], {seriesUrl}));
   }
   
   async addAsync(seriesUrl: string, rootPath?: string) {
-    if (this._source.entries[seriesUrl]) return false;
-    this._source.entries[seriesUrl] = {rootPath};
-    return await this._saveAsync(true);
+    if (this.source.entries[seriesUrl]) return false;
+    this.source.entries[seriesUrl] = {rootPath};
+    return await this.saveAsync(true);
   }
 
   async removeAsync(seriesUrl: string) {
-    if (!this._source.entries[seriesUrl]) return false;
-    delete this._source.entries[seriesUrl];
-    return await this._saveAsync(true);
+    if (!this.source.entries[seriesUrl]) return false;
+    delete this.source.entries[seriesUrl];
+    return await this.saveAsync(true);
   }
 
-  private async _saveAsync<T>(result: T) {
-    await fs.ensureDir(path.dirname(this._filePath));
-    await fs.writeJson(`${this._filePath}.tmp`, this._source, {spaces: 2});
-    await fs.move(`${this._filePath}.tmp`, this._filePath, {overwrite: true});
+  private async saveAsync<T>(result: T) {
+    await fs.ensureDir(path.dirname(this.filePath));
+    await fs.writeJson(`${this.filePath}.tmp`, this.source, {spaces: 2});
+    await fs.move(`${this.filePath}.tmp`, this.filePath, {overwrite: true});
     return result;
   }
 }

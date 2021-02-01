@@ -1,12 +1,12 @@
 import * as app from '..';
 
 export class HlsManifestLineStream {
-  private readonly _manifest: app.HlsManifest;
-  private readonly _line: app.HlsManifestLine;
+  private readonly manifest: app.HlsManifest;
+  private readonly line: app.HlsManifestLine;
 
   constructor(manifest: app.HlsManifest, line: app.HlsManifestLine) {
-    this._manifest = manifest;
-    this._line = line;
+    this.manifest = manifest;
+    this.line = line;
   }
 
   static compareFn(a: HlsManifestLineStream, b: HlsManifestLineStream) {
@@ -16,29 +16,29 @@ export class HlsManifestLineStream {
   }
 
   get bandwidth() {
-    if (this._line.params['BANDWIDTH']) {
-      return parseFloat(this._line.params['BANDWIDTH']);
+    if (this.line.params['BANDWIDTH']) {
+      return parseFloat(this.line.params['BANDWIDTH']);
     } else {
       return 0;
     }
   }
 
   get resolution() {
-    if (this._line.params['RESOLUTION']) {
-      return parseResolution(this._line.params['RESOLUTION']);
+    if (this.line.params['RESOLUTION']) {
+      return parseResolution(this.line.params['RESOLUTION']);
     } else {
       return {width: 0, height: 0};
     }
   }
 
   get url() {
-    let index = this._manifest.indexOf(this._line);
-    while (this._manifest[++index].type) continue;
-    return this._manifest[index].data;
+    let index = this.manifest.indexOf(this.line);
+    while (this.manifest[++index].type) continue;
+    return this.manifest[index].data;
   }
 
   toString() {
-    return this._line.toString();
+    return this.line.toString();
   }
 }
 

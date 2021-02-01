@@ -8,12 +8,12 @@ import * as nsg from '@nestjs/swagger';
 @nsg.ApiBadRequestResponse()
 @nsg.ApiInternalServerErrorResponse()
 export class RemoteController {
-  private readonly _cacheService: app.CacheService;
-  private readonly _providerService: app.ProviderService;
+  private readonly cacheService: app.CacheService;
+  private readonly providerService: app.ProviderService;
 
   constructor(cacheService: app.CacheService, providerService: app.ProviderService) {
-    this._cacheService = cacheService;
-    this._providerService = providerService;
+    this.cacheService = cacheService;
+    this.providerService = providerService;
   }
 
   @app.ResponseValidator(app.api.RemoteSearch)
@@ -22,7 +22,7 @@ export class RemoteController {
   async popularAsync(@ncm.Query() model: app.api.RemoteQueryPopular) {
     const cacheKey = `popular/${model.providerName}/${model.pageNumber || 1}`;
     const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
-    return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.popularAsync(model.providerName, model.pageNumber));
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.popularAsync(model.providerName, model.pageNumber));
   }
 
   @app.ResponseValidator(app.api.RemoteSeries)
@@ -31,7 +31,7 @@ export class RemoteController {
   async seriesAsync(@ncm.Query() model: app.api.RemoteQuerySeries) {
     const cacheKey = `series/${model.url}`;
     const cacheTimeout = app.settings.cacheRemoteSeriesTimeout;
-    return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.seriesAsync(model.url));
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(model.url));
   }
 
   @app.ResponseValidator(app.api.RemoteStream)
@@ -40,6 +40,6 @@ export class RemoteController {
   async streamAsync(@ncm.Query() model: app.api.RemoteQueryStream) {
     const cacheKey = `stream/${model.url}`;
     const cacheTimeout = app.settings.cacheRemoteStreamTimeout;
-    return await this._cacheService.getAsync(cacheKey, cacheTimeout, () => this._providerService.streamAsync(model.url));
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(model.url));
   }
 }

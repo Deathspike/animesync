@@ -8,12 +8,12 @@ import net from 'net';
   controllers: [app.CoreController],
   providers: [app.HttpTunnelService]})
 export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
-  private readonly _adapterHost: ncr.HttpAdapterHost;
-  private readonly _tunnelService: app.HttpTunnelService;
+  private readonly adapterHost: ncr.HttpAdapterHost;
+  private readonly tunnelService: app.HttpTunnelService;
 
   constructor(adapterHost: ncr.HttpAdapterHost, tunnelService: app.HttpTunnelService) {
-    this._adapterHost = adapterHost;
-    this._tunnelService = tunnelService;
+    this.adapterHost = adapterHost;
+    this.tunnelService = tunnelService;
   }
 
   configure(consumer: ncm.MiddlewareConsumer) {
@@ -21,16 +21,16 @@ export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
   }
 
   onApplicationBootstrap() {
-    const adapter = this._adapterHost.httpAdapter;
+    const adapter = this.adapterHost.httpAdapter;
     const http = adapter.getHttpServer() as http.Server;
-    http.on('connect', this._onConnect.bind(this));
+    http.on('connect', this.onConnect.bind(this));
   }
 
-  private _onConnect(request: http.IncomingMessage, socket: net.Socket) {
+  private onConnect(request: http.IncomingMessage, socket: net.Socket) {
     if (socket.localAddress === socket.remoteAddress && request.url) {
       const clientSocket = socket;
       const clientUrl = `http://${request.url}`;
-      this._tunnelService.connect(clientSocket, clientUrl);
+      this.tunnelService.connect(clientSocket, clientUrl);
     } else {
       socket.destroy();
     }

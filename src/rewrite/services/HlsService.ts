@@ -3,10 +3,10 @@ import * as ncm from '@nestjs/common';
 
 @ncm.Injectable()
 export class HlsService {
-  private readonly _contextService: app.ContextService;
+  private readonly contextService: app.ContextService;
 
   constructor(contextService: app.ContextService) {
-    this._contextService = contextService;
+    this.contextService = contextService;
   }
 
   getBestStreamUrl(manifest: string) {
@@ -21,7 +21,7 @@ export class HlsService {
 
   rewrite(manifest: string, headers?: Record<string, string>) {
     const hls = app.HlsManifest.from(manifest);
-    rewrite(this._contextService, hls, headers);
+    rewrite(this.contextService, hls, headers);
     return hls.toString();
   }
 }

@@ -4,17 +4,17 @@ import express from 'express';
 
 @ncm.Injectable()
 export class HttpProxyMiddleware implements ncm.NestMiddleware {
-  private readonly _agentService: app.AgentService;
+  private readonly agentService: app.AgentService;
   
   constructor(agentService: app.AgentService) {
-    this._agentService = agentService;
+    this.agentService = agentService;
   }
 
   async use(request: express.Request, response: express.Response, next: express.NextFunction) {
     if (request.socket.localAddress !== request.socket.remoteAddress || request.url.startsWith('/')) return next();
     const body = request.body;
-    const headers = this._agentService.getHeaders(request.headers);
+    const headers = this.agentService.getHeaders(request.headers);
     const method = request.method;
-    await this._agentService.forwardAsync(new URL(request.url), response, {body, headers, method});
+    await this.agentService.forwardAsync(new URL(request.url), response, {body, headers, method});
   }
 }

@@ -4,40 +4,40 @@ import winston from 'winston';
 import 'winston-daily-rotate-file';
 
 export class LoggerService implements ncm.LoggerService {
-  private readonly _logger: winston.Logger;
+  private readonly logger: winston.Logger;
 
   constructor() {
-    this._logger = createLogger();
+    this.logger = createLogger();
   }
 
   debug(value: string) {
-    this._logger.debug(value);
+    this.logger.debug(value);
   }
   
   error(value: Error | string, trace?: string) {
     if (value instanceof Error) {
-      this._logger.error(formatError(value.stack ?? value.message));
+      this.logger.error(formatError(value.stack ?? value.message));
     } else if (trace) {
-      this._logger.error(formatError(trace));
+      this.logger.error(formatError(trace));
     } else {
-      this._logger.error(formatError(value));
+      this.logger.error(formatError(value));
     }
   }
 
   info(value: string) {
-    this._logger.info(value);
+    this.logger.info(value);
   }
 
   log(value: string) {
-    this._logger.debug(value);
+    this.logger.debug(value);
   }
   
   verbose(value: string) {
-    this._logger.debug(value);
+    this.logger.debug(value);
   }
 
   warn(value: string) {
-    this._logger.debug(value);
+    this.logger.debug(value);
   }
 }
 

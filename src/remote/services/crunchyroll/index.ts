@@ -6,12 +6,12 @@ import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
 export class CrunchyRollProvider {
-  private readonly _browserService: app.BrowserService;
-  private readonly _composeService: app.ComposeService;
+  private readonly browserService: app.BrowserService;
+  private readonly composeService: app.ComposeService;
 
   constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
-    this._browserService = browserService;
-    this._composeService = composeService;
+    this.browserService = browserService;
+    this.composeService = composeService;
   }
 
   isSupported(url: string) {
@@ -20,29 +20,29 @@ export class CrunchyRollProvider {
 
   async popularAsync(pageNumber = 1) {
     const queryUrl = createQueryUrl('popular', pageNumber);
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
-      return this._composeService.search(search, headers);
+      return this.composeService.search(search, headers);
     });
   }
   
   async seriesAsync(seriesUrl: string) {
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeries);
-      return this._composeService.series(series, headers);
+      return this.composeService.series(series, headers);
     });
   }
 
   async streamAsync(episodeUrl: string) {
-    return await this._browserService.pageAsync(async (page, userAgent) => {
+    return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
-      return this._composeService.stream(stream, headers);
+      return this.composeService.stream(stream, headers);
     });
   }
 }
