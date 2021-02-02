@@ -9,14 +9,14 @@ export class RemoteQueryPopular {
     this.providerName = api.property('providerName', source, sourcePatch, api.RemoteProvider.CrunchyRoll);
   }
 
+  @clv.IsEnum(api.RemoteProvider)
+  @nsg.ApiProperty({enum: api.RemoteProvider})
+  readonly providerName: api.RemoteProvider;
+
   @clv.IsOptional()
   @clv.IsNumber()
   @clv.Min(1)
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly pageNumber?: number;
-
-  @clv.IsEnum(api.RemoteProvider)
-  @nsg.ApiProperty({enum: api.RemoteProvider})
-  readonly providerName: api.RemoteProvider;
 }

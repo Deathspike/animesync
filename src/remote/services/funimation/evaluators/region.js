@@ -1,10 +1,10 @@
 /**
- * Evaluate the search.
+ * Evaluate the region.
  * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
  * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
  * @returns {RemoteSearch}
  **/
-function evaluateSearch() {
+function evaluateRegion() {
   const series = mapSeries();
   const hasMorePages = Boolean(series.length);
   return {hasMorePages, series};
@@ -14,10 +14,10 @@ function evaluateSearch() {
    * @returns {Array<RemoteSearchSeries>}
    */
   function mapSeries() {
-    return Array.from(document.querySelectorAll('.product-results')).map((containerNode) => {
+    return Array.from(document.querySelectorAll('.show-wrapper')).map((containerNode) => {
       const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
-      const title = validateStrict(containerNode.querySelector('.content a'));
-      const url = processUrl(containerNode.querySelector('.content a'));
+      const title = validateStrict(containerNode.querySelector('.name a'));
+      const url = processUrl(containerNode.querySelector('.name a'));
       return {imageUrl, title, url};
     });
   }
@@ -40,7 +40,7 @@ function evaluateSearch() {
       throw new Error();
     }
   }
-
+  
   /**
    * Validate the text content.
    * @param {(Element|string)?} value 
@@ -70,7 +70,7 @@ function evaluateSearch() {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {evaluateSearch};
+  module.exports = {evaluateRegion};
 } else {
-  console.info(evaluateSearch());
+  console.info(evaluateRegion());
 }

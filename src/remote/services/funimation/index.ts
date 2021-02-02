@@ -1,4 +1,5 @@
 import * as app from '../..';
+import {evaluateRegion} from './evaluators/region';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
 import querystring from 'querystring';
@@ -19,6 +20,17 @@ export class FunimationProvider {
 
   async popularAsync(pageNumber = 1) {
     const queryUrl = createQueryUrl('popularity', pageNumber);
+    return await this.browserService.pageAsync(async (page, userAgent) => {
+      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const search = await page.evaluate(evaluateRegion);
+      return this.composeService.search(search, headers);
+    });
+  }
+
+  async searchAsync(query: string, pageNumber = 1) {
+    const queryRaw = querystring.stringify({categoryType: 'Series', q: query});
+    const queryUrl = new URL(`/search/${pageNumber}/?${queryRaw}`, baseUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
