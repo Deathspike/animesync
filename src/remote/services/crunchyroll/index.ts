@@ -1,6 +1,6 @@
 import * as app from '../..';
 import {evaluateRegion} from './evaluators/region';
-import {evaluateSearch} from './evaluators/search';
+import {evaluateSearchAsync} from './evaluators/search';
 import {evaluateSeries} from './evaluators/series';
 import {evaluateStream} from './evaluators/stream';
 import querystring from 'querystring';
@@ -33,7 +33,7 @@ export class CrunchyRollProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const search = await page.evaluate(evaluateSearch, {query, pageNumber});
+      const search = await page.evaluate(evaluateSearchAsync, {query, pageNumber});
       return this.composeService.search(search, headers);
     });
   }

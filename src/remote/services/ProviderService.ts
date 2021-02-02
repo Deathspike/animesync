@@ -28,6 +28,8 @@ export class ProviderService {
     switch (providerName) {
       case app.api.RemoteProvider.CrunchyRoll:
         return await this.crunchyrollProvider.searchAsync(query, pageNumber);
+      case app.api.RemoteProvider.Funimation:
+        return await this.funimationProvider.searchAsync(query, pageNumber);
       default:
         throw new Error();
     }

@@ -10,6 +10,10 @@ export class RemoteQuerySearch {
     this.providerName = api.property('providerName', source, sourcePatch, api.RemoteProvider.CrunchyRoll);
   }
 
+  @clv.IsEnum(api.RemoteProvider)
+  @nsg.ApiProperty({enum: api.RemoteProvider})
+  readonly providerName: api.RemoteProvider;
+
   @clv.IsString()
   @clv.MinLength(1)
   @nsg.ApiProperty()
@@ -21,8 +25,4 @@ export class RemoteQuerySearch {
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly pageNumber?: number;
-
-  @clv.IsEnum(api.RemoteProvider)
-  @nsg.ApiProperty({enum: api.RemoteProvider})
-  readonly providerName: api.RemoteProvider;
 }

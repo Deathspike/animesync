@@ -3,11 +3,11 @@
  * @typedef {import('.').PageSearch} PageSearch
  * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
  * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
- * @param   {{query: string, pageNumber?: number}} model
+ * @param {{query: string, pageNumber?: number}=} model
  * @returns {Promise<RemoteSearch>}
  **/
-async function evaluateSearch(model) {
-  const series = await getSeriesAsync(model.query, model.pageNumber ?? 1);
+async function evaluateSearchAsync(model) {
+  const series = await getSeriesAsync((model && model.query) ?? '', (model && model.pageNumber) ?? 1);
   const hasMorePages = Boolean(series.length);
   return {hasMorePages, series};
 
@@ -65,14 +65,14 @@ async function evaluateSearch(model) {
    */
   function spawnSimilarlySet(value, length) {
     const s = ' '.repeat(length - 1) + value.toLowerCase() + ' '.repeat(length - 1);
-    const r = new Array(s.length - length + 1);
-    for (let i = 0; i < r.length; i++) r[i] = s.slice(i, i + length);
-    return r;
+    const v = new Array(s.length - length + 1);
+    for (let i = 0; i < v.length; i++) v[i] = s.slice(i, i + length);
+    return v;
   }
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {evaluateSearch};
+  module.exports = {evaluateSearchAsync};
 } else {
-  evaluateSearch({query: 'Railgun'}).then(console.info.bind(console));
+  evaluateSearchAsync().then(console.info.bind(console));
 }
