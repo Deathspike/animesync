@@ -1,76 +1,78 @@
 /**
  * Evaluate the search.
+ * @typedef {import('.').PageSearch} PageSearch
  * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
  * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
- * @returns {RemoteSearch}
+ * @param   {{query: string, pageNumber?: number}} model
+ * @returns {Promise<RemoteSearch>}
  **/
-function evaluateSearch() {
-  const series = mapSeries();
+async function evaluateSearch(model) {
+  const series = await getSeriesAsync(model.query, model.pageNumber ?? 1);
   const hasMorePages = Boolean(series.length);
   return {hasMorePages, series};
 
   /**
-   * Map the series.
-   * @returns {Array<RemoteSearchSeries>}
+   * Fetch the candidates.
+   * @returns {Promise<PageSearch>}
    */
-  function mapSeries() {
-    return Array.from(document.querySelectorAll('li')).map((containerNode) => {
-      const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
-      const title = validateStrict(containerNode.querySelector('span[itemprop=name]'));
-      const url = processUrl(containerNode.querySelector('a'));
-      return {imageUrl, title, url};
-    });
+  async function fetchCandidatesAsync() {
+    const response = await fetch('/ajax/?req=RpcApiSearch_GetSearchCandidates');
+    const text = await response.text();
+    return JSON.parse(text.replace(/^[^{]+(.*)[^}]+$/m, '$1'));
   }
 
   /**
-   * Process the URL.
-   * @throws If the URL is invalid.
-   * @param {Element|string?} value 
-   * @param {string=} attributeName
-   * @returns {string}
+   * Retrieve the series.
+   * @param {string} query
+   * @param {number} pageNumber
+   * @returns {Promise<Array<RemoteSearchSeries>>}
    */
-  function processUrl(value, attributeName) {
-    if (typeof value === 'string') {
-      return new URL(value, location.href).toString();
-    } else if (value && value.nodeName === 'A') {
-      return processUrl((attributeName && value.getAttribute(attributeName)) ?? value.getAttribute('href'));
-    } else if (value && value.nodeName === 'IMG') {
-      return processUrl((attributeName && value.getAttribute(attributeName)) ?? value.getAttribute('src'));
-    } else {
-      throw new Error();
-    }
-  }
-  
-  /**
-   * Validate the text content.
-   * @param {(Element|string)?} value 
-   * @returns {string|undefined}
-   */
-  function validate(value) {
-    if (typeof value === 'string') {
-      return value.trim().replace(/\s+/g, ' ') || undefined;
-    } else if (value) {
-      return validate(value.textContent);
-    } else {
-      return undefined;
-    }
+  async function getSeriesAsync(query, pageNumber) {
+    const candidates = await fetchCandidatesAsync();
+    const matches = candidates.data
+      .filter(x => x.type === 'Series')
+      .map(x => ({item: x, score: measureSimilarity(query, x.name)}));
+    const results = matches
+      .sort((a, b) => b.score - a.score)
+      .slice(Math.max(pageNumber - 1, 0) * 50)
+      .slice(0, 50);
+    return results.map(x => ({
+      imageUrl: x.item.img.replace(/_small\.jpg$/, '_thumb.jpg'),
+      title: x.item.name,
+      url: new URL(x.item.link, location.href).toString()
+    }));
   }
 
   /**
-   * Validate the text content.
-   * @throws If the text content is empty.
-   * @param {(Element|string)?} value 
-   * @returns {string}
+   * Measures the similarly of two values.
+   * @param {string} v1
+   * @param {string} v2
+   * @returns {number}
    */
-  function validateStrict(value) {
-    const result = validate(value);
-    if (result) return result;
-    throw new Error();
+  function measureSimilarity(v1, v2) {
+    if (!v1.length || !v2.length) return 0;
+    const p1 = spawnSimilarlySet(v1.length < v2.length ? v1 : v2, 2);
+    const p2 = spawnSimilarlySet(v1.length < v2.length ? v2 : v1, 2);
+    const ps = new Set(p1);
+    return p2.reduce((p, c) => ps.delete(c) ? p + 1 : p, 0) / p2.length;
+  }
+
+  /**
+   * Spawns the similarity set.
+   * @param {string} value
+   * @param {number} length
+   * @returns {Array<number>}
+   */
+  function spawnSimilarlySet(value, length) {
+    const s = ' '.repeat(length - 1) + value.toLowerCase() + ' '.repeat(length - 1);
+    const r = new Array(s.length - length + 1);
+    for (let i = 0; i < r.length; i++) r[i] = s.slice(i, i + length);
+    return r;
   }
 }
 
 if (typeof module !== 'undefined') {
   module.exports = {evaluateSearch};
 } else {
-  console.info(evaluateSearch());
+  evaluateSearch({query: 'Railgun'}).then(console.info.bind(console));
 }

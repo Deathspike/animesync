@@ -21,8 +21,17 @@ export class RemoteController {
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async popularAsync(@ncm.Query() model: app.api.RemoteQueryPopular) {
     const cacheKey = `popular/${model.providerName}/${model.pageNumber || 1}`;
-    const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
+    const cacheTimeout = app.settings.cacheRemotePopularTimeout;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.popularAsync(model.providerName, model.pageNumber));
+  }
+
+  @app.ResponseValidator(app.api.RemoteSearch)
+  @ncm.Get('search')
+  @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
+  async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
+    const cacheKey = `search/${model.providerName}/${model.query}/${model.pageNumber || 1}`;
+    const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.providerName, model.query, model.pageNumber));
   }
 
   @app.ResponseValidator(app.api.RemoteSeries)

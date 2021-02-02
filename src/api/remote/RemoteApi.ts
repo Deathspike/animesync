@@ -15,6 +15,12 @@ export class RemoteApi {
     return await fetchJsonAsync<api.RemoteSearch>(url);
   }
 
+  async searchAsync(model: api.RemoteQuerySearch) {
+    const query = querystring.stringify(model as any);
+    const url = new URL(`/api/remote/search?${query}`, this.baseUrl);
+    return await fetchJsonAsync<api.RemoteSearch>(url);
+  }
+
   async seriesAsync(model: api.RemoteQuerySeries) {
     const query = querystring.stringify(model as any);
     const url = new URL(`/api/remote/series?${query}`, this.baseUrl);
