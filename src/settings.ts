@@ -11,7 +11,8 @@ const defaultPaths = {
 };
 
 const defaultSettings = {
-  cacheRemoteSearchTimeout: 3600000,
+  cacheRemotePopularTimeout: 3600000,
+  cacheRemoteSearchTimeout: 300000,
   cacheRemoteSeriesTimeout: 900000,
   cacheRemoteStreamTimeout: 300000,
   chromeHeadless: true,

@@ -1,3 +1,4 @@
+export * from './remote/models/RemoteProvider';
 export * from './remote/models/RemoteSearchSeries';
 export * from './remote/models/RemoteSearch';
 export * from './remote/models/RemoteSeriesSeasonEpisode';
@@ -6,6 +7,7 @@ export * from './remote/models/RemoteSeries';
 export * from './remote/models/RemoteStreamSubtitle';
 export * from './remote/models/RemoteStream';
 export * from './remote/queries/RemoteQueryPopular';
+export * from './remote/queries/RemoteQuerySearch';
 export * from './remote/queries/RemoteQuerySeries';
 export * from './remote/queries/RemoteQueryStream';
 export * from './remote/RemoteApi';

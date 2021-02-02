@@ -3,7 +3,7 @@ export class HlsManifestLine {
   public params: Record<string, string>;
   public type?: string;
 
-  constructor(data: string, params?: Record<string, string>, type?: string) {
+  private constructor(data: string, params?: Record<string, string>, type?: string) {
     this.data = data;
     this.params = params ?? {};
     this.type = type;

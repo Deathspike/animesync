@@ -9,7 +9,7 @@ export class AgentConnector {
   private readonly resolver: app.Future<net.Socket>;
   private readonly socket: net.Socket;
   
-  constructor(socket: net.Socket) {
+  private constructor(socket: net.Socket) {
     this.chunks = [];
     this.endListener = this.onSocketEnd.bind(this);
     this.errorListener = this.onSocketError.bind(this);

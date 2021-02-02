@@ -15,10 +15,19 @@ export class ProviderService {
 
   async popularAsync(providerName: string, pageNumber?: number) {
     switch (providerName) {
-      case 'crunchyroll':
+      case app.api.RemoteProvider.CrunchyRoll:
         return await this.crunchyrollProvider.popularAsync(pageNumber);
-      case 'funimation':
+      case app.api.RemoteProvider.Funimation:
         return await this.funimationProvider.popularAsync(pageNumber);
+      default:
+        throw new Error();
+    }
+  }
+
+  async searchAsync(providerName: string, query: string, pageNumber?: number) {
+    switch (providerName) {
+      case app.api.RemoteProvider.CrunchyRoll:
+        return await this.crunchyrollProvider.searchAsync(query, pageNumber);
       default:
         throw new Error();
     }
