@@ -39,7 +39,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
 
   private async launchAsync() {
     try {
-      const args = ['--autoplay-policy=no-user-gesture-required'];
+      const args = ['--autoplay-policy=no-user-gesture-required', '--lang=en-US'];
       const executablePath = clr.Launcher.getFirstInstallation();
       const headless = app.settings.chromeHeadless;
       const proxy = {server: app.settings.serverUrl};
