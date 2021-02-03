@@ -60,7 +60,7 @@ export class FunimationProvider {
   async streamAsync(episodeUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
-      await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(new URL('?lang=japanese', episodeUrl).toString(), {waitUntil: 'domcontentloaded'});
       const manifestSrc = await manifestPromise.then(x => x.url());
       const vttSubtitleSrc = await vttSubtitlePromise.then(x => x.url());
       await page.close();

@@ -65,7 +65,7 @@ async function evaluateSeriesAsync() {
     const isPremium = Boolean(episode.mostRecentSvod.subscriptionRequired);
     const name = episode.item.episodeNum;
     const title = episode.item.episodeName;
-    const url = new URL(`${episode.item.episodeSlug}/?lang=japanese`, location.href).toString();
+    const url = new URL(`${episode.item.episodeSlug}/`, location.href).toString();
     return {imageUrl, isPremium, name, title, url};
   }
 }
