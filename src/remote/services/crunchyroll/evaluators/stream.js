@@ -2,15 +2,16 @@
  * Evaluate the stream.
  * @typedef {import('.').PageStream} PageStream
  * @typedef {import('../../..').api.RemoteStream} RemoteStream
+ * @typedef {import('../../..').api.RemoteStreamSource} RemoteStreamSource
  * @typedef {import('../../..').api.RemoteStreamSubtitle} RemoteStreamSubtitle
  * @returns {RemoteStream}
  **/
 function evaluateStream() {
   const dataSource = extractDataSource();
+  const sources = mapSource(dataSource);
   const subtitles = mapSubtitle(dataSource);
   const type = 'hls';
-  const url = mapStreamUrl(dataSource);
-  return {subtitles, type, url};
+  return {sources, subtitles, type};
 
   /**
    * Extract the data source.
@@ -24,13 +25,13 @@ function evaluateStream() {
   }
 
   /**
-   * Map the stream.
+   * Map the sources.
    * @param {PageStream} dataSource 
-   * @returns {string}
+   * @returns {Array<RemoteStreamSource>}
    */
-  function mapStreamUrl(dataSource) {
+  function mapSource(dataSource) {
     const stream = dataSource.streams.find(x => x.format === 'adaptive_hls' && x.audio_lang === 'jaJP' && !x.hardsub_lang);
-    if (stream) return stream.url;
+    if (stream) return [{url: stream.url}];
     throw new Error();
   }
 

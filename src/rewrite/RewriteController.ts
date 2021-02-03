@@ -35,9 +35,7 @@ export class RewriteController {
     const result = await this.agentService.fetchAsync(new URL(params.url), {headers: {...headers, ...query}});
     if (result.status === 200) {
       const manifest = await result.text();
-      const streamUrl = this.hlsService.getBestStreamUrl(manifest);
-      if (streamUrl) await this.hlsAsync(headers, query, {url: streamUrl}, response);
-      else response.send(this.hlsService.rewrite(manifest, query));
+      response.send(this.hlsService.rewrite(manifest, query));
     } else {
       response.sendStatus(500);
     }

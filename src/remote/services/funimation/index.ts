@@ -63,7 +63,7 @@ export class FunimationProvider {
       await page.goto(new URL('?lang=japanese', episodeUrl).toString(), {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
-      return this.composeService.stream(stream, headers);
+      return await this.composeService.streamAsync(stream, headers);
     });
   }
 }

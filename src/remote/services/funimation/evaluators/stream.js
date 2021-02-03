@@ -5,6 +5,7 @@
  * @typedef {import('.').PageStreamExperienceTrack} PageStreamExperienceTrack
  * @typedef {import('.').PageStreamShowExperience} PageStreamShowExperience
  * @typedef {import('../../..').api.RemoteStream} RemoteStream
+ * @typedef {import('../../..').api.RemoteStreamSource} RemoteStreamSource
  * @typedef {import('../../..').api.RemoteStreamSubtitle} RemoteStreamSubtitle
  * @type {PageStream}
  **/
@@ -16,10 +17,10 @@ var TITLE_DATA;
  **/
 async function evaluateStreamAsync() {
   const dataSource = await getDataSourceAsync();
-  const subtitles = mapSubtitle(dataSource.textTracks);
+  const sources = mapSource(dataSource.show);
+  const subtitles = mapSubtitle(dataSource.experience);
   const type = 'hls';
-  const url = dataSource.src;
-  return {subtitles, type, url};
+  return {sources, subtitles, type};
 
   /**
    * Fetch the experience.
@@ -61,35 +62,35 @@ async function evaluateStreamAsync() {
   }
 
   /**
-   * Find the source.
-   * @param {PageStreamShowExperience} sources
-   * @returns {string}
-   */
-  function findSource(sources) {
-    const item = sources.items.find(x => x.videoType === 'm3u8');
-    if (item) return item.src;
-    throw new Error();
-  }
-
-  /**
    * Retrieve the data source.
-   * @returns {Promise<{src: string, textTracks: Array<PageStreamExperienceTrack>}>}
+   * @returns {Promise<{experience: PageStreamExperience, show: PageStreamShowExperience}>}
    */
   async function getDataSourceAsync() {
     const experiencePromise = fetchExperience();
     const showPromise = fetchShowExperience();
     const experience = await experiencePromise;
     const show = await showPromise;
-    return {src: findSource(show), textTracks: findTextTracks(experience)};
+    return {experience, show};
   }
   
   /**
+   * Map the sources.
+   * @param {PageStreamShowExperience} show
+   * @returns {Array<RemoteStreamSource>}
+   */
+  function mapSource(show) {
+    const item = show.items.find(x => x.videoType === 'm3u8');
+    if (item) return [{url: item.src}];
+    throw new Error();
+  }
+
+  /**
    * Map the subtitles.
-   * @param {Array<PageStreamExperienceTrack>} textTracks
+   * @param {PageStreamExperience} experience
    * @returns {Array<RemoteStreamSubtitle>}
    */
-  function mapSubtitle(textTracks) {
-    return textTracks.filter(x => x.src.endsWith('.vtt') && x.type === 'Full').map(x => ({
+  function mapSubtitle(experience) {
+    return findTextTracks(experience).filter(x => x.src.endsWith('.vtt') && x.type === 'Full').map(x => ({
       language: mapSubtitleLanguage(x.language),
       type: 'vtt',
       url: x.src

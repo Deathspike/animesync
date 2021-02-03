@@ -61,7 +61,7 @@ export class CrunchyRollProvider {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
-      return this.composeService.stream(stream, headers);
+      return await this.composeService.streamAsync(stream, headers);
     });
   }
 }
