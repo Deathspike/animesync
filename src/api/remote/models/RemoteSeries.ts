@@ -25,7 +25,6 @@ export class RemoteSeries {
   readonly imageUrl: string;
 
   @clv.IsArray()
-  @clv.ArrayNotEmpty()
   @clv.ValidateNested()
   @clt.Type(() => api.RemoteSeriesSeason)
   @nsg.ApiProperty({type: [api.RemoteSeriesSeason]})

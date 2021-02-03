@@ -14,7 +14,6 @@ export class RemoteSearch {
   readonly hasMorePages: boolean;
 
   @clv.IsArray()
-  @clv.ArrayNotEmpty()
   @clv.ValidateNested()
   @clt.Type(() => api.RemoteSearchSeries)
   @nsg.ApiProperty({type: [api.RemoteSearchSeries]})
