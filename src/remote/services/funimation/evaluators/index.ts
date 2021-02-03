@@ -5,11 +5,11 @@ export type PageSeries = {
   poster: string;
   synopsis: string;
   title: string;
-}
+};
 
 export type PageSeriesSeason = {
   items: Array<PageSeriesSeasonEpisode>;
-}
+};
 
 export type PageSeriesSeasonEpisode = {
   audio: Array<string>;
@@ -17,4 +17,34 @@ export type PageSeriesSeasonEpisode = {
   mostRecentSvod: {subscriptionRequired?: boolean};
   poster: string;
   synopsis: string;
+};
+
+export type PageStream = {
+  id: string;
+};
+
+export type PageStreamExperience = {
+  seasons: Array<{
+    episodes: Array<{
+      languages: Record<string, {
+        alpha: Record<string, {
+          experienceId: number;
+          sources: Array<{
+            textTracks: Array<PageStreamExperienceTrack>;
+            type: string;
+          }>;
+        }>
+      }>
+    }>;
+  }>;
+};
+
+export type PageStreamExperienceTrack = {
+  language: string;
+  src: string;
+  type: string;
 }
+
+export type PageStreamShowExperience = {
+  items: Array<{src: string, videoType: string}>
+};

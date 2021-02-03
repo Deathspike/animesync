@@ -3,6 +3,7 @@ import {createPages} from './pages';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
+import {evaluateStreamAsync} from './evaluators/stream';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
@@ -59,19 +60,10 @@ export class FunimationProvider {
 
   async streamAsync(episodeUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const [manifestPromise, vttSubtitlePromise] = new app.Observer(page).getAsync(/\.m3u8$/i, /\.vtt$/i);
       await page.goto(new URL('?lang=japanese', episodeUrl).toString(), {waitUntil: 'domcontentloaded'});
-      const manifestSrc = await manifestPromise.then(x => x.url());
-      const vttSubtitleSrc = await vttSubtitlePromise.then(x => x.url());
-      await page.close();
-      if (manifestSrc && vttSubtitleSrc) {
-        const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-        const subtitle = new app.api.RemoteStreamSubtitle({language: 'eng', type: 'vtt', url: vttSubtitleSrc});
-        const stream = new app.api.RemoteStream({subtitles: [subtitle], type: 'hls', url: manifestSrc});
-        return this.composeService.stream(stream, headers);
-      } else {
-        throw new Error();
-      }
+      const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const stream = await page.evaluate(evaluateStreamAsync);
+      return this.composeService.stream(stream, headers);
     });
   }
 }
