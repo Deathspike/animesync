@@ -17,7 +17,7 @@ function evaluatePage() {
     return Array.from(document.querySelectorAll('.show-wrapper')).map((containerNode) => {
       const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
       const title = validateStrict(containerNode.querySelector('.name a'));
-      const url = processUrl(containerNode.querySelector('.name a'));
+      const url = processUrl(containerNode.querySelector('.name a')).split('?')[0];
       return {imageUrl, title, url};
     });
   }
