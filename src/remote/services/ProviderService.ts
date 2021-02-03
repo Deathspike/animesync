@@ -24,7 +24,7 @@ export class ProviderService {
       case app.api.RemoteProviderId.CrunchyRoll:
         return await this.crunchyrollProvider.pageAsync(page, options, pageNumber);
       case app.api.RemoteProviderId.Funimation:
-        return await this.funimationProvider.popularAsync(pageNumber);
+        return await this.funimationProvider.pageAsync(page, options, pageNumber);
     }
   }
 

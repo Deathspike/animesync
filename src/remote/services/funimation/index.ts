@@ -1,4 +1,5 @@
 import * as app from '../..';
+import {createPages} from './pages';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
@@ -17,7 +18,7 @@ export class FunimationProvider {
   context() {
     const id = app.api.RemoteProviderId.Funimation;
     const label = 'Funimation';
-    const pages: Array<app.api.RemoteProviderPage> = [{type: 'oneOf', id: 'popularity', label: 'Popularity', options: []}];
+    const pages = createPages();
     return new app.api.RemoteProvider({id, label, pages});
   }
 
@@ -25,10 +26,11 @@ export class FunimationProvider {
     return url.startsWith(baseUrl);
   }
 
-  async popularAsync(pageNumber = 1) {
-    const queryUrl = createQueryUrl('popularity', pageNumber);
+  async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
+    const pageSource = createPages().find(x => x.id === page);
+    const pageUrl = createPageUrl(pageSource, options, pageNumber);
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(pageUrl.toString(), {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluatePage);
       return this.composeService.search(search, headers);
@@ -39,7 +41,7 @@ export class FunimationProvider {
     const queryRaw = querystring.stringify({categoryType: 'Series', q: query});
     const queryUrl = new URL(`/search/${pageNumber}/?${queryRaw}`, baseUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(queryUrl.toString(), {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
       return this.composeService.search(search, headers);
@@ -74,10 +76,13 @@ export class FunimationProvider {
   }
 }
 
-function createQueryUrl(sort: string, pageNumber = 1) {
-  const page = pageNumber > 1 ? {p: pageNumber} : undefined;
-  const query = querystring.stringify(Object.assign({audio: 'japanese', sort}, page));
-  return new URL(`/shows/all-shows/?${query}`, baseUrl).toString();
+function createPageUrl(page?: app.api.RemoteProviderPage, options?: Array<string>, pageNumber = 1) {
+  if (page && page.id === 'genres') return options && options.length && page.options.find(x => x.id === options[0])
+    ? new URL(`/shows/all-shows/?${querystring.stringify({genre: options[0], audio: 'japanese', sort: 'date', p: pageNumber})}`, baseUrl)
+    : new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: 'date', p: pageNumber})}`, baseUrl);
+  return page
+    ? new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: page.id, p: pageNumber})}`, baseUrl)
+    : new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: 'popularity', p: pageNumber})}`, baseUrl);
 }
 
 const defaultHeaders = {
