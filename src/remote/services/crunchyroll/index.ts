@@ -72,7 +72,7 @@ function createPageUrl(page?: app.api.RemoteProviderPage, options?: Array<string
     : new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl);
   if (page && page.id === 'seasons') return options && options.length && page.options.find(x => x.id === options[0])
     ? new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, 'tagged[]': `season:${options[0]}`})}`, baseUrl)
-    : new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, 'tagged[]': `season:${page.options[0]}`})}`, baseUrl);
+    : new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, 'tagged[]': `season:${page.options[0].id}`})}`, baseUrl);
   return page
     ? new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl)
     : new URL(`/videos/anime/popular/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl);
