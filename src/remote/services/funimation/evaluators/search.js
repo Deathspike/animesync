@@ -17,7 +17,7 @@ function evaluateSearch() {
     return Array.from(document.querySelectorAll('.product-results')).map((containerNode) => {
       const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
       const title = validateStrict(containerNode.querySelector('.content a'));
-      const url = processUrl(containerNode.querySelector('.content a'));
+      const url = processUrl(containerNode.querySelector('.content a')).split('?')[0];
       return {imageUrl, title, url};
     });
   }
