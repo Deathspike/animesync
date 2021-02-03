@@ -25,11 +25,12 @@ async function evaluateSeriesAsync() {
 
   /**
    * Fetch the season.
-   * @param {URL} url 
+   * @param {string} seasonNumber
    * @returns {Promise<PageSeriesSeason>}
    */
-  async function fetchSeasonAsync(url) {
-    return await fetch(url.toString()).then(x => x.json());
+  async function fetchSeasonAsync(seasonNumber) {
+    const seasonUrl = new URL(`/api/episodes/?title_id=${titleData.id}&season=${seasonNumber}&sort=order&sort_direction=ASC`, location.href);
+    return await fetch(seasonUrl.toString()).then(x => x.json());
   }
 
   /**
@@ -38,7 +39,7 @@ async function evaluateSeriesAsync() {
    */
   async function getSeasonAsync() {
     return await Promise.all(titleData.children.filter(x => x.mediaCategory === 'season').map(async (season) => {
-      const episodes = await getSeasonEpisodeAsync(new URL(`/api/episodes/?title_id=${titleData.id}&season=${season.number}&sort=order&sort_direction=ASC`, location.href));
+      const episodes = await getSeasonEpisodeAsync(season.number);
       const title = season.title;
       return {episodes, title};
     }));
@@ -46,11 +47,11 @@ async function evaluateSeriesAsync() {
 
   /**
    * Retrieve the season episodes.
-   * @param {URL} url 
+   * @param {string} seasonNumber
    * @returns {Promise<Array<RemoteSeriesSeasonEpisode>>}
    */
-  async function getSeasonEpisodeAsync(url) {
-    const season = await fetchSeasonAsync(url);
+  async function getSeasonEpisodeAsync(seasonNumber) {
+    const season = await fetchSeasonAsync(seasonNumber);
     const episodes = season.items.filter(x => x.audio.includes('Japanese')).map(mapSeasonEpisode);
     return episodes;
   }
