@@ -3,9 +3,11 @@ import * as ncm from '@nestjs/common';
 
 @ncm.Injectable()
 export class ComposeService {
+  private readonly agentService: app.AgentService;
   private readonly contextService: app.ContextService;
 
-  constructor(contextService: app.ContextService) {
+  constructor(agentService: app.AgentService, contextService: app.ContextService) {
+    this.agentService = agentService;
     this.contextService = contextService;
   }
 
@@ -28,9 +30,21 @@ export class ComposeService {
     });
   }
 
-  stream(stream: app.api.RemoteStream, headers?: Record<string, string>) {
+  async streamAsync(stream: app.api.RemoteStream, headers?: Record<string, string>) {
+    const manifests = await Promise.all(stream.sources.map(x => this.agentService
+      .fetchAsync(new URL(x.url), {headers})
+      .then(x => x.text())
+      .then(x => app.HlsManifest.from(x))));
+    const streams = manifests.map(x => x.fetchStreams())
+      .reduce((p, c) => p.concat(c), [])
+      .sort(app.HlsManifestLineStream.compareFn);
     return new app.api.RemoteStream(stream, {
-      url: this.contextService.hlsUrl(stream.url, headers),
+      sources: streams.map(x => new app.api.RemoteStreamSource({
+        bandwidth: x.bandwidth || undefined,
+        resolutionX: x.resolution.x || undefined,
+        resolutionY: x.resolution.y || undefined,
+        url: this.contextService.hlsUrl(x.url, headers)
+      })),
       subtitles: stream.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
         url: this.contextService.emulateUrl(subtitle.url, headers)
       }))

@@ -26,7 +26,7 @@ export class Sync {
       const sortedSubtitles = allSubtitles
         .filter(x => x.language === 'eng')
         .concat(foreignSubtitles);
-      const inputs = [['-i', stream.url]]
+      const inputs = [['-i', stream.sources[0].url]]
         .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
         .reduce((p, c) => p.concat(c))
       const mappings = [['-map', '0:v', '-map', '0:a']]

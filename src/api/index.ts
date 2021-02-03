@@ -8,6 +8,7 @@ export * from './remote/models/RemoteSeriesSeasonEpisode';
 export * from './remote/models/RemoteSeriesSeason';
 export * from './remote/models/RemoteSeries';
 export * from './remote/models/RemoteStreamSubtitle';
+export * from './remote/models/RemoteStreamSource';
 export * from './remote/models/RemoteStream';
 export * from './remote/queries/RemoteQueryPage';
 export * from './remote/queries/RemoteQuerySearch';
