@@ -1,10 +1,10 @@
 /**
- * Evaluate the region.
+ * Evaluate the page.
  * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
  * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
  * @returns {RemoteSearch}
  **/
-function evaluateRegion() {
+function evaluatePage() {
   const series = mapSeries();
   const hasMorePages = Boolean(series.length);
   return {hasMorePages, series};
@@ -70,7 +70,7 @@ function evaluateRegion() {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = {evaluateRegion};
+  module.exports = {evaluatePage};
 } else {
-  console.info(evaluateRegion());
+  console.info(evaluatePage());
 }

@@ -1,5 +1,5 @@
 import * as app from '../..';
-import {evaluateRegion} from './evaluators/region';
+import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
 import querystring from 'querystring';
@@ -14,6 +14,13 @@ export class FunimationProvider {
     this.composeService = composeService;
   }
 
+  context() {
+    const id = app.api.RemoteProviderId.Funimation;
+    const label = 'Funimation';
+    const pages: Array<app.api.RemoteProviderPage> = [{type: 'oneOf', id: 'popularity', label: 'Popularity', options: []}];
+    return new app.api.RemoteProvider({id, label, pages});
+  }
+
   isSupported(url: string) {
     return url.startsWith(baseUrl);
   }
@@ -23,7 +30,7 @@ export class FunimationProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const search = await page.evaluate(evaluateRegion);
+      const search = await page.evaluate(evaluatePage);
       return this.composeService.search(search, headers);
     });
   }

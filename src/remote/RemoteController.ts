@@ -16,22 +16,36 @@ export class RemoteController {
     this.providerService = providerService;
   }
 
+  @app.ResponseValidator([app.api.RemoteProvider])
+  @ncm.Get()
+  @nsg.ApiResponse({status: 200, type: [app.api.RemoteProvider]})
+  context() {
+    return this.providerService.context();
+  }
+
+  @app.ResponseValidator(app.api.RemoteSearch)
+  @ncm.Get('page')
+  @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
+  async pageAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
+    const cacheKey = `${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber || 1}`;
+    const cacheTimeout = app.settings.cacheRemotePageTimeout;
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider!, model.page, model.options, model.pageNumber));
+  }
+
   @app.ResponseValidator(app.api.RemoteSearch)
   @ncm.Get('popular')
-  @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
-  async popularAsync(@ncm.Query() model: app.api.RemoteQueryPopular) {
-    const cacheKey = `popular/${model.providerName}/${model.pageNumber || 1}`;
-    const cacheTimeout = app.settings.cacheRemotePopularTimeout;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.popularAsync(model.providerName, model.pageNumber));
+  @nsg.ApiExcludeEndpoint()
+  async popularAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
+    return await this.pageAsync(model);
   }
 
   @app.ResponseValidator(app.api.RemoteSearch)
   @ncm.Get('search')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
-    const cacheKey = `search/${model.providerName}/${model.query}/${model.pageNumber || 1}`;
+    const cacheKey = `search/${model.provider}/${model.query}/${model.pageNumber || 1}`;
     const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.providerName, model.query, model.pageNumber));
+    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider!, model.query, model.pageNumber));
   }
 
   @app.ResponseValidator(app.api.RemoteSeries)

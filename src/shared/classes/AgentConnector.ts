@@ -2,7 +2,7 @@ import * as app from '..';
 import net from 'net';
 
 export class AgentConnector {
-  private readonly chunks: Buffer[];
+  private readonly chunks: Array<Buffer>;
   private readonly endListener: () => void;
   private readonly errorListener: (error: Error) => void;
   private readonly dataListener: (chunk: Buffer) => void;
