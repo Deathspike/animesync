@@ -1,3 +1,6 @@
+export * from './remote/models/RemoteProviderPageOption';
+export * from './remote/models/RemoteProviderPage';
+export * from './remote/models/RemoteProviderId';
 export * from './remote/models/RemoteProvider';
 export * from './remote/models/RemoteSearchSeries';
 export * from './remote/models/RemoteSearch';
@@ -6,7 +9,7 @@ export * from './remote/models/RemoteSeriesSeason';
 export * from './remote/models/RemoteSeries';
 export * from './remote/models/RemoteStreamSubtitle';
 export * from './remote/models/RemoteStream';
-export * from './remote/queries/RemoteQueryPopular';
+export * from './remote/queries/RemoteQueryPage';
 export * from './remote/queries/RemoteQuerySearch';
 export * from './remote/queries/RemoteQuerySeries';
 export * from './remote/queries/RemoteQueryStream';

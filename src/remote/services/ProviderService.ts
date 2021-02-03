@@ -13,25 +13,27 @@ export class ProviderService {
     this.funimationProvider = new FunimationProvider(browserService, composeService);
   }
 
-  async popularAsync(providerName: string, pageNumber?: number) {
-    switch (providerName) {
-      case app.api.RemoteProvider.CrunchyRoll:
-        return await this.crunchyrollProvider.popularAsync(pageNumber);
-      case app.api.RemoteProvider.Funimation:
+  context() {
+    const crunchyroll = this.crunchyrollProvider.context();
+    const funimation = this.funimationProvider.context();
+    return [crunchyroll, funimation];
+  }
+
+  async pageAsync(provider: app.api.RemoteProviderId, page?: string, options?: Array<string>, pageNumber?: number) {
+    switch (provider) {
+      case app.api.RemoteProviderId.CrunchyRoll:
+        return await this.crunchyrollProvider.pageAsync(page, options, pageNumber);
+      case app.api.RemoteProviderId.Funimation:
         return await this.funimationProvider.popularAsync(pageNumber);
-      default:
-        throw new Error();
     }
   }
 
-  async searchAsync(providerName: string, query: string, pageNumber?: number) {
-    switch (providerName) {
-      case app.api.RemoteProvider.CrunchyRoll:
+  async searchAsync(provider: app.api.RemoteProviderId, query: string, pageNumber?: number) {
+    switch (provider) {
+      case app.api.RemoteProviderId.CrunchyRoll:
         return await this.crunchyrollProvider.searchAsync(query, pageNumber);
-      case app.api.RemoteProvider.Funimation:
+      case app.api.RemoteProviderId.Funimation:
         return await this.funimationProvider.searchAsync(query, pageNumber);
-      default:
-        throw new Error();
     }
   }
 

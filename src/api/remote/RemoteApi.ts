@@ -9,9 +9,14 @@ export class RemoteApi {
     this.baseUrl = baseUrl;
   }
 
-  async popularAsync(model: api.RemoteQueryPopular) {
+  async contextAsync() {
+    const url = new URL('/api/remote', this.baseUrl);
+    return await fetchJsonAsync<api.RemoteProvider>(url);
+  }
+
+  async pageAsync(model: api.RemoteQueryPage) {
     const query = querystring.stringify(model as any);
-    const url = new URL(`/api/remote/popular?${query}`, this.baseUrl);
+    const url = new URL(`/api/remote/page?${query}`, this.baseUrl);
     return await fetchJsonAsync<api.RemoteSearch>(url);
   }
 

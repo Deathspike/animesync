@@ -1,5 +1,6 @@
 import * as app from '../..';
-import {evaluateRegion} from './evaluators/region';
+import {createPages} from './pages';
+import {evaluatePage} from './evaluators/page';
 import {evaluateSearchAsync} from './evaluators/search';
 import {evaluateSeries} from './evaluators/series';
 import {evaluateStream} from './evaluators/stream';
@@ -15,16 +16,24 @@ export class CrunchyRollProvider {
     this.composeService = composeService;
   }
 
+  context() {
+    const id = app.api.RemoteProviderId.CrunchyRoll;
+    const label = 'CrunchyRoll';
+    const pages = createPages();
+    return new app.api.RemoteProvider({id, label, pages});
+  }
+
   isSupported(url: string) {
     return url.startsWith(baseUrl);
   }
 
-  async popularAsync(pageNumber = 1) {
-    const queryUrl = createQueryUrl('popular', pageNumber);
+  async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
+    const pageSource = createPages().find(x => x.id === page);
+    const pageUrl = createPageUrl(pageSource, options, pageNumber).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(queryUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const search = await page.evaluate(evaluateRegion);
+      const search = await page.evaluate(evaluatePage);
       return this.composeService.search(search, headers);
     });
   }
@@ -57,10 +66,16 @@ export class CrunchyRollProvider {
   }
 }
 
-function createQueryUrl(sort: string, pageNumber = 1) {
-  const page = pageNumber > 1 ? {pg: pageNumber} : undefined;
-  const query = querystring.stringify(page);
-  return new URL(`/videos/anime/${encodeURIComponent(sort)}/ajax_page?${query}`, baseUrl).toString();
+function createPageUrl(page?: app.api.RemoteProviderPage, options?: Array<string>, pageNumber = 1) {
+  if (page && page.id === 'genres') return options && options.length && options.every(x => page.options.find(y => x === y.id))
+    ? new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, tagged: options.join(',')})}`, baseUrl)
+    : new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl);
+  if (page && page.id === 'seasons') return options && options.length && page.options.find(x => x.id === options[0])
+    ? new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, 'tagged[]': `season:${options[0]}`})}`, baseUrl)
+    : new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1, 'tagged[]': `season:${page.options[0]}`})}`, baseUrl);
+  return page
+    ? new URL(`/videos/anime/${page.id}/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl)
+    : new URL(`/videos/anime/popular/ajax_page?${querystring.stringify({pg: pageNumber - 1})}`, baseUrl);
 }
 
 const defaultHeaders = {
