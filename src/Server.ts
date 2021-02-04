@@ -18,6 +18,7 @@ export class Server extends app.api.ServerApi {
   static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
     const server = await ncr.NestFactory.create<npe.NestExpressApplication>(app.ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
+    attachErrorFilter(server);
     attachRequestValidation(server);
     await server.listen(app.settings.serverPort);
     await handlerAsync(new Server(server)).finally(() => server.close());
@@ -32,16 +33,20 @@ export class Server extends app.api.ServerApi {
   }
 }
 
-function attachDocumentation(serverApp: ncm.INestApplication) {
-  nsg.SwaggerModule.setup('api', serverApp, nsg.SwaggerModule.createDocument(serverApp, new nsg.DocumentBuilder()
+function attachDocumentation(server: ncm.INestApplication) {
+  nsg.SwaggerModule.setup('api', server, nsg.SwaggerModule.createDocument(server, new nsg.DocumentBuilder()
     .setDescription(require('../package').description)
     .setTitle(require('../package').name)
     .setVersion(require('../package').version)
     .build()));
 }
 
-function attachRequestValidation(serverApp: ncm.INestApplication) {
-  serverApp.useGlobalPipes(new ncm.ValidationPipe({
+function attachErrorFilter(server: ncm.INestApplication) {
+  server.useGlobalFilters(new app.ServerFilter());
+}
+
+function attachRequestValidation(server: ncm.INestApplication) {
+  server.useGlobalPipes(new ncm.ValidationPipe({
     forbidNonWhitelisted: true,
     forbidUnknownValues: true,
     transform: true
