@@ -1,6 +1,7 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
 import * as fch from 'node-fetch';
+import {AbortController} from 'abort-controller';
 import fetch from 'node-fetch';
 import http from 'http';
 import express from 'express';
@@ -18,8 +19,9 @@ export class AgentService implements ncm.OnModuleDestroy {
   async fetchAsync(url: URL, options?: fch.RequestInit) {
     const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
     const headers = this.getHeaders(options && options.headers ? options.headers : {});
+    const signal = this.createSignal();
     headers['host'] = url.host ?? '';
-    return await fetch(url, {...options, agent, headers});
+    return await fetch(url, {...options, agent, headers, signal});
   }
 
   async forwardAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
@@ -42,6 +44,12 @@ export class AgentService implements ncm.OnModuleDestroy {
   onModuleDestroy() {
     this.httpAgent.destroy();
     this.httpsAgent.destroy();
+  }
+  
+  private createSignal() {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), app.settings.fetchTimeout);
+    return controller.signal;
   }
 }
 
