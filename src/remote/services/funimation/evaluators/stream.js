@@ -19,8 +19,7 @@ async function evaluateStreamAsync() {
   const dataSource = await getDataSourceAsync();
   const sources = mapSource(dataSource.show);
   const subtitles = mapSubtitle(dataSource.experience);
-  const type = 'hls';
-  return {sources, subtitles, type};
+  return {sources, subtitles};
 
   /**
    * Fetch the experience.
@@ -80,7 +79,7 @@ async function evaluateStreamAsync() {
    */
   function mapSource(show) {
     const item = show.items.find(x => x.videoType === 'm3u8');
-    if (item) return [{url: item.src}];
+    if (item) return [{url: item.src, type: 'hls'}];
     throw new Error();
   }
 

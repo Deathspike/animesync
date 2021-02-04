@@ -43,6 +43,7 @@ export class ComposeService {
         bandwidth: x.bandwidth || undefined,
         resolutionX: x.resolution.x || undefined,
         resolutionY: x.resolution.y || undefined,
+        type: stream.sources[0].type,
         url: this.contextService.hlsUrl(x.url, headers)
       })),
       subtitles: stream.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
