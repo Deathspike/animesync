@@ -8,6 +8,7 @@ export class RemoteStreamSource {
     this.bandwidth = api.property('bandwidth', source, sourcePatch, undefined);
     this.resolutionX = api.property('resolutionX', source, sourcePatch, undefined);
     this.resolutionY = api.property('resolutionY', source, sourcePatch, undefined);
+    this.type = api.property('type', source, sourcePatch, 'hls');
     this.url = api.property('url', source, sourcePatch, '');
   }
 
@@ -31,6 +32,11 @@ export class RemoteStreamSource {
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly resolutionY?: number;
+
+  @clv.IsString()
+  @clv.IsIn(['hls'])
+  @nsg.ApiProperty({enum: ['hls']})
+  readonly type: 'hls';
 
   @clv.IsString()
   @clv.IsUrl({require_tld: false})

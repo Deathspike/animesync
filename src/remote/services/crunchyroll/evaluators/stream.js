@@ -10,8 +10,7 @@ function evaluateStream() {
   const dataSource = extractDataSource();
   const sources = mapSource(dataSource);
   const subtitles = mapSubtitle(dataSource);
-  const type = 'hls';
-  return {sources, subtitles, type};
+  return {sources, subtitles};
 
   /**
    * Extract the data source.
@@ -31,7 +30,7 @@ function evaluateStream() {
    */
   function mapSource(dataSource) {
     const stream = dataSource.streams.find(x => x.format === 'adaptive_hls' && x.audio_lang === 'jaJP' && !x.hardsub_lang);
-    if (stream) return [{url: stream.url}];
+    if (stream) return [{url: stream.url, type: 'hls'}];
     throw new Error();
   }
 
