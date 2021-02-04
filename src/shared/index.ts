@@ -2,7 +2,6 @@ export * from '..';
 export * from './classes/AgentConnector';
 export * from './classes/AgentHttp';
 export * from './classes/AgentHttps';
-export * from './classes/Future';
 export * from './classes/HlsManifest';
 export * from './classes/HlsManifestLine';
 export * from './classes/HlsManifestLineStream';
