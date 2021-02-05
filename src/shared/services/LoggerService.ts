@@ -49,7 +49,7 @@ function createLogger() {
         level: 'info'
       }),
       new winston.transports.DailyRotateFile({
-        dirname: app.settings.logger,
+        dirname: app.settings.path.logger,
         filename: '%DATE%.log',
         format: winston.format.combine(winston.format.timestamp(), winston.format.printf(x => `[${x.timestamp}] ${x.level.toUpperCase().padEnd(5)} ${x.message}`)),
         level: 'debug',

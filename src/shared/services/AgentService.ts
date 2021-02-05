@@ -48,7 +48,7 @@ export class AgentService implements ncm.OnModuleDestroy {
   
   private createSignal() {
     const controller = new AbortController();
-    setTimeout(() => controller.abort(), app.settings.fetchTimeout);
+    setTimeout(() => controller.abort(), app.settings.core.fetchTimeout);
     return controller.signal;
   }
 }

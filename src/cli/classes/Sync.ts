@@ -14,7 +14,7 @@ export class Sync {
   constructor(api: app.Server, episodePath: string) {
     this.api = api;
     this.episodePath = episodePath;
-    this.syncPath = path.join(app.settings.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
+    this.syncPath = path.join(app.settings.path.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
   }
 
   async saveAsync(stream: app.api.RemoteStream) {

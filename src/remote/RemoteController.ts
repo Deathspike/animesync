@@ -27,24 +27,17 @@ export class RemoteController {
   @ncm.Get('page')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async pageAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
-    const cacheKey = `${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber || 1}`;
-    const cacheTimeout = app.settings.cacheRemotePageTimeout;
+    const cacheKey = `remote/page/${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber || 1}`;
+    const cacheTimeout = app.settings.core.cacheTimeoutPage;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider!, model.page, model.options, model.pageNumber));
-  }
-
-  @app.ResponseValidator(app.api.RemoteSearch)
-  @ncm.Get('popular')
-  @nsg.ApiExcludeEndpoint()
-  async popularAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
-    return await this.pageAsync(model);
   }
 
   @app.ResponseValidator(app.api.RemoteSearch)
   @ncm.Get('search')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
-    const cacheKey = `search/${model.provider}/${model.query}/${model.pageNumber || 1}`;
-    const cacheTimeout = app.settings.cacheRemoteSearchTimeout;
+    const cacheKey = `remote/search/${model.provider}/${model.query}/${model.pageNumber || 1}`;
+    const cacheTimeout = app.settings.core.cacheTimeoutSearch;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider!, model.query, model.pageNumber));
   }
 
@@ -52,8 +45,8 @@ export class RemoteController {
   @ncm.Get('series')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSeries})
   async seriesAsync(@ncm.Query() model: app.api.RemoteQuerySeries) {
-    const cacheKey = `series/${model.url}`;
-    const cacheTimeout = app.settings.cacheRemoteSeriesTimeout;
+    const cacheKey = `remote/series/${model.url}`;
+    const cacheTimeout = app.settings.core.cacheTimeoutSeries;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(model.url));
   }
 
@@ -61,8 +54,8 @@ export class RemoteController {
   @ncm.Get('stream')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteStream})
   async streamAsync(@ncm.Query() model: app.api.RemoteQueryStream) {
-    const cacheKey = `stream/${model.url}`;
-    const cacheTimeout = app.settings.cacheRemoteStreamTimeout;
+    const cacheKey = `remote/stream/${model.url}`;
+    const cacheTimeout = app.settings.core.cacheTimeoutStream;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(model.url));
   }
 }

@@ -1,8 +1,6 @@
 import * as app from '..';
 import * as cli from '.';
 import commander from 'commander';
-import fs from 'fs-extra';
-import path from 'path';
 import process from 'process';
 
 commander.createCommand()
@@ -34,15 +32,17 @@ commander.createCommand()
     .action(checkStart(cli.actions.serverAsync)))
   .addCommand(commander.createCommand('settings')
     .description('Manage settings.')
-    .option('--chrome [string]', withCurrent('Path to chrome-data.', app.settings.chrome), validatePath)
-    .option('--library [string]', withCurrent('Path to library. Video files are stored here.', app.settings.library), validatePath)
-    .option('--sync [string]', withCurrent('Path to sync. Temporary files are stored here.', app.settings.sync), validatePath)
-    .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', app.settings.chromeHeadless), primitiveBoolean)
-    .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', app.settings.chromeInactiveTimeout), primitiveNumber)
-    .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.chromeNavigationTimeout), primitiveNumber)
-    .option('--chromeObserverTimeout [number]', withCurrent('Chrome observation timeout in milliseconds.', app.settings.chromeObserverTimeout), primitiveNumber)
-    .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.chromeViewport), validateViewport)
-    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.proxyServer), validateProxyServer)
+    .option('--cache [string]', withCurrent('Path to cache data.', app.settings.path.cache))
+    .option('--chrome [string]', withCurrent('Path to chrome data.', app.settings.path.chrome))
+    .option('--library [string]', withCurrent('Path to library.', app.settings.path.library))
+    .option('--logger [string]', withCurrent('Path to logger.', app.settings.path.logger))
+    .option('--sync [string]', withCurrent('Path to sync.', app.settings.path.sync))
+    .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', app.settings.core.chromeHeadless), primitiveBoolean)
+    .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', app.settings.core.chromeTimeoutInactive), primitiveNumber)
+    .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.core.chromeTimeoutNavigation), primitiveNumber)
+    .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.core.chromeViewport))
+    .option('--fetchTimeout [number]', withCurrent('Fetch timeout in milliseconds.', app.settings.core.fetchTimeout), primitiveNumber)
+    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.core.proxyServer))
     .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
   .parse();
 
@@ -59,20 +59,6 @@ function primitiveBoolean(value: string) {
 
 function primitiveNumber(value: string) {
   return parseInt(value, 10) > 0 ? parseInt(value, 10) : undefined;
-}
-
-function validatePath(value: string) {
-  return fs.pathExistsSync(value) ? path.resolve(value) : undefined;
-}
-
-function validateProxyServer(value: string) {
-  if (/^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?((?:.+)\.(?:.+))$/i.test(value)) return value;
-  if (/^nordvpn\:\/\/(?:(.+)\:(.+)@)?(?:.+)$/i.test(value)) return value;
-  return undefined;
-}
-
-function validateViewport(value: string) {
-  return /^[0-9]+x[0-9]+$/.test(value) ? value : undefined;
 }
 
 function withCurrent<T>(description: string, value: T) {

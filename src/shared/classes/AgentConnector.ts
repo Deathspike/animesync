@@ -22,7 +22,7 @@ export class AgentConnector {
   
   static async createAsync(hostname: string, port: number) {
     return await new Promise<net.Socket>((resolve, reject) => {
-      const socket = net.connect(app.settings.serverPort, '127.0.0.1');
+      const socket = net.connect(app.settings.server.port, '127.0.0.1');
       const agent = new AgentConnector(reject, resolve, socket);
       agent.connect(hostname, port);
     });
