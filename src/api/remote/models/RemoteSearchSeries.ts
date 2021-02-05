@@ -20,7 +20,7 @@ export class RemoteSearchSeries {
   readonly title: string;
 
   @clv.IsString()
-  @clv.IsUrl()
+  @api.RemoteSeriesUrl()
   @nsg.ApiProperty()
   readonly url: string;
 }

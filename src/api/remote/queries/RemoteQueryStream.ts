@@ -8,7 +8,7 @@ export class RemoteQueryStream {
   }
   
   @clv.IsString()
-  @clv.IsUrl()
+  @api.RemoteEpisodeUrl()
   @nsg.ApiProperty()
   readonly url: string;
 }
