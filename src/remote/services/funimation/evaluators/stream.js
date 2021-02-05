@@ -22,12 +22,28 @@ async function evaluateStreamAsync() {
   return {sources, subtitles};
 
   /**
-   * Fetch the experience.
+   * Extracts the experience.
    * @returns {Promise<PageStreamExperience>}
    */
   async function fetchExperience() {
-    const experienceUrl = new URL(`/api/experience/${TITLE_DATA.id}`, location.href);
-    return await fetch(experienceUrl.toString()).then(x => x.json());
+    const endTime = Date.now() + 10000;
+    return await new Promise((resolve, reject) => {
+      (function tick() {
+        const player = document.querySelector('iframe');
+        const playerDoc = player?.contentWindow?.document;
+        const playerReady = playerDoc?.readyState === 'complete' || playerDoc?.readyState === 'interactive';
+        const playerMatch = playerReady && playerDoc?.body?.innerHTML.match(/var\s*show\s*=\s*({.+});/);
+        if (playerMatch) try {
+          resolve(JSON.parse(playerMatch[1]));
+        } catch {
+          reject();
+        } else if (endTime >= Date.now()) {
+          setTimeout(tick, 0);
+        } else {
+          reject();
+        }
+      })();
+    });
   }
 
   /**
