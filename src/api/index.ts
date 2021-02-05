@@ -21,6 +21,7 @@ export * from './rewrite/params/RewriteParamEmulate';
 export * from './rewrite/params/RewriteParamHls';
 export * from './rewrite/RewriteApi';
 export * from './setting/models/SettingCore';
+export * from './setting/models/SettingCredential';
 export * from './setting/models/SettingPath';
 export * from './setting/SettingApi';
 export * from './ServerApi';

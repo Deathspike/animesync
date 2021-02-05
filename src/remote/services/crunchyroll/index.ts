@@ -1,5 +1,6 @@
 import * as app from '../..';
 import {createPages} from './pages';
+import {CrunchyrollCredential} from './CrunchyrollCredential';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearchAsync} from './evaluators/search';
 import {evaluateSeries} from './evaluators/series';
@@ -50,6 +51,7 @@ export class CrunchyRollProvider {
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      await CrunchyrollCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeries);
       return this.composeService.series(series, headers);
@@ -59,6 +61,7 @@ export class CrunchyRollProvider {
   async streamAsync(episodeUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(episodeUrl, {waitUntil: 'domcontentloaded'});
+      await CrunchyrollCredential.tryAsync(baseUrl, page, episodeUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
       return await this.composeService.streamAsync(stream, headers);

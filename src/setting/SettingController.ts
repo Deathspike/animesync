@@ -26,6 +26,19 @@ export class SettingController {
     await this.settingService.coreAsync(model);
   }
 
+  @app.ResponseValidator(app.api.SettingCredential)
+  @ncm.Get('credential')
+  @nsg.ApiResponse({status: 200, type: app.api.SettingCredential})
+  credential() {
+    return app.settings.credential;
+  }
+
+  @ncm.Put('credential')
+  @ncm.HttpCode(204)
+  async credentialAsync(@ncm.Body() model: app.api.SettingCredential) {
+    await this.settingService.credentialAsync(model);
+  }
+  
   @app.ResponseValidator(app.api.SettingPath)
   @ncm.Get('path')
   @nsg.ApiResponse({status: 200, type: app.api.SettingPath})

@@ -15,6 +15,13 @@ const defaultCore = new app.api.SettingCore({
   fetchTimeout: 30000
 });
 
+const defaultCredential = new app.api.SettingCredential({
+  crunchyrollUsername: undefined,
+  crunchyrollPassword: undefined,
+  funimationUsername: undefined,
+  funimationPassword: undefined
+});
+
 const defaultPath = new app.api.SettingPath({
   cache: path.join(os.homedir(), 'animesync', 'cache'),
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
@@ -29,7 +36,8 @@ const settingOverrides = fs.readJsonSync(
 
 export const settings = {
   core: new app.api.SettingCore(defaultCore, settingOverrides),
+  credential: new app.api.SettingCredential(defaultCredential, settingOverrides),
   path: new app.api.SettingPath(defaultPath, settingOverrides),
   server: {port: 6583, url: `http://localhost:6583/`},
-  source: {defaultCore, defaultPath}
+  source: {defaultCore, defaultCredential, defaultPath}
 };
