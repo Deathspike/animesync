@@ -4,6 +4,7 @@ import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
 import {evaluateStreamAsync} from './evaluators/stream';
+import {FunimationCredential} from './FunimationCredential';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
@@ -40,7 +41,7 @@ export class FunimationProvider {
 
   async searchAsync(query: string, pageNumber = 1) {
     const queryRaw = querystring.stringify({categoryType: 'Series', q: query});
-    const queryUrl = new URL(`/search/${pageNumber}/?${queryRaw}`, baseUrl).toString();
+    const queryUrl = new URL(`/search/${pageNumber}/?${queryRaw}`, baseUrl);
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(queryUrl.toString(), {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
@@ -52,6 +53,7 @@ export class FunimationProvider {
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
       return this.composeService.series(series, headers);
@@ -59,8 +61,10 @@ export class FunimationProvider {
   }
 
   async streamAsync(episodeUrl: string) {
+    const japaneseEpisodeUrl = new URL('?lang=japanese', episodeUrl);
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(new URL('?lang=japanese', episodeUrl).toString(), {waitUntil: 'domcontentloaded'});
+      await page.goto(japaneseEpisodeUrl.toString(), {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, japaneseEpisodeUrl.toString());
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
       return await this.composeService.streamAsync(stream, headers);

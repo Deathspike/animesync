@@ -22,6 +22,12 @@ export class SettingService {
     await this.saveAsync();
   }
 
+  async credentialAsync(credential: app.api.SettingCredential) {
+    app.settings.credential = credential;
+    await this.restartAsync();
+    await this.saveAsync();
+  }
+
   async pathAsync(path: app.api.SettingPath) {
     app.settings.path = path;
     await this.restartAsync();
@@ -29,17 +35,18 @@ export class SettingService {
   }
 
   private async restartAsync() {
-    await Promise.all([
-      this.agentService.onModuleDestroy(),
-      this.browserService.onModuleDestroy(),
-      this.cacheService.onModuleDestroy()
-    ]);
+    const agentPromise = this.agentService.onModuleDestroy();
+    const browserPromise = this.browserService.onModuleDestroy();
+    const cachePromise = this.cacheService.onModuleDestroy();
+    await Promise.all([agentPromise, browserPromise, cachePromise]);
+    await fs.remove(app.settings.path.chrome);
   }
 
   private async saveAsync() {
     const settingsPath = path.join(os.homedir(), 'animesync', 'settings.json');
     const settingOverrides = Object.assign({},
       shallowDiff(app.settings.core, app.settings.source.defaultCore),
+      shallowDiff(app.settings.credential, app.settings.source.defaultCredential),
       shallowDiff(app.settings.path, app.settings.source.defaultPath));
     await fs.writeJson(settingsPath, settingOverrides, {spaces: 2});
   }

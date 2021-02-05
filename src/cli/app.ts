@@ -32,18 +32,30 @@ commander.createCommand()
     .action(checkStart(cli.actions.serverAsync)))
   .addCommand(commander.createCommand('settings')
     .description('Manage settings.')
-    .option('--cache [string]', withCurrent('Path to cache data.', app.settings.path.cache))
-    .option('--chrome [string]', withCurrent('Path to chrome data.', app.settings.path.chrome))
-    .option('--library [string]', withCurrent('Path to library.', app.settings.path.library))
-    .option('--logger [string]', withCurrent('Path to logger.', app.settings.path.logger))
-    .option('--sync [string]', withCurrent('Path to sync.', app.settings.path.sync))
-    .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', app.settings.core.chromeHeadless), primitiveBoolean)
-    .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', app.settings.core.chromeTimeoutInactive), primitiveNumber)
-    .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.core.chromeTimeoutNavigation), primitiveNumber)
-    .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.core.chromeViewport))
-    .option('--fetchTimeout [number]', withCurrent('Fetch timeout in milliseconds.', app.settings.core.fetchTimeout), primitiveNumber)
-    .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.core.proxyServer))
-    .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
+    .addCommand(commander.createCommand('core')
+      .description('The core settings.')
+      .option('--chromeHeadless [bool]', withCurrent('Chrome headless mode.', app.settings.core.chromeHeadless), primitiveBoolean)
+      .option('--chromeInactiveTimeout [number]', withCurrent('Chrome inactive timeout in milliseconds.', app.settings.core.chromeTimeoutInactive), primitiveNumber)
+      .option('--chromeNavigationTimeout [number]', withCurrent('Chrome navigation timeout in milliseconds.', app.settings.core.chromeTimeoutNavigation), primitiveNumber)
+      .option('--chromeViewport [string]', withCurrent('Chrome viewport while headless.', app.settings.core.chromeViewport))
+      .option('--fetchTimeout [number]', withCurrent('Fetch timeout in milliseconds.', app.settings.core.fetchTimeout), primitiveNumber)
+      .option('--proxyServer [string]', withCurrent('Proxy server for network traffic.', app.settings.core.proxyServer))
+      .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
+    .addCommand(commander.createCommand('credential')
+      .description('The credential settings.')
+      .option('--crunchyrollUsername [string]', withCurrent('CrunchyRoll username for premium videos', app.settings.credential.crunchyrollUsername))
+      .option('--crunchyrollPassword [string]', withCurrent('CrunchyRoll password for premium videos', app.settings.credential.crunchyrollPassword))
+      .option('--funimationUsername [string]', withCurrent('Funimation username for premium/mature videos', app.settings.credential.funimationUsername))
+      .option('--funimationPassword [string]', withCurrent('Funimation password for premium/mature videos', app.settings.credential.funimationPassword))
+      .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help())))
+    .addCommand(commander.createCommand('path')
+      .description('The path settings.')
+      .option('--cache [string]', withCurrent('Path to cache data.', app.settings.path.cache))
+      .option('--chrome [string]', withCurrent('Path to chrome data.', app.settings.path.chrome))
+      .option('--library [string]', withCurrent('Path to library.', app.settings.path.library))
+      .option('--logger [string]', withCurrent('Path to logger.', app.settings.path.logger))
+      .option('--sync [string]', withCurrent('Path to sync.', app.settings.path.sync))
+      .action((command) => cli.actions.settingsAsync(command).then((showHelp) => showHelp && command.help()))))
   .parse();
 
 function checkStart(fn: Function) {
@@ -58,9 +70,9 @@ function primitiveBoolean(value: string) {
 }
 
 function primitiveNumber(value: string) {
-  return parseInt(value, 10) > 0 ? parseInt(value, 10) : undefined;
+  return Number(value);
 }
 
 function withCurrent<T>(description: string, value: T) {
-  return `${description}\n-> ${value}`;
+  return `${description}\n-> ${value || ''}`;
 }

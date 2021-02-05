@@ -91,11 +91,23 @@ Commands:
 
 ### Log In
 
-Since streaming services require active subscriptions to access all content, you may want to log into your account. To access content, `animesync` uses a private instance of *Google Chrome*. This private instance does not share information with your normal instance, so even if you are already logged in there, `animesync` does not know of it. Launch the `animesync` browser instance:
+Since streaming services require active subscriptions to access all content, you may want to log into your account. To access content, `animesync` uses a private instance of *Google Chrome*. This private instance does not share information with your normal instance, so even if you are already logged in there, `animesync` does not know of it. To launch *Google Chrome* and manually log in, you can use:
 
     animesync browser
 
-A *Google Chrome* window will appear. You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. Now you can use this browser instance to open the website of your streaming service, and log into your account. Once you're done, close the browser.
+You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. This approach works, but both *CrunchyRoll* and *Funimation* occassionally log you out. To prevent that, `animesync` can be configured with credentials and log in on your behalf.
+
+#### CrunchyRoll
+
+To set your *CrunchyRoll* credentials, you can use:
+
+    animesync settings credential --crunchyrollUsername YOURUSER --crunchyrollPassword YOURPASS
+
+#### Funimation
+
+To set your *Funimation* credentials, you can use:
+
+    animesync settings credential --funimationUsername YOURUSER --funimationPassword YOURPASS
 
 ### Quick Download
 
@@ -150,49 +162,60 @@ To check the settings, you can use:
 You will see something similar to:
 
 ```
-Usage: animesync settings [options]
+Usage: animesync settings [options] [command]
 
 Manage settings.
 
 Options:
-  --chrome [string]                   Path to chrome-data.
-                                      -> C:\Users\Deathspike\animesync\chrome-data
-  --library [string]                  Path to library. Video files are stored here.
-                                      -> C:\Users\Deathspike\animesync\library
-  --sync [string]                     Path to sync. Temporary files are stored here.
-                                      -> C:\Users\Deathspike\animesync\sync
+  -h, --help            display help for command
+
+Commands:
+  core [options]        The core settings.
+  credential [options]  The credential settings.
+  path [options]        The path settings.
+  help [command]        display help for command
+```
+
+Each section holds its own settings that can be configured. For example, `core` has these values:
+
+```
+Usage: app settings core [options]
+
+The core settings.
+
+Options:
   --chromeHeadless [bool]             Chrome headless mode.
                                       -> true
   --chromeInactiveTimeout [number]    Chrome inactive timeout in milliseconds.
-                                      -> 1000
+                                      -> 600000
   --chromeNavigationTimeout [number]  Chrome navigation timeout in milliseconds.
                                       -> 30000
-  --chromeObserverTimeout [number]    Chrome observation timeout in milliseconds.
-                                      -> 30000
   --chromeViewport [string]           Chrome viewport while headless.
-                                      ->⠀1920x974
+                                      -> 1920x974
+  --fetchTimeout [number]             Fetch timeout in milliseconds.
+                                      -> 30000
   --proxyServer [string]              Proxy server for network traffic.
-                                      ⠀⠀
+                                      -> 
   -h, --help                          display help for command
 ```
 
 To change a setting, you can use an option flag. For example:
 
-    animesync settings --chromeHeadless false
+    animesync settings core --chromeHeadless false
 
 To remove a custom user setting, leave an option flag empty. For example:
 
-    animesync settings --chromeHeadless 
+    animesync settings core --chromeHeadless 
 
 ### Proxy Server
 
 Using a proxy server is supported in case you need to change region. For example:
 
-    animesync settings --proxyServer https://example.com
+    animesync settings core --proxyServer https://example.com
 
 Proxies often require authentication. You can use authentication like this:
 
-    animesync settings --proxyServer https://username:password@example.com
+    animesync settings core --proxyServer https://username:password@example.com
 
 You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
 
@@ -211,7 +234,7 @@ Note that *CrunchyRoll* and *Funimation* are USA-based. So I recommend a USA-bas
 
 If you have an account with *NordVPN*, you can use:
 
-    animesync settings --proxyServer nordvpn://username:password@us
+    animesync settings core --proxyServer nordvpn://username:password@us
 
 With this configuration, `animesync` periodically queries the list of proxies provided by *NordVPN* and automatically selects the HTTPS proxy with the least amount of load. That should be the fastest proxy available at that time. The `@us` suffix stands for *USA*, and ensures the proxy server is in that country. You can use whatever country flag you desire, but I recommend *USA* for the best video availability.
 
