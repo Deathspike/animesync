@@ -9,19 +9,19 @@ export class Server extends app.api.ServerApi {
   private readonly server: npe.NestExpressApplication;
 
   private constructor(server: npe.NestExpressApplication) {
-    super(app.settings.serverUrl);
+    super(app.settings.server.url);
     this.server = server;
     this.server.disable('x-powered-by');
     this.server.useLogger(this.logger);
   }
 
-  static async usingAsync(handlerAsync: (server: Server) => Promise<void>) {
+  static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>) {
     const server = await ncr.NestFactory.create<npe.NestExpressApplication>(app.ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
     attachErrorFilter(server);
     attachRequestValidation(server);
-    await server.listen(app.settings.serverPort);
-    await handlerAsync(new Server(server)).finally(() => server.close());
+    await server.listen(app.settings.server.port);
+    return await handlerAsync(new Server(server)).finally(() => server.close());
   }
 
   get browser() {
@@ -42,7 +42,7 @@ function attachDocumentation(server: ncm.INestApplication) {
 }
 
 function attachErrorFilter(server: ncm.INestApplication) {
-  server.useGlobalFilters(new app.ServerFilter());
+  server.useGlobalFilters(new app.ServerError());
 }
 
 function attachRequestValidation(server: ncm.INestApplication) {

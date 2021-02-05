@@ -1,27 +1,28 @@
 import * as app from '../..';
-import fs from 'fs-extra';
-import os from 'os';
-import path from 'path';
 
 export async function settingsAsync(values: Record<string, boolean | string | undefined>) {
-  const settingsPath = path.join(os.homedir(), 'animesync', 'settings.json');
-  const settings = await fs.readJson(settingsPath, {throws: false}) ?? {};
-  if (mergeSettings(values, settings)) {
-    await fs.writeJson(settingsPath, settings, {spaces: 2});
-    return false;
-  } else {
-    return true;
-  }
+  return await app.Server.usingAsync(async (api) => {
+    const corePromise = api.setting.coreAsync()
+    const pathPromise = api.setting.pathAsync();
+    const core = await corePromise;
+    const path = await pathPromise;
+    if (core.value && path.value && (mergeSettings(values, core.value) || mergeSettings(values, path.value))) {
+      await Promise.all([api.setting.updateCoreAsync(core.value), api.setting.updatePathAsync(path.value)]);
+      return false;
+    } else {
+      return true;
+    }
+  });
 }
 
-function mergeSettings(values: Record<string, boolean | string | undefined>, settings: Record<string, boolean | number | string>) {
-  return Object.keys(app.settings).reduce((p, key) => {
-    const value = values[key];
-    if (value === true) {
-      delete settings[key];
+function mergeSettings(source: Record<string, any>, target: Record<string, any>) {
+  return Object.keys(target).reduce((p, key) => {
+    const value = source[key];
+    if (typeof target[key] !== 'boolean' && value === true) {
+      delete target[key];
       return true;
     } else if (typeof value !== 'undefined') {
-      settings[key] = value;
+      target[key] = value;
       return true;
     } else {
       return p;

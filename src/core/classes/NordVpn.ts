@@ -1,17 +1,16 @@
 import fetch from 'node-fetch';
-import url from 'url';
 
 export class NordVpn {
   private isBusy?: boolean;
-  private previousServer?: url.UrlWithStringQuery;
+  private previousServer?: URL;
   private refreshTime: number;
-  private url?: Promise<url.UrlWithStringQuery>;
+  private url?: Promise<URL>;
 
   constructor() {
     this.refreshTime = 0;
   }
 
-  async getAsync(server: url.UrlWithStringQuery) {
+  async getAsync(server: URL) {
     if ((this.previousServer && this.previousServer.toString() !== server.toString()) || this.refreshTime < Date.now() || !this.url) {
       return await this.tryUpdateAsync(server);
     } else {
@@ -19,7 +18,7 @@ export class NordVpn {
     }
   }
 
-  private async fetchAsync(server: url.UrlWithStringQuery) {
+  private async fetchAsync(server: URL) {
     const allServers = await fetch('https://nordvpn.com/api/server')
       .then(x => x.json())
       .then(x => x as Array<INordVPN>);
@@ -29,16 +28,16 @@ export class NordVpn {
     const bestServer = filteredServers
       .sort((a, b) => a.load - b.load)
       .shift();
-    if (bestServer && server.auth) {
-      return url.parse(`https://${server.auth}@${bestServer.domain}:89/`);
+    if (bestServer && server.username) {
+      return new URL(`https://${server.username}:${server.password}@${bestServer.domain}:89/`);
     } else if (bestServer) {
-      return url.parse(`https://${bestServer.domain}:89/`);
+      return new URL(`https://${bestServer.domain}:89/`);
     } else {
       throw new Error();
     }
   }
 
-  private async tryUpdateAsync(server: url.UrlWithStringQuery) {
+  private async tryUpdateAsync(server: URL) {
     try {
       if (this.isBusy && this.url) return await this.url;
       this.isBusy = true;

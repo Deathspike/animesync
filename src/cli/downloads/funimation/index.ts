@@ -12,7 +12,7 @@ export async function funimationAsync(api: app.Server, rootPath: string, url: st
 async function seriesAsync(api: app.Server, rootPath: string, series: app.api.RemoteSeries, options?: cli.IOptions) {
   const seriesName = sanitizeFilename(series.title);
   const seriesPath = path.join(rootPath, seriesName);
-  const tracker = new cli.Tracker(app.settings.library);
+  const tracker = new cli.Tracker(app.settings.path.library);
   for (const season of series.seasons) {
     const seasonMatch = season.title.match(/([0-9\.]+)/);
     const seasonNumber = seasonMatch ? parseFloat(seasonMatch[1]) : NaN;

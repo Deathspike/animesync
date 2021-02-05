@@ -2,7 +2,6 @@ import * as app from '..';
 import * as sks from 'socks';
 import dns from 'dns';
 import net from 'net';
-import url from 'url';
 import tls from 'tls';
 import util from 'util';
 
@@ -10,18 +9,19 @@ export class HttpTunnelService {
   private nordvpn?: app.NordVpn;
 
   connect(clientSocket: net.Socket, clientUrl: string) {
-    const client = url.parse(clientUrl);
-    const server = url.parse(app.settings.proxyServer);
-    if (server.protocol === 'nordvpn:') {
-      (this.nordvpn ?? (this.nordvpn = new app.NordVpn())).getAsync(server)
+    const client = new URL(clientUrl);
+    if (app.settings.core.proxyServer?.startsWith('nordvpn:')) {
+      (this.nordvpn ?? (this.nordvpn = new app.NordVpn())).getAsync(new URL(app.settings.core.proxyServer))
         .then(x => this.connectTo(client, clientSocket, x))
         .catch(() => clientSocket.destroy());
+    } else if (app.settings.core.proxyServer) {
+      this.connectTo(client, clientSocket, new URL(app.settings.core.proxyServer));
     } else {
-      this.connectTo(client, clientSocket, server);
+      this.noProxy(client, clientSocket);
     }
   }
 
-  private connectTo(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private connectTo(client: URL, clientSocket: net.Socket, server: URL) {
     if (server.protocol === 'http:') {
       this.httpProxy(client, clientSocket, server);
     } else if (server.protocol === 'https:') {
@@ -35,34 +35,34 @@ export class HttpTunnelService {
     }
   }
 
-  private httpProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private httpProxy(client: URL, clientSocket: net.Socket, server: URL) {
     const serverPort = Number(server.port ?? 80);
     const serverSocket = net.connect(serverPort, String(server.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('connect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
 
-  private httpsProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery) {
+  private httpsProxy(client: URL, clientSocket: net.Socket, server: URL) {
     const serverPort = Number(server.port ?? 443);
     const serverSocket = tls.connect(serverPort, String(server.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('secureConnect', () => serverSocket.write(connectHeader(client, server), serverTunnel));
   }
   
-  private noProxy(client: url.UrlWithStringQuery, clientSocket: net.Socket) {
+  private noProxy(client: URL, clientSocket: net.Socket) {
     const serverPort = Number(client.port ?? 80);
     const serverSocket = net.connect(serverPort, String(client.hostname));
     const serverTunnel = tunnel(clientSocket, serverSocket);
     serverSocket.on('connect', () => clientSocket.write(statusHeader(200, 'OK'), serverTunnel));
   } 
 
-  private async socksProxyAsync(client: url.UrlWithStringQuery, clientSocket: net.Socket, server: url.UrlWithStringQuery, socks4: boolean) {
+  private async socksProxyAsync(client: URL, clientSocket: net.Socket, server: URL, socks4: boolean) {
     // Initialize the destination.
     const destination: sks.SocksRemoteHost = {host: String(client.hostname), port: Number(client.port ?? 80)};
     const proxy: sks.SocksProxy = {host: String(server.hostname), port: Number(server.port ?? 1080), type: socks4 ? 4 :5};
     
     // Initialize the options.
-    if (server.auth) [proxy.userId, proxy.password] = server.auth.split(':', 2);
+    if (server.username) [proxy.userId, proxy.password] = [server.username, server.password];
     if (socks4) destination.host = (await util.promisify(dns.lookup)(destination.host)).address;
 
     // Initialize the tunnel.
@@ -73,9 +73,9 @@ export class HttpTunnelService {
   }
 }
 
-function connectHeader(client: url.UrlWithStringQuery, server: url.UrlWithStringQuery) {
-  if (server.auth) {
-    const auth = Buffer.from(server.auth).toString('base64');
+function connectHeader(client: URL, server: URL) {
+  if (server.username) {
+    const auth = Buffer.from(`${server.username}:${server.password}`).toString('base64');
     return [`CONNECT ${client.host} HTTP/1.1`, `Proxy-Authorization: Basic ${auth}`, '', ''].join('\r\n');
   } else {
     return [`CONNECT ${client.host} HTTP/1.1`, '', ''].join('\r\n');
