@@ -27,7 +27,7 @@ export class RemoteController {
   @ncm.Get('page')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async pageAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
-    const cacheKey = `remote/page/${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber || 1}`;
+    const cacheKey = `remote/page/${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber ?? 1}`;
     const cacheTimeout = app.settings.core.cacheTimeoutPage;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider!, model.page, model.options, model.pageNumber));
   }
@@ -36,7 +36,7 @@ export class RemoteController {
   @ncm.Get('search')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
   async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
-    const cacheKey = `remote/search/${model.provider}/${model.query}/${model.pageNumber || 1}`;
+    const cacheKey = `remote/search/${model.provider}/${model.query}/${model.pageNumber ?? 1}`;
     const cacheTimeout = app.settings.core.cacheTimeoutSearch;
     return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider!, model.query, model.pageNumber));
   }

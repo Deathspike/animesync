@@ -1,16 +1,16 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
-import {CrunchyRollProvider} from './crunchyroll';
-import {FunimationProvider} from './funimation';
+import {CrunchyRoll} from './crunchyroll/Crunchyroll';
+import {Funimation} from './funimation/Funimation';
 
 @ncm.Injectable()
 export class ProviderService {
-  private readonly crunchyrollProvider: CrunchyRollProvider;
-  private readonly funimationProvider: FunimationProvider;
+  private readonly crunchyrollProvider: CrunchyRoll;
+  private readonly funimationProvider: Funimation;
 
   constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
-    this.crunchyrollProvider = new CrunchyRollProvider(browserService, composeService);
-    this.funimationProvider = new FunimationProvider(browserService, composeService);
+    this.crunchyrollProvider = new CrunchyRoll(browserService, composeService);
+    this.funimationProvider = new Funimation(browserService, composeService);
   }
 
   context() {
@@ -19,7 +19,7 @@ export class ProviderService {
     return [crunchyroll, funimation];
   }
 
-  async pageAsync(provider: app.api.RemoteProviderId, page?: string, options?: Array<string>, pageNumber?: number) {
+  async pageAsync(provider: app.api.RemoteProviderId, page?: string, options?: Array<string>, pageNumber = 1) {
     switch (provider) {
       case app.api.RemoteProviderId.CrunchyRoll:
         return await this.crunchyrollProvider.pageAsync(page, options, pageNumber);

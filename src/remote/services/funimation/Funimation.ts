@@ -1,14 +1,14 @@
 import * as app from '../..';
-import {createPages} from './pages';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
 import {evaluateStreamAsync} from './evaluators/stream';
+import {FunimationContext} from './FunimationContext';
 import {FunimationCredential} from './FunimationCredential';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
-export class FunimationProvider {
+export class Funimation {
   private readonly browserService: app.BrowserService;
   private readonly composeService: app.ComposeService;
 
@@ -20,7 +20,7 @@ export class FunimationProvider {
   context() {
     const id = app.api.RemoteProviderId.Funimation;
     const label = 'Funimation';
-    const pages = createPages();
+    const pages = FunimationContext.pages();
     return new app.api.RemoteProvider({id, label, pages});
   }
 
@@ -29,7 +29,7 @@ export class FunimationProvider {
   }
 
   async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
-    const pageSource = createPages().find(x => x.id === page);
+    const pageSource = FunimationContext.findPage(page);
     const pageUrl = createPageUrl(pageSource, options, pageNumber);
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(pageUrl.toString(), {waitUntil: 'domcontentloaded'});

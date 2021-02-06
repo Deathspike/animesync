@@ -1,5 +1,5 @@
 import * as app from '../..';
-import {createPages} from './pages';
+import {CrunchyrollContext} from './CrunchyrollContext';
 import {CrunchyrollCredential} from './CrunchyrollCredential';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearchAsync} from './evaluators/search';
@@ -8,7 +8,7 @@ import {evaluateStream} from './evaluators/stream';
 import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
-export class CrunchyRollProvider {
+export class CrunchyRoll {
   private readonly browserService: app.BrowserService;
   private readonly composeService: app.ComposeService;
 
@@ -20,7 +20,7 @@ export class CrunchyRollProvider {
   context() {
     const id = app.api.RemoteProviderId.CrunchyRoll;
     const label = 'CrunchyRoll';
-    const pages = createPages();
+    const pages = CrunchyrollContext.pages();
     return new app.api.RemoteProvider({id, label, pages});
   }
 
@@ -29,7 +29,7 @@ export class CrunchyRollProvider {
   }
 
   async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
-    const pageSource = createPages().find(x => x.id === page);
+    const pageSource = CrunchyrollContext.findPage(page);
     const pageUrl = createPageUrl(pageSource, options, pageNumber).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
