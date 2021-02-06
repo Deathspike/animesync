@@ -15,7 +15,7 @@ export class AgentHttp extends http.Agent {
   }
 
   private superCreateConnection(options: net.TcpSocketConnectOpts, socket: net.Socket) {
-    const unsafeAgent: any = http.Agent.prototype;
+    const unsafeAgent = app.api.unsafe(http.Agent.prototype);
     const unsafeOptions = Object.assign(options, {socket});
     return unsafeAgent.createConnection.call(this, unsafeOptions);
   }

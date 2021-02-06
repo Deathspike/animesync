@@ -27,3 +27,7 @@ export function property<T extends object, K extends keyof T, V extends T[K]>(na
       ? source[name]
       : value;
 }
+
+export function unsafe<T>(value: T) {
+  return value as any;
+}
