@@ -51,9 +51,10 @@ export class Funimation {
   }
 
   async seriesAsync(seriesUrl: string) {
+    const qidSeriesUrl = new URL('?qid=None', seriesUrl);
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
+      await page.goto(qidSeriesUrl.toString(), {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl.toString());
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
       return this.composeService.series(series, headers);
@@ -61,10 +62,10 @@ export class Funimation {
   }
 
   async streamAsync(episodeUrl: string) {
-    const japaneseEpisodeUrl = new URL('?lang=japanese', episodeUrl);
+    const qidEpisodeUrl = new URL('?qid=None&lang=japanese', episodeUrl);
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(japaneseEpisodeUrl.toString(), {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, japaneseEpisodeUrl.toString());
+      await page.goto(qidEpisodeUrl.toString(), {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, qidEpisodeUrl.toString());
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
       return await this.composeService.streamAsync(stream, headers);
