@@ -10,8 +10,8 @@ export class CrunchyrollContext {
       {type: 'oneOf', id: 'popular', label: 'Popular', options: []},
       {type: 'oneOf', id: 'simulcasts', label: 'Simulcasts', options: []},
       {type: 'oneOf', id: 'updated', label: 'Updated', options: []},
-      {type: 'anyOf', id: 'genres', label: 'Genres', options: this.genres()},
-      {type: 'oneOf', id: 'seasons', label: 'Seasons', options: this.seasons()}
+      {type: 'oneOf', id: 'seasons', label: 'Seasons', options: this.seasons()},
+      {type: 'anyOf', id: 'genres', label: 'Genres', options: this.genres()}
     ];
   }
 

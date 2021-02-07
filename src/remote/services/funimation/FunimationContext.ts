@@ -7,8 +7,8 @@ export class FunimationContext {
 
   static pages(): Array<app.api.RemoteProviderPage> {
     return [
-      {type: 'oneOf', id: 'popularity', label: 'Most Popular', options: []},
-      {type: 'oneOf', id: 'date', label: 'Date Added', options: []},
+      {type: 'oneOf', id: 'popularity', label: 'Popular', options: []},
+      {type: 'oneOf', id: 'date', label: 'Updated', options: []},
       {type: 'oneOf', id: 'genres', label: 'Genres', options: [
         {id: 'action-adventure', label: 'Action/Adventure'},
         {id: 'comedy', label: 'Comedy'},
