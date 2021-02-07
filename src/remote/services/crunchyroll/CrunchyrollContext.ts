@@ -11,7 +11,7 @@ export class CrunchyrollContext {
       {type: 'oneOf', id: 'simulcasts', label: 'Simulcasts', options: []},
       {type: 'oneOf', id: 'updated', label: 'Updated', options: []},
       {type: 'oneOf', id: 'seasons', label: 'Seasons', options: this.seasons()},
-      {type: 'anyOf', id: 'genres', label: 'Genres', options: this.genres()}
+      {type: 'mixOf', id: 'genres', label: 'Genres', options: this.genres()}
     ];
   }
 
