@@ -20,7 +20,7 @@ async function evaluateSeriesAsync() {
     seasons: await getSeasonAsync(),
     synopsis: titleData.synopsis,
     title: titleData.title,
-    url: location.href
+    url: location.href.split('?')[0]
   };
 
   /**
