@@ -29,7 +29,7 @@ export class RemoteProviderPage {
   readonly options: api.RemoteProviderPageOption[];
 
   @clv.IsString()
-  @clv.IsEnum({enum: ['anyOf', 'oneOf']})
-  @nsg.ApiProperty({enum: ['anyOf', 'oneOf']})
-  readonly type: 'anyOf' | 'oneOf';
+  @clv.IsEnum({enum: ['mixOf', 'oneOf']})
+  @nsg.ApiProperty({enum: ['mixOf', 'oneOf']})
+  readonly type: 'mixOf' | 'oneOf';
 }
