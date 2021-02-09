@@ -26,9 +26,9 @@ function evaluateSeries() {
    * @returns {boolean}
    */
   function hasJapaneseAudio(season) {
-    const languages = ['Arabic', 'English', 'French', 'German', 'Italian', 'Portuguese', 'Russian', 'Spanish'];
-    const expression = new RegExp(`\((?:${languages.join('|')})(?:\s*Dub)?\)`, 'i');
-    return !expression.test(season.title);
+    if (/\((Arabic|English|French|German|Italian|Portuguese|Russian|Spanish)(\s+Dub)?\)$/.test(season.title)) return false;
+    if (/\(Dub\)$/.test(season.title)) return false;
+    return true;
   }
 
   /**
