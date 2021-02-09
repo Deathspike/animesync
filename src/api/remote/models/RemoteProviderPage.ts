@@ -21,11 +21,10 @@ export class RemoteProviderPage {
   @nsg.ApiProperty()
   readonly label: string;
 
-  @clv.IsOptional()
   @clv.IsArray()
   @clv.ValidateNested()
   @clt.Type(() => api.RemoteProviderPageOption)
-  @nsg.ApiPropertyOptional({type: [api.RemoteProviderPageOption]})
+  @nsg.ApiProperty({type: [api.RemoteProviderPageOption]})
   readonly options: api.RemoteProviderPageOption[];
 
   @clv.IsString()
