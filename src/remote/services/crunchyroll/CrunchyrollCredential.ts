@@ -25,7 +25,7 @@ export class CrunchyrollCredential {
 
   private async runAsync() {
     if (await this.checkAsync() || !await this.tryLoginAsync() || await this.checkAsync()) return;
-    throw new Error('Invalid credentials: CrunchyRoll');
+    throw new Error('Invalid credentials: Crunchyroll');
   }
 
   private async tryLoginAsync() {

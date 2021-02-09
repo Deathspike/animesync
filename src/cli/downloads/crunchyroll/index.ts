@@ -19,7 +19,7 @@ async function seriesAsync(api: app.Server, rootPath: string, series: app.api.Re
     for (const episode of season.episodes) {
       const elapsedTime = new cli.Timer();
       const episodeData = clv.isNumberString(episode.name) ? episode.name.padStart(2, '0') : episode.name;
-      const episodeName = `${seasonName} ${episodeData} [CrunchyRoll]`;
+      const episodeName = `${seasonName} ${episodeData} [Crunchyroll]`;
       const episodePath = `${path.join(seriesPath, episodeName)}.mkv`;
       if (await tracker.existsAsync(seasonName, episodeName) || await tracker.existsAsync(seriesName, episodeName)) {
         api.logger.info(`Skipping ${episodeName}`);

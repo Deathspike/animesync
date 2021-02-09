@@ -9,7 +9,14 @@ export class Tracker {
   }
 
   async existsAsync(seriesName: string, episodeName: string) {
-    return await fs.pathExists(path.join(this.rootPath, seriesName, episodeName));
+    const directoryPath = path.join(this.rootPath, seriesName);
+    if (await fs.pathExists(directoryPath)) {
+      const fileNames = await fs.readdir(directoryPath);
+      const lowerEpisodeName = episodeName.toLowerCase();
+      return fileNames.some(x => x.toLowerCase() === lowerEpisodeName);
+    } else {
+      return false;
+    }
   }
 
   async trackAsync(seriesName: string, episodeName: string) {
