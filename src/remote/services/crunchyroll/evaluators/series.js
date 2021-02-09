@@ -37,7 +37,7 @@ function evaluateSeries() {
    * @returns {Array<RemoteSeriesSeason>}
    */
   function mapSeason(containerNode) {
-    if (!containerNode) throw new Error();
+    if (!containerNode) return [];
     return Array.from(containerNode.querySelectorAll('.season')).reverse().map((seasonNode) => {
       const episodes = mapSeasonEpisodes(seasonNode.querySelector('ul')) ?? [];
       const title = validateStrict(seasonNode.querySelector(':scope > a') ?? document.querySelector('#template_container h1'));
@@ -51,7 +51,7 @@ function evaluateSeries() {
    * @returns {Array<RemoteSeriesSeasonEpisode>}
    */
   function mapSeasonEpisodes(seasonNode) {
-    if (!seasonNode) throw new Error();
+    if (!seasonNode) return [];
     return Array.from(seasonNode.querySelectorAll('li')).reverse().map((episodeNode) => {
       const bubbleData = processBubbleData($(episodeNode).data('bubble_data'));
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
