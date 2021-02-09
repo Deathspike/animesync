@@ -31,6 +31,7 @@ async function evaluateSearchAsync(model) {
     const candidates = await fetchCandidatesAsync();
     const matches = candidates.data
       .filter(x => x.type === 'Series')
+      .filter(x => x.link && x.link.length > 1)
       .map(x => ({item: x, score: measureSimilarity(query, x.name)}));
     const results = matches
       .sort((a, b) => b.score - a.score)
