@@ -118,9 +118,9 @@ async function evaluateStreamAsync() {
    * @return {RemoteStreamSubtitle['language']}
    */
   function mapSubtitleLanguage(language) {
-    if (language === 'es') return 'spa';
-    if (language === 'en') return 'eng';
-    if (language === 'pt') return 'por';
+    if (language === 'es') return 'es-LA';
+    if (language === 'en') return 'en-US';
+    if (language === 'pt') return 'pt-BR';
     throw new Error();
   }
 }

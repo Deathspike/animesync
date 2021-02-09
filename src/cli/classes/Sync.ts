@@ -27,7 +27,7 @@ export class Sync {
         .filter(x => x.language === 'eng')
         .concat(foreignSubtitles);
       const inputs = [['-i', stream.sources[0].url]]
-        .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
+        .concat(sortedSubtitles.map(x => (['-i', x.filePath])))
         .reduce((p, c) => p.concat(c))
       const mappings = [['-map', '0:v', '-map', '0:a']]
         .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
@@ -47,6 +47,13 @@ export class Sync {
     }
   }
 
+  private localSubtitle(subtitle: app.api.RemoteStreamSubtitle, filePath: string) {
+    const language = translate(subtitle.language);
+    const type = subtitle.type;
+    const url = subtitle.url;
+    return {filePath, language, type, url};
+  }
+
   private async prepareAsync(stream: app.api.RemoteStream) {
     await fs.ensureDir(this.syncPath);
     return await Promise.all(stream.subtitles.map(async (subtitle, i) => {
@@ -54,16 +61,16 @@ export class Sync {
         const subtitleData = await fetch(subtitle.url).then(x => x.text());
         const subtitlePath = path.join(this.syncPath, `${i}.${subtitle.language}.srt`);
         await fs.writeFile(subtitlePath, sub.stringifySync(sub.parseSync(subtitleData), {format: 'SRT'}));
-        return Object.assign(subtitle, {subtitlePath});
+        return this.localSubtitle(subtitle, subtitlePath);
       } else {
         const subtitleData = await fetch(subtitle.url).then(x => x.text());
         const subtitlePath = path.join(this.syncPath, `${i}.${subtitle.language}.${subtitle.type}`);
         await fs.writeFile(subtitlePath, subtitleData);
-        return Object.assign(subtitle, {subtitlePath});
+        return this.localSubtitle(subtitle, subtitlePath);
       }
     }));
   }
-
+  
   private async spawnAsync(command: string, args: Array<string>) {
     this.api.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
     return await new Promise<void>((resolve, reject) => {
@@ -86,5 +93,20 @@ function ffmpeg() {
       return path.join(__dirname, '../../../static/ffmpeg.exe');
     default:
       return 'ffmpeg';
+  }
+}
+
+function translate(language: app.api.RemoteStreamSubtitle['language']) {
+  switch (language) {
+    case 'ar-ME': return 'ara';
+    case 'de-DE': return 'ger';
+    case 'en-US': return 'eng';
+    case 'es-ES': return 'spa';
+    case 'es-LA': return 'spa';
+    case 'fr-FR': return 'fre';
+    case 'it-IT': return 'ita';
+    case 'pt-BR': return 'por';
+    case 'ru-RU': return 'rus';
+    default: throw new Error();
   }
 }
