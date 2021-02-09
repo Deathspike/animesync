@@ -8,7 +8,7 @@ import {evaluateStream} from './evaluators/stream';
 import querystring from 'querystring';
 const baseUrl = 'https://www.crunchyroll.com';
 
-export class CrunchyRoll {
+export class Crunchyroll {
   private readonly browserService: app.BrowserService;
   private readonly composeService: app.ComposeService;
 
@@ -18,8 +18,8 @@ export class CrunchyRoll {
   }
 
   context() {
-    const id = app.api.RemoteProviderId.CrunchyRoll;
-    const label = 'CrunchyRoll';
+    const id = app.api.RemoteProviderId.Crunchyroll;
+    const label = 'Crunchyroll';
     const pages = CrunchyrollContext.pages();
     return new app.api.RemoteProvider({id, label, pages});
   }

@@ -1,4 +1,4 @@
 export enum RemoteProviderId {
-  CrunchyRoll = 'crunchyroll',
+  Crunchyroll = 'crunchyroll',
   Funimation = 'funimation'
 }

@@ -6,7 +6,7 @@
 # animesync
 
 AnimeSync is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
-A Certain Scientific Railgun 01 [CrunchyRoll].mkv`.
+A Certain Scientific Railgun 01 [Crunchyroll].mkv`.
 
 ## Motivation
 
@@ -62,7 +62,7 @@ This application is not endorsed or affliated with any streaming service. The us
 
 The following streaming services are currently supported:
 
-* [CrunchyRoll](https://www.crunchyroll.com/)
+* [Crunchyroll](https://www.crunchyroll.com/)
 * [Funimation](https://www.funimation.com/)
 
 Requests to support additional streaming services are welcome.
@@ -95,11 +95,11 @@ Since streaming services require active subscriptions to access all content, you
 
     animesync browser
 
-You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. This approach works, but both *CrunchyRoll* and *Funimation* occassionally log you out. To prevent that, `animesync` can be configured with credentials and log in on your behalf.
+You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. This approach works, but both *Crunchyroll* and *Funimation* occassionally log you out. To prevent that, `animesync` can be configured with credentials and log in on your behalf.
 
-#### CrunchyRoll
+#### Crunchyroll
 
-To set your *CrunchyRoll* credentials, you can use:
+To set your *Crunchyroll* credentials, you can use:
 
     animesync settings credential --crunchyrollUsername YOURUSER --crunchyrollPassword YOURPASS
 
@@ -115,7 +115,7 @@ To download a series, you can use:
 
     animesync download [seriesUrl...]
 
-For example, to download *A Certain Scientific Railgun* from *CrunchyRoll*, you can use:
+For example, to download *A Certain Scientific Railgun* from *Crunchyroll*, you can use:
 
     animesync download https://www.crunchyroll.com/a-certain-scientific-railgun
 
@@ -127,7 +127,7 @@ To add a series to your library, you can use:
 
     animesync series add <seriesUrl> [rootPath]
 
-For example, to add *A Certain Scientific Railgun* from *CrunchyRoll*, you can use:
+For example, to add *A Certain Scientific Railgun* from *Crunchyroll*, you can use:
 
     animesync series add https://www.crunchyroll.com/a-certain-scientific-railgun
 
@@ -228,7 +228,7 @@ You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
 * `socks5://example.com`
 * `socks5://username:password@example.com`
 
-Note that *CrunchyRoll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
+Note that *Crunchyroll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
 
 #### NordVPN
 
