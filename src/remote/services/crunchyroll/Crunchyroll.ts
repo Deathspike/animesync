@@ -53,8 +53,14 @@ export class Crunchyroll {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await CrunchyrollCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const series = await page.evaluate(evaluateSeries);
-      return this.composeService.series(series, headers);
+      if (/\/maturity_wall\?/.test(page.url())) {
+        await page.goto(`${seriesUrl}?skip_wall=1`, {waitUntil: 'domcontentloaded'});
+        const series = await page.evaluate(evaluateSeries);
+        return this.composeService.series(series, headers);
+      } else {
+        const series = await page.evaluate(evaluateSeries);
+        return this.composeService.series(series, headers);
+      }
     });
   }
 
