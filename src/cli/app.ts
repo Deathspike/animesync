@@ -60,7 +60,7 @@ commander.createCommand()
 
 function checkStart(fn: Function) {
   return function(this: cli.IOptions) {
-    if ((process.version.match(/^v(\d+)\.\d+\.\d$/)?.pop() ?? 0) < 12) throw new Error(`Invalid node version: Must be >= 12`);
+    if ((process.version.match(/^v(\d+)\.\d+\.\d$/)?.pop() ?? 0) < 14) throw new Error(`Invalid node version: Must be >= 14`);
     return fn.apply(this, arguments);
   };
 }

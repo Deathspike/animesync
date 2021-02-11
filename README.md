@@ -18,7 +18,7 @@ This application is not endorsed or affliated with any streaming service. The us
 
 # Prerequisites
 
-* NodeJS >= 12 (http://nodejs.org/)
+* NodeJS >= 14 (http://nodejs.org/)
 * NPM >= 6 (https://www.npmjs.org/)
 
 # Install
