@@ -9,6 +9,6 @@ import cors from 'cors'
 export class SettingModule implements ncm.NestModule {
   configure(consumer: ncm.MiddlewareConsumer) {
     consumer.apply(bodyParser.json()).forRoutes(app.SettingController);
-    consumer.apply(cors()).forRoutes(app.SettingController);
+    consumer.apply(cors()).forRoutes('api/setting')
   }
 }

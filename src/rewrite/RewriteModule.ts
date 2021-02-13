@@ -7,6 +7,6 @@ import cors from 'cors'
   providers: [app.HlsService]})
 export class RewriteModule implements ncm.NestModule {
   configure(consumer: ncm.MiddlewareConsumer) {
-    consumer.apply(cors()).forRoutes(app.RewriteController);
+    consumer.apply(cors()).forRoutes('api/rewrite');
   }
 }
