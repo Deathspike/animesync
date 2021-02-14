@@ -10,9 +10,9 @@ export class RemoteStreamSubtitle {
   }
 
   @clv.IsString()
-  @clv.IsIn(['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU'])
-  @nsg.ApiProperty({enum: ['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU']})
-  readonly language: 'ar-ME' | 'de-DE' | 'en-US' | 'es-ES' | 'es-LA' | 'fr-FR' | 'it-IT' | 'pt-BR' | 'ru-RU';
+  @clv.IsIn(['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'tr-TR'])
+  @nsg.ApiProperty({enum: ['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'tr-TR']})
+  readonly language: 'ar-ME' | 'de-DE' | 'en-US' | 'es-ES' | 'es-LA' | 'fr-FR' | 'it-IT' | 'pt-BR' | 'ru-RU' | 'tr-TR';
 
   @clv.IsString()
   @clv.IsIn(['ass', 'vtt'])
