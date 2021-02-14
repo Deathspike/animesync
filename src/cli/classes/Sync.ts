@@ -107,6 +107,7 @@ function translate(language: app.api.RemoteStreamSubtitle['language']) {
     case 'it-IT': return 'ita';
     case 'pt-BR': return 'por';
     case 'ru-RU': return 'rus';
+    case 'tr-TR': return 'tur';
     default: throw new Error();
   }
 }

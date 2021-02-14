@@ -63,6 +63,7 @@ function evaluateStream() {
     if (language === 'itIT') return 'it-IT';
     if (language === 'ptBR') return 'pt-BR';
     if (language === 'ruRU') return 'ru-RU';
+    if (language === 'trTR') return 'tr-TR';
     throw new Error();
   }
   
