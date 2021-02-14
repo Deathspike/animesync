@@ -33,7 +33,7 @@ async function evaluateSearchAsync(model) {
       .map(x => x.toLowerCase())
       .filter(Boolean);
     const matches = candidates.data
-      .filter(x => x.type === 'Series')
+      .filter(x => x.type === 'Series' && !x.img.includes('no_image'))
       .filter(x => x.link && x.link.length > 1)
       .filter(x => pieces.every(y => x.name.toLowerCase().includes(y)))
       .map(x => ({item: x, score: measureSimilarity(query, x.name)}));
