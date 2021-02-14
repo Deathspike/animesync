@@ -39,7 +39,12 @@ export class CrunchyrollCredential {
 
   private async trySubmitAsync() {
     const navigationPromise = this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
-    await this.page.click('#login_submit_button');
+    const submitButton = '#login_submit_button'
+    this.page.click('#onetrust-accept-btn-handler')
+      .then(() => this.page.click(submitButton))
+      .catch(() => {});
+    this.page.click(submitButton)
+      .catch(() => {});
     await navigationPromise;
   }
 }
