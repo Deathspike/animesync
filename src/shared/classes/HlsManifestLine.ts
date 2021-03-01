@@ -45,7 +45,7 @@ function format(params: Record<string, string>) {
 }
 
 function parse(params: string) {
-  let expression = /(?:^|,)(?:([^=]*)=(?:"([^"]*)"|([^,]*)))/g;
+  let expression = /(?:^|,)\s*(?:([^=]*)=(?:"([^"]*)"|([^,]*)))/g;
   let match: RegExpMatchArray | null;
   let result: Record<string, string> = {};
   while ((match = expression.exec(params))) result[match[1]] = match[3] ?? match[2];
