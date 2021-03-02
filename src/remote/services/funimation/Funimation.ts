@@ -30,45 +30,45 @@ export class Funimation {
 
   async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
     const pageSource = FunimationContext.findPage(page);
-    const pageUrl = createPageUrl(pageSource, options, pageNumber);
+    const pageUrl = createPageUrl(pageSource, options, pageNumber).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(pageUrl.toString(), {waitUntil: 'domcontentloaded'});
+      await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluatePage);
-      return this.composeService.search(search, headers);
+      return this.composeService.search(pageUrl, search, headers);
     });
   }
 
   async searchAsync(query: string, pageNumber = 1) {
-    const queryRaw = querystring.stringify({categoryType: 'Series', q: query});
-    const queryUrl = new URL(`/search/${pageNumber}/?${queryRaw}`, baseUrl);
+    const searchRaw = querystring.stringify({categoryType: 'Series', q: query});
+    const searchUrl = new URL(`/search/${pageNumber}/?${searchRaw}`, baseUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(queryUrl.toString(), {waitUntil: 'domcontentloaded'});
+      await page.goto(searchUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearch);
-      return this.composeService.search(search, headers);
+      return this.composeService.search(searchUrl, search, headers);
     });
   }
 
   async seriesAsync(seriesUrl: string) {
-    const qidSeriesUrl = new URL('?qid=None', seriesUrl);
+    const qidSeriesUrl = new URL('?qid=None', seriesUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(qidSeriesUrl.toString(), {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl.toString());
+      await page.goto(qidSeriesUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = await page.evaluate(evaluateSeriesAsync);
-      return this.composeService.series(series, headers);
+      return this.composeService.series(qidSeriesUrl, series, headers);
     });
   }
 
   async streamAsync(episodeUrl: string) {
-    const qidEpisodeUrl = new URL('?qid=None&lang=japanese', episodeUrl);
+    const qidEpisodeUrl = new URL('?qid=None&lang=japanese', episodeUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(qidEpisodeUrl.toString(), {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, qidEpisodeUrl.toString());
+      await page.goto(qidEpisodeUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, qidEpisodeUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
-      return await this.composeService.streamAsync(stream, headers);
+      return await this.composeService.streamAsync(qidEpisodeUrl, stream, headers);
     });
   }
 }

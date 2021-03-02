@@ -12,6 +12,12 @@ export class RemoteStreamSource {
     this.url = api.property('url', source, sourcePatch, '');
   }
 
+  static compareFn(a: RemoteStreamSource, b: RemoteStreamSource) {
+    if (a.resolutionX !== b.resolutionX) return (b.resolutionX ?? 0) - (a.resolutionX ?? 0);
+    if (a.resolutionY !== b.resolutionY) return (b.resolutionY ?? 0) - (a.resolutionY ?? 0);
+    return (b.bandwidth ?? 0) - (a.bandwidth ?? 0);
+  }
+  
   @clv.IsOptional()
   @clv.IsNumber()
   @clv.Min(1)
