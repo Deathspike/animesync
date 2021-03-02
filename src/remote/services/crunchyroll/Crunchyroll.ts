@@ -35,7 +35,7 @@ export class Crunchyroll {
       await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluatePage);
-      return this.composeService.search(search, headers);
+      return this.composeService.search(pageUrl, search, headers);
     });
   }
 
@@ -44,7 +44,7 @@ export class Crunchyroll {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearchAsync, {query, pageNumber});
-      return this.composeService.search(search, headers);
+      return this.composeService.search(baseUrl, search, headers);
     });
   }
   
@@ -56,10 +56,10 @@ export class Crunchyroll {
       if (/\/maturity_wall\?/.test(page.url())) {
         await page.goto(`${seriesUrl}?skip_wall=1`, {waitUntil: 'domcontentloaded'});
         const series = await page.evaluate(evaluateSeries);
-        return this.composeService.series(series, headers);
+        return this.composeService.series(seriesUrl, series, headers);
       } else {
         const series = await page.evaluate(evaluateSeries);
-        return this.composeService.series(series, headers);
+        return this.composeService.series(seriesUrl, series, headers);
       }
     });
   }
@@ -70,7 +70,7 @@ export class Crunchyroll {
       await CrunchyrollCredential.tryAsync(baseUrl, page, episodeUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
-      return await this.composeService.streamAsync(stream, headers);
+      return await this.composeService.streamAsync(episodeUrl, stream, headers);
     });
   }
 }

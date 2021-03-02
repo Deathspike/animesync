@@ -13,15 +13,15 @@ export class ContextService {
     this.baseUrl = new URL(`${protocol}://${host}/`);
   }
 
-  emulateUrl(url: string, headers?: Record<string, string>) {
+  emulateUrl(baseUrl: string, relativeUrl: string, headers?: Record<string, string>) {
     const safeQuery = querystring.stringify(headers);
-    const safeUrl = encodeURIComponent(url);
+    const safeUrl = encodeURIComponent(new URL(relativeUrl, baseUrl).toString());
     return new URL(`/api/rewrite/${safeUrl}?${safeQuery}`, this.baseUrl).toString();
   }
 
-  hlsUrl(url: string, headers?: Record<string, string>) {
+  hlsUrl(baseUrl: string, relativeUrl: string, headers?: Record<string, string>) {
     const safeQuery = querystring.stringify(headers);
-    const safeUrl = encodeURIComponent(url);
+    const safeUrl = encodeURIComponent(new URL(relativeUrl, baseUrl).toString());
     return new URL(`/api/rewrite/hls/${safeUrl}?${safeQuery}`, this.baseUrl).toString();
   }
 }
