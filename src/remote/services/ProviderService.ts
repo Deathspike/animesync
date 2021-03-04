@@ -1,59 +1,57 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
+import * as ncr from '@nestjs/core';
 import {Crunchyroll} from './crunchyroll/Crunchyroll';
 import {Funimation} from './funimation/Funimation';
 
 @ncm.Injectable()
 export class ProviderService {
-  private readonly crunchyrollProvider: Crunchyroll;
-  private readonly funimationProvider: Funimation;
+  private readonly moduleRef: ncr.ModuleRef;
 
-  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
-    this.crunchyrollProvider = new Crunchyroll(browserService, composeService);
-    this.funimationProvider = new Funimation(browserService, composeService);
+  constructor(moduleRef: ncr.ModuleRef) {
+    this.moduleRef = moduleRef;
   }
 
-  context() {
-    const crunchyroll = this.crunchyrollProvider.context();
-    const funimation = this.funimationProvider.context();
-    return [crunchyroll, funimation];
+  async contextAsync() {
+    const providers = await this.providersAsync();
+    const contexts = providers.map(p => p.contextAsync());
+    return await Promise.all(contexts);
   }
 
-  async pageAsync(provider: app.api.RemoteProviderId, page?: string, options?: Array<string>, pageNumber = 1) {
-    switch (provider) {
-      case app.api.RemoteProviderId.Crunchyroll:
-        return await this.crunchyrollProvider.pageAsync(page, options, pageNumber);
-      case app.api.RemoteProviderId.Funimation:
-        return await this.funimationProvider.pageAsync(page, options, pageNumber);
-    }
+  async pageAsync(id: string, page?: string, options?: Array<string>, pageNumber = 1) {
+    const provider = await this.findAsync(x => x.contextAsync(), x => x.id === id);
+    if (provider) return await provider.pageAsync(page, options, pageNumber);
+    throw new ncm.NotFoundException();
   }
 
-  async searchAsync(provider: app.api.RemoteProviderId, query: string, pageNumber?: number) {
-    switch (provider) {
-      case app.api.RemoteProviderId.Crunchyroll:
-        return await this.crunchyrollProvider.searchAsync(query, pageNumber);
-      case app.api.RemoteProviderId.Funimation:
-        return await this.funimationProvider.searchAsync(query, pageNumber);
-    }
+  async searchAsync(id: string, query: string, pageNumber?: number) {
+    const provider = await this.findAsync(x => x.contextAsync(), x => x.id === id);
+    if (provider) return await provider.searchAsync(query, pageNumber);
+    throw new ncm.NotFoundException();
   }
 
   async seriesAsync(seriesUrl: string) {
-    if (this.crunchyrollProvider.isSupported(seriesUrl)) {
-      return await this.crunchyrollProvider.seriesAsync(seriesUrl);
-    } else if (this.funimationProvider.isSupported(seriesUrl)) {
-      return await this.funimationProvider.seriesAsync(seriesUrl);
-    } else {
-      throw new Error();
-    }
+    const provider = await this.findAsync(x => x.isSeriesAsync(seriesUrl));
+    if (provider) return await provider.seriesAsync(seriesUrl);
+    throw new ncm.NotFoundException();
   }
 
-  async streamAsync(episodeUrl: string) {
-    if (this.crunchyrollProvider.isSupported(episodeUrl)) {
-      return await this.crunchyrollProvider.streamAsync(episodeUrl);
-    } else if (this.funimationProvider.isSupported(episodeUrl)) {
-      return await this.funimationProvider.streamAsync(episodeUrl);
-    } else {
-      throw new Error();
-    }
+  async streamAsync(streamUrl: string) {
+    const provider = await this.findAsync(x => x.isStreamAsync(streamUrl));
+    if (provider) return await provider.streamAsync(streamUrl);
+    throw new ncm.NotFoundException();
+  }
+  
+  private async findAsync<T>(getAsync: (provider: app.IProvider) => Promise<T>, validate?: (item: T) => boolean) {
+    const providers = await this.providersAsync();
+    const results = await Promise.all(providers.map(x => getAsync(x).then(y => ({provider: x, result: y}))));
+    const result = results.find(x => validate ? validate(x.result) : x.result);
+    return result?.provider;
+  }
+
+  private async providersAsync(): Promise<Array<app.IProvider>> {
+    const crunchyroll = this.moduleRef.create(Crunchyroll);
+    const funimation = this.moduleRef.create(Funimation);
+    return await Promise.all([crunchyroll, funimation]);
   }
 }

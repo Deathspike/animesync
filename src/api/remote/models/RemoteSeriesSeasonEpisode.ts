@@ -31,7 +31,7 @@ export class RemoteSeriesSeasonEpisode {
   readonly title?: string;
 
   @clv.IsString()
-  @api.RemoteEpisodeUrl()
+  @clv.IsUrl()
   @nsg.ApiProperty()
   readonly url: string;
 }

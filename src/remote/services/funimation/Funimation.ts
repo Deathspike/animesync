@@ -1,4 +1,5 @@
 import * as app from '../..';
+import * as ncm from '@nestjs/common';
 import {evaluatePage} from './evaluators/page';
 import {evaluateSearch} from './evaluators/search';
 import {evaluateSeriesAsync} from './evaluators/series';
@@ -8,7 +9,8 @@ import {FunimationCredential} from './FunimationCredential';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
-export class Funimation {
+@ncm.Injectable()
+export class Funimation implements app.IProvider {
   private readonly browserService: app.BrowserService;
   private readonly composeService: app.ComposeService;
 
@@ -17,15 +19,21 @@ export class Funimation {
     this.composeService = composeService;
   }
 
-  context() {
-    const id = app.api.RemoteProviderId.Funimation;
+  contextAsync() {
+    const id = 'funimation';
     const label = 'Funimation';
     const pages = FunimationContext.pages();
-    return new app.api.RemoteProvider({id, label, pages});
+    return Promise.resolve(new app.api.RemoteProvider({id, label, pages}));
   }
 
-  isSupported(url: string) {
-    return url.startsWith(baseUrl);
+  isSeriesAsync(seriesUrl: string) {
+    const isSeries = /^https:\/\/www\.funimation\.com\/shows\/[^\/]+\/$/.test(seriesUrl);
+    return Promise.resolve(isSeries);
+  }
+
+  isStreamAsync(streamUrl: string) {
+    const isStream = /^https:\/\/www\.funimation\.com\/shows\/[^\/]+\/[^\/]+\/$/.test(streamUrl);
+    return Promise.resolve(isStream);
   }
 
   async pageAsync(page?: string, options?: Array<string>, pageNumber = 1) {
@@ -61,14 +69,14 @@ export class Funimation {
     });
   }
 
-  async streamAsync(episodeUrl: string) {
-    const qidEpisodeUrl = new URL('?qid=None&lang=japanese', episodeUrl).toString();
+  async streamAsync(streamUrl: string) {
+    const qidStreamUrl = new URL('?qid=None&lang=japanese', streamUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(qidEpisodeUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, qidEpisodeUrl);
+      await page.goto(qidStreamUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, qidStreamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
-      return await this.composeService.streamAsync(qidEpisodeUrl, stream, headers);
+      return await this.composeService.streamAsync(qidStreamUrl, stream, headers);
     });
   }
 }

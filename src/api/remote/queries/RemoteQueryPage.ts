@@ -5,15 +5,16 @@ import * as nsg from '@nestjs/swagger';
 
 export class RemoteQueryPage {
   constructor(source?: RemoteQueryPage, sourcePatch?: Partial<RemoteQueryPage>) {
-    this.provider = api.property('provider', source, sourcePatch, undefined);
+    this.provider = api.property('provider', source, sourcePatch, '');
     this.page = api.property('page', source, sourcePatch, undefined);
     this.options = api.property('options', source, sourcePatch, undefined);
     this.pageNumber = api.property('pageNumber', source, sourcePatch, 1);
   }
 
-  @clv.IsEnum(api.RemoteProviderId)
-  @nsg.ApiProperty({enum: api.RemoteProviderId})
-  readonly provider?: api.RemoteProviderId;
+  @clv.IsString()
+  @clv.MinLength(1)
+  @nsg.ApiProperty()
+  readonly provider: string;
 
   @clv.IsOptional()
   @clv.IsString()

@@ -4,27 +4,27 @@ import * as ncm from '@nestjs/common';
 @ncm.Injectable()
 export class ComposeService {
   private readonly agentService: app.AgentService;
-  private readonly contextService: app.ContextService;
+  private readonly rewriteService: app.RewriteService;
 
-  constructor(agentService: app.AgentService, contextService: app.ContextService) {
+  constructor(agentService: app.AgentService, rewriteService: app.RewriteService) {
     this.agentService = agentService;
-    this.contextService = contextService;
+    this.rewriteService = rewriteService;
   }
 
   search(baseUrl: string, search: app.api.RemoteSearch, headers?: Record<string, string>) {
     return new app.api.RemoteSearch(search, {
       series: search.series.map(series => new app.api.RemoteSearchSeries(series, {
-        imageUrl: this.contextService.emulateUrl(baseUrl, series.imageUrl, headers)
+        imageUrl: this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers)
       }))
     });
   }
 
   series(baseUrl: string, series: app.api.RemoteSeries, headers?: Record<string, string>) {
     return new app.api.RemoteSeries(series, {
-      imageUrl: this.contextService.emulateUrl(baseUrl, series.imageUrl, headers),
+      imageUrl: this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers),
       seasons: series.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
         episodes: season.episodes.map(episode => new app.api.RemoteSeriesSeasonEpisode(episode, {
-          imageUrl: this.contextService.emulateUrl(baseUrl, episode.imageUrl, headers)
+          imageUrl: this.rewriteService.emulateUrl(baseUrl, episode.imageUrl, headers)
         }))
       }))
     });
@@ -36,7 +36,7 @@ export class ComposeService {
         .then(x => x.reduce((p, c) => p.concat(c), []))
         .then(x => x.sort(app.api.RemoteStreamSource.compareFn)),
       subtitles: stream.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
-        url: this.contextService.emulateUrl(baseUrl, subtitle.url, headers)
+        url: this.rewriteService.emulateUrl(baseUrl, subtitle.url, headers)
       }))
     });
   }
@@ -51,7 +51,7 @@ export class ComposeService {
       resolutionX: x.resolution.x || undefined,
       resolutionY: x.resolution.y || undefined,
       type: 'hls',
-      url: this.contextService.hlsUrl(manifestUrl, x.url, headers)
+      url: this.rewriteService.hlsUrl(manifestUrl, x.url, headers)
     }));
   }
 }

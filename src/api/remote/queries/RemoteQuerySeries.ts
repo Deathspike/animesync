@@ -8,7 +8,7 @@ export class RemoteQuerySeries {
   }
 
   @clv.IsString()
-  @api.RemoteSeriesUrl()
+  @clv.IsUrl()
   @nsg.ApiProperty()
   readonly url: string;
 }
