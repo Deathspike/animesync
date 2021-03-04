@@ -43,7 +43,7 @@ export class CrunchyrollContext {
     ];
   }
 
-  private static  seasons() {
+  private static seasons() {
     const current = new Date();
     const results = [];
     while (current >= new Date(2009, 0, 1)) {

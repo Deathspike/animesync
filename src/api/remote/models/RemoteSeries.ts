@@ -41,7 +41,7 @@ export class RemoteSeries {
   readonly title: string;
 
   @clv.IsString()
-  @api.RemoteSeriesUrl()
+  @clv.IsUrl()
   @nsg.ApiProperty()
   readonly url: string;
 }

@@ -9,7 +9,7 @@ export * from './services/LoggerService';
 export * from './services/AgentService';
 export * from './services/BrowserService';
 export * from './services/CacheService';
-export * from './services/ContextService';
+export * from './services/RewriteService';
 export * from './ResponseLoggerInterceptor';
 export * from './ResponseValidator';
 export * from './ResponseValidatorInterceptor';
