@@ -8,6 +8,7 @@ export class SettingPath {
     this.chrome = api.property('chrome', source, sourcePatch, '');
     this.library = api.property('library', source, sourcePatch, '');
     this.logger = api.property('logger', source, sourcePatch, '');
+    this.plugin = api.property('plugin', source, sourcePatch, '');
     this.sync = api.property('sync', source, sourcePatch, '');
   }
 
@@ -30,6 +31,11 @@ export class SettingPath {
   @clv.MinLength(1)
   @nsg.ApiProperty()
   readonly logger: string;
+
+  @clv.IsString()
+  @clv.MinLength(1)
+  @nsg.ApiProperty()
+  readonly plugin: string;
 
   @clv.IsString()
   @clv.MinLength(1)
