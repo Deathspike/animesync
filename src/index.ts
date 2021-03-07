@@ -4,3 +4,4 @@ export * from './settings';
 export * from './Server';
 export * from './ServerError';
 export * from './ServerModule';
+import './hook';

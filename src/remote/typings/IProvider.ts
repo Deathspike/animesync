@@ -1,4 +1,4 @@
-import * as app from '../../shared';
+import * as app from '..';
 
 export interface IProvider {
   contextAsync(): Promise<app.api.RemoteProvider>;

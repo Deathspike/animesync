@@ -1,7 +1,18 @@
 import * as app from '.';
+import childProcess from 'child_process';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
+
+function accessNpm() {
+  try {
+    const result = childProcess.execSync('npm root -g', {encoding: 'utf8'});
+    const match = result.match(/^.+/);
+    return match && match[0];
+  } catch {
+    return;
+  }
+}
 
 const defaultCore = new app.api.SettingCore({
   cacheTimeoutPage: 3600000,
@@ -27,6 +38,7 @@ const defaultPath = new app.api.SettingPath({
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
   library: path.join(os.homedir(), 'animesync', 'library'),
   logger: path.join(os.homedir(), 'animesync', 'logger'),
+  plugin: accessNpm() || path.join(os.homedir(), 'animesync', 'plugin'),
   sync: path.join(os.homedir(), 'animesync', 'sync')
 });
 
