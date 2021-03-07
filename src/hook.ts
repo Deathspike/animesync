@@ -1,3 +1,4 @@
+import fs from 'fs-extra';
 import path from 'path';
 const core = require('module');
 const next = core['_load'];
@@ -11,26 +12,27 @@ core['_load'] = function(request: string) {
 
 function fetchDependency(request: string) {
   return Object.keys(packageData.dependencies)
-    .map(x => route(path.join(__dirname, '../node_modules', x), x, request))
+    .map(x => match(x, request, (y, z) => route(path.join(__dirname, '../node_modules'), path.join(y, z))))
     .filter(x => x)
     .shift();
 }
 
 function fetchSelf(request: string) {
-  const basePath = path.join(__dirname, '..');
   const name = packageData.name;
-  return route(basePath, name, request);
+  return match(name, request, (_, p) => route(path.join(__dirname, '..'), p));
 }
 
-function route(basePath: string, name: string, request: string) {
+function match(name: string, request: string, require: (module: string, path: string) => any) {
   const expressionName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const expression = new RegExp(`^${expressionName}(?:\/(.*))?$`);
+  const expression = new RegExp(`^(${expressionName})(?:\/(.*))?$`);
   const match = request.match(expression);
-  if (match && match[1]) {
-    return require(path.join(basePath, match[1]));
-  } else if (match) {
-    return require(basePath);
-  } else {
-    return undefined;
+  return match ? require(match[1], match[2] ?? '') : undefined;
+}
+
+function route(basePath: string, relativePath: string) {
+  while (true) {
+    const modulePath = path.resolve(basePath, relativePath);
+    if (fs.existsSync(modulePath) || fs.existsSync(`${modulePath}.js`)) return require(modulePath);
+    basePath = path.dirname(basePath);
   }
 }
