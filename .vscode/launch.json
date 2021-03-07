@@ -3,6 +3,7 @@
   "configurations": [{
     "args": ["dist/cli/app", "download"],
     "name": "Launch Program",
+    "outFiles": ["${workspaceFolder}/dist/**/*.js"],
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
     "request": "launch",
