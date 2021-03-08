@@ -1,12 +1,13 @@
 {
   "version": "0.2.0",
   "configurations": [{
-    "args": ["dist/cli/app", "download"],
+    "args": ["dist/cli/app", "server"],
     "name": "Launch Program",
     "outFiles": ["${workspaceFolder}/dist/**/*.js"],
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
     "request": "launch",
+    "runtimeArgs": ["--inspect=16583"],
     "type": "node"
   }]
 }
