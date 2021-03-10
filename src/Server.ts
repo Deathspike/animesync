@@ -42,7 +42,8 @@ function attachDocumentation(server: ncm.INestApplication) {
 }
 
 function attachErrorFilter(server: ncm.INestApplication) {
-  server.useGlobalFilters(new app.ServerError());
+  const logger = server.get(ash.LoggerService);
+  server.useGlobalFilters(new app.ServerError(logger));
 }
 
 function attachRequestValidation(server: ncm.INestApplication) {

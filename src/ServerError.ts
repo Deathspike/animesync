@@ -1,20 +1,31 @@
-import * as app from '.';
+import * as app from './shared';
 import * as ncm from '@nestjs/common';
 import express from 'express';
 
 @ncm.Catch()
 export class ServerError implements ncm.ExceptionFilter {
+  private readonly loggerService: app.LoggerService;
+
+  constructor(loggerService: app.LoggerService) {
+    this.loggerService = loggerService;
+  }
+
   catch(error: Error, host: ncm.ArgumentsHost) {
+    const request: express.Request = host.switchToHttp().getRequest();
     const response: express.Response = host.switchToHttp().getResponse();
     if (error instanceof ncm.HttpException) {
       const message = error.stack ?? error.message;
       const statusCode = error.getStatus();
-      const errors = app.api.unsafe(error.getResponse()).message;
-      response.status(statusCode).json({statusCode, message, errors});
+      const value = {statusCode, message};
+      response.status(statusCode).json(value);
+      this.loggerService.debug(`HTTP/${request.httpVersion} ${statusCode} ${JSON.stringify(value)}`);
     } else {
       const message = error.stack ?? error.message;
       const statusCode = 500;
-      response.status(statusCode).json({statusCode, message});
+      const value = {statusCode, message};
+      response.status(statusCode).json(value);
+      this.loggerService.debug(`HTTP/${request.httpVersion} ${statusCode} ${JSON.stringify(value)}`);
+      this.loggerService.error(message);
     }
   }
 }
