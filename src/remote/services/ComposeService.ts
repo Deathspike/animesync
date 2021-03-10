@@ -21,10 +21,10 @@ export class ComposeService {
 
   series(baseUrl: string, series: app.api.RemoteSeries, headers?: Record<string, string>) {
     return new app.api.RemoteSeries(series, {
-      imageUrl: this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers),
+      imageUrl: series.imageUrl && this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers),
       seasons: series.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
         episodes: season.episodes.map(episode => new app.api.RemoteSeriesSeasonEpisode(episode, {
-          imageUrl: this.rewriteService.emulateUrl(baseUrl, episode.imageUrl, headers)
+          imageUrl: episode.imageUrl && this.rewriteService.emulateUrl(baseUrl, episode.imageUrl, headers)
         }))
       }))
     });

@@ -6,7 +6,7 @@ import * as nsg from '@nestjs/swagger';
 export class RemoteSeries {
   constructor(source?: RemoteSeries, sourcePatch?: Partial<RemoteSeries>) {
     this.genres = api.property('genres', source, sourcePatch, []);
-    this.imageUrl = api.property('imageUrl', source, sourcePatch, '');
+    this.imageUrl = api.property('imageUrl', source, sourcePatch, undefined);
     this.seasons = api.property('seasons', source, sourcePatch, []);
     this.synopsis = api.property('synopsis', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
@@ -19,10 +19,11 @@ export class RemoteSeries {
   @nsg.ApiProperty()
   readonly genres: Array<string>;
 
+  @clv.IsOptional()
   @clv.IsString()
   @clv.IsUrl({require_tld: false})
-  @nsg.ApiProperty()
-  readonly imageUrl: string;
+  @nsg.ApiPropertyOptional()
+  readonly imageUrl?: string;
 
   @clv.IsArray()
   @clv.ValidateNested()
