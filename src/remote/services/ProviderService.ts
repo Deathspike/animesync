@@ -14,9 +14,10 @@ export class ProviderService {
     this.pluginService = pluginService;
   }
 
-  async contextAsync() {
+  async contextAsync(url?: string) {
     return await this.providersAsync(async (providers) => {
-      const contexts = providers.map(p => p.contextAsync());
+      const filtered = await this.filterAsync(providers, x => Promise.resolve(!url || isSupportedAsync(x, url)));
+      const contexts = filtered.map(p => p.contextAsync());
       return await Promise.all(contexts);
     });
   }
@@ -59,6 +60,12 @@ export class ProviderService {
     return result?.provider;
   }
 
+  private async filterAsync<T>(providers: Array<app.IProvider>, getAsync: (provider: app.IProvider) => Promise<T>, validate?: (item: T) => boolean) {
+    const results = await Promise.all(providers.map(x => getAsync(x).then(y => ({provider: x, result: y}))));
+    const result = results.filter(x => validate ? validate(x.result) : x.result);
+    return result?.map(x => x.provider);
+  }
+
   private async providersAsync<T>(handlerAsync: (providers: Array<app.IProvider>) => Promise<T>) {
     return await this.pluginService.providersAsync(async (externalProviders) => {
       const crunchyroll = this.moduleRef.create(Crunchyroll) as Promise<app.IProvider>;
@@ -67,4 +74,10 @@ export class ProviderService {
       return await handlerAsync(providers.concat(externalProviders));
     });
   }
+}
+
+async function isSupportedAsync(provider: app.IProvider, url: string) {
+  if (await provider.isSeriesAsync(url)) return true;
+  if (await provider.isStreamAsync(url)) return true;
+  return false;
 }

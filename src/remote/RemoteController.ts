@@ -19,8 +19,8 @@ export class RemoteController {
   @app.ResponseValidator([app.api.RemoteProvider])
   @ncm.Get()
   @nsg.ApiResponse({status: 200, type: [app.api.RemoteProvider]})
-  async contextAsync() {
-    return await this.providerService.contextAsync();
+  async contextAsync(@ncm.Query() model: app.api.RemoteQueryContext) {
+    return await this.providerService.contextAsync(model.url);
   }
 
   @app.ResponseValidator(app.api.RemoteSearch)

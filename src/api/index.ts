@@ -9,6 +9,7 @@ export * from './remote/models/RemoteSeries';
 export * from './remote/models/RemoteStreamSubtitle';
 export * from './remote/models/RemoteStreamSource';
 export * from './remote/models/RemoteStream';
+export * from './remote/queries/RemoteQueryContext';
 export * from './remote/queries/RemoteQueryPage';
 export * from './remote/queries/RemoteQuerySearch';
 export * from './remote/queries/RemoteQuerySeries';
