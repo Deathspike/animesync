@@ -29,7 +29,7 @@ async function evaluateStreamAsync() {
     const endTime = Date.now() + 10000;
     return await new Promise((resolve, reject) => {
       (function tick() {
-        const player = document.querySelector('iframe');
+        const player = Array.from(document.querySelectorAll('iframe')).filter(x => x.id === 'player').shift();
         const playerDoc = player?.contentWindow?.document;
         const playerReady = playerDoc?.readyState === 'complete' || playerDoc?.readyState === 'interactive';
         const playerMatch = playerReady && playerDoc?.body?.innerHTML.match(/var\s*show\s*=\s*({.+});/);
