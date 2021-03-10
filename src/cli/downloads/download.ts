@@ -26,7 +26,7 @@ export async function downloadAsync(api: app.Server, rootPath: string, provider:
           await tracker.trackAsync(seriesName, episodeFile);
           api.logger.info(`Finished ${episodeFile} (${elapsedTime})`);
         } else {
-          throw new Error();
+          api.logger.info(`Rejected ${episodeFile}`);
         }
       }
     }
