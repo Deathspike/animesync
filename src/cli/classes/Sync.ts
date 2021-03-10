@@ -39,7 +39,6 @@ export class Sync {
       await this.spawnAsync(ffmpeg(), ['-y']
         .concat(inputs)
         .concat(mappings)
-        .concat(['-metadata:s:a:0', 'language=jpn'])
         .concat(metadata)
         .concat(['-c', 'copy', this.episodePath]));
     } finally {
