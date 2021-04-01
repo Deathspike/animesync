@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 const core = require('module');
 const next = core['_load'];
-const packageData = require('../package.json');
+const packageData = require('../package');
 
 core['_load'] = function(request: string) {
   return fetchDependency(request)

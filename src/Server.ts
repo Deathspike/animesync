@@ -13,6 +13,7 @@ export class Server extends app.api.ServerApi {
     this.server = server;
     this.server.disable('x-powered-by');
     this.server.useLogger(this.logger);
+    this.traceVersion();
   }
 
   static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>) {
@@ -30,6 +31,12 @@ export class Server extends app.api.ServerApi {
   
   get logger() {
     return this.server.get(ash.LoggerService);
+  }
+
+  private traceVersion() {
+    const name = require('../package').name;
+    const version = require('../package').version;
+    this.logger.debug(`Running ${name} (${version})`);
   }
 }
 
