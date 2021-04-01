@@ -6,6 +6,7 @@ import {evaluateSeriesAsync} from './evaluators/series';
 import {evaluateStreamAsync} from './evaluators/stream';
 import {FunimationContext} from './FunimationContext';
 import {FunimationCredential} from './FunimationCredential';
+import {FunimationRegion} from './FunimationRegion';
 import querystring from 'querystring';
 const baseUrl = 'https://www.funimation.com';
 
@@ -42,7 +43,7 @@ export class Funimation implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const search = await page.evaluate(evaluatePage);
+      const search = FunimationRegion.search(await page.evaluate(evaluatePage));
       return this.composeService.search(pageUrl, search, headers);
     });
   }
@@ -53,7 +54,7 @@ export class Funimation implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(searchUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const search = await page.evaluate(evaluateSearch);
+      const search = FunimationRegion.search(await page.evaluate(evaluateSearch));
       return this.composeService.search(searchUrl, search, headers);
     });
   }
@@ -64,7 +65,7 @@ export class Funimation implements app.IProvider {
       await page.goto(qidSeriesUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const series = await page.evaluate(evaluateSeriesAsync);
+      const series = FunimationRegion.series(await page.evaluate(evaluateSeriesAsync));
       return this.composeService.series(qidSeriesUrl, series, headers);
     });
   }
