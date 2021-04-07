@@ -27,7 +27,7 @@ function evaluateSeries() {
    */
   function hasJapaneseAudio(season) {
     if (/\((Arabic|English|French|German|Italian|Portuguese|Russian|Spanish)(\s+Dub)?\)$/.test(season.title)) return false;
-    if (/\(Dub\)$/.test(season.title)) return false;
+    if (/\((Dub|Dubbed)\)$/.test(season.title)) return false;
     return true;
   }
 
