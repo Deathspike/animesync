@@ -28,13 +28,13 @@ export class Sync {
         .concat(foreignSubtitles);
       const inputs = [['-i', stream.sources[0].url]]
         .concat(sortedSubtitles.map(x => (['-i', x.filePath])))
-        .reduce((p, c) => p.concat(c))
+        .reduce((p, c) => p.concat(c), [])
       const mappings = [['-map', '0:v', '-map', '0:a']]
         .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
-        .reduce((p, c) => p.concat(c));
+        .reduce((p, c) => p.concat(c), []);
       const metadata = sortedSubtitles
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
-        .reduce((p, c) => p.concat(c));
+        .reduce((p, c) => p.concat(c), []);
       await fs.ensureDir(path.dirname(this.episodePath));
       await this.spawnAsync(ffmpeg(), ['-y']
         .concat(inputs)
