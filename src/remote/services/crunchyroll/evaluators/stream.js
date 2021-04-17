@@ -29,7 +29,7 @@ function evaluateStream() {
    * @returns {Array<RemoteStreamSource>}
    */
   function mapSource(dataSource) {
-    const streams = dataSource.streams.filter(x => x.format === 'adaptive_hls' && x.audio_lang === 'jaJP');
+    const streams = dataSource.streams.filter(x => x.format === 'adaptive_hls');
     const stream = streams.find(x => !x.hardsub_lang) ?? streams[0];
     if (stream) return [{url: stream.url, type: 'hls'}];
     throw new Error();
