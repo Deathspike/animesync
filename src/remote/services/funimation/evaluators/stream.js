@@ -1,42 +1,33 @@
 /**
  * Evaluate the stream.
- * @typedef {import('.').PageStream} PageStream
  * @typedef {import('.').PageStreamExperience} PageStreamExperience
  * @typedef {import('.').PageStreamExperienceTrack} PageStreamExperienceTrack
  * @typedef {import('.').PageStreamShowExperience} PageStreamShowExperience
  * @typedef {import('../../..').api.RemoteStream} RemoteStream
  * @typedef {import('../../..').api.RemoteStreamSource} RemoteStreamSource
  * @typedef {import('../../..').api.RemoteStreamSubtitle} RemoteStreamSubtitle
- * @type {PageStream}
- **/
-var TITLE_DATA;
-
-/**
- * Evaluate the stream.
  * @returns {Promise<RemoteStream>}
  **/
 async function evaluateStreamAsync() {
   const dataSource = await getDataSourceAsync();
   const sources = mapSource(dataSource.show);
-  const subtitles = mapSubtitle(dataSource.experience);
+  const subtitles = mapSubtitle(dataSource.experienceId, dataSource.experience);
   return {sources, subtitles};
 
   /**
-   * Extracts the experience.
+   * Fetch the experience.
+   * @param {HTMLIFrameElement} player
    * @returns {Promise<PageStreamExperience>}
    */
-  async function fetchExperience() {
+  async function fetchExperienceAsync(player) {
     const endTime = Date.now() + 10000;
     return await new Promise((resolve, reject) => {
       (function tick() {
-        const player = Array.from(document.querySelectorAll('iframe')).filter(x => x.id === 'player').shift();
-        const playerDoc = player?.contentWindow?.document;
-        const playerReady = playerDoc?.readyState === 'complete' || playerDoc?.readyState === 'interactive';
-        const playerMatch = playerReady && playerDoc?.body?.innerHTML.match(/var\s*show\s*=\s*({.+});/);
-        if (playerMatch) try {
-          resolve(JSON.parse(playerMatch[1]));
+        const match = player?.contentWindow?.document?.body?.innerHTML.match(/var\s*show\s*=\s*({.+});/);
+        if (match) try {
+          resolve(JSON.parse(match[1]));
         } catch {
-          reject();
+          setTimeout(tick, 0);
         } else if (endTime >= Date.now()) {
           setTimeout(tick, 0);
         } else {
@@ -47,26 +38,39 @@ async function evaluateStreamAsync() {
   }
 
   /**
+   * Fetch the experience identifier.
+   * @param {HTMLIFrameElement} player
+   * @returns {string}
+   */
+   function fetchExperienceId(player) {
+    const match = player?.getAttribute('src')?.match(/\/player\/([0-9]+)\//);
+    if (match) return match[1];
+    throw new Error();
+  }
+
+  /**
    * Fetch the show experience.
+   * @param {string} experienceId
    * @returns {Promise<PageStreamShowExperience>}
    */
-  async function fetchShowExperience() {
+  async function fetchShowExperienceAsync(experienceId) {
     const id = [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
-    const showExperienceUrl = new URL(`/api/showexperience/${TITLE_DATA.id}?pinst_id=${id}`, location.href);
+    const showExperienceUrl = new URL(`/api/showexperience/${experienceId}?pinst_id=${id}`, location.href);
     return await fetch(showExperienceUrl.toString()).then(x => x.json());
   }
 
   /**
    * Find the text tracks.
+   * @param {string} experienceId
    * @param {PageStreamExperience} experience 
    * @returns {Array<PageStreamExperienceTrack>}
    */
-  function findTextTracks(experience) {
+  function findTextTracks(experienceId, experience) {
     for (const season of experience.seasons) {
       for (const episode of season.episodes) {
         for (const language of Object.values(episode.languages)) {
           for (const alpha of Object.values(language.alpha)) {
-            if (String(alpha.experienceId) !== TITLE_DATA.id) continue;
+            if (String(alpha.experienceId) !== experienceId) continue;
             const source = alpha.sources.find(x => x.type === 'application/x-mpegURL');
             if (source) return source.textTracks;
           }
@@ -78,14 +82,14 @@ async function evaluateStreamAsync() {
 
   /**
    * Retrieve the data source.
-   * @returns {Promise<{experience: PageStreamExperience, show: PageStreamShowExperience}>}
+   * @returns {Promise<{experience: PageStreamExperience, experienceId: string, show: PageStreamShowExperience}>}
    */
   async function getDataSourceAsync() {
-    const experiencePromise = fetchExperience();
-    const showPromise = fetchShowExperience();
-    const experience = await experiencePromise;
-    const show = await showPromise;
-    return {experience, show};
+    const player = await waitForPlayerAsync();
+    const experience = await fetchExperienceAsync(player);
+    const experienceId = fetchExperienceId(player);
+    const show = await fetchShowExperienceAsync(experienceId);
+    return {experience, experienceId, show};
   }
   
   /**
@@ -101,11 +105,12 @@ async function evaluateStreamAsync() {
 
   /**
    * Map the subtitles.
+   * @param {string} experienceId
    * @param {PageStreamExperience} experience
    * @returns {Array<RemoteStreamSubtitle>}
    */
-  function mapSubtitle(experience) {
-    return findTextTracks(experience).filter(x => x.src.endsWith('.vtt') && x.type === 'Full').map(x => ({
+  function mapSubtitle(experienceId, experience) {
+    return findTextTracks(experienceId, experience).filter(x => x.src.endsWith('.vtt') && x.type === 'full').map(x => ({
       language: mapSubtitleLanguage(x.language),
       type: 'vtt',
       url: x.src
@@ -122,6 +127,28 @@ async function evaluateStreamAsync() {
     if (language === 'en') return 'en-US';
     if (language === 'pt') return 'pt-BR';
     throw new Error();
+  }
+  
+  /**
+   * Wait for the player.
+   * @returns {Promise<HTMLIFrameElement>}
+   */
+   async function waitForPlayerAsync() {
+    const endTime = Date.now() + 10000;
+    return await new Promise((resolve, reject) => {
+      (function tick() {
+        const player = Array.from(document.querySelectorAll('iframe')).filter(x => x.id === 'player').shift();
+        const playerDoc = player?.contentWindow?.document;
+        const playerReady = playerDoc?.readyState === 'complete' || playerDoc?.readyState === 'interactive';
+        if (player && playerReady) {
+          resolve(player);
+        } else if (endTime >= Date.now()) {
+          setTimeout(tick, 0);
+        } else {
+          reject();
+        }
+      })();
+    });
   }
 }
 

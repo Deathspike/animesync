@@ -5,31 +5,42 @@
  * @typedef {import('../../..').api.RemoteSeries} RemoteSeries
  * @typedef {import('../../..').api.RemoteSeriesSeason} RemoteSeriesSeason
  * @typedef {import('../../..').api.RemoteSeriesSeasonEpisode} RemoteSeriesSeasonEpisode
- * @type {PageSeries}
+ * @type {string}
  */
-var titleData;
+var region;
 
 /**
  * Evaluate the series.
  * @returns {Promise<RemoteSeries>}
  **/
 async function evaluateSeriesAsync() {
-  return {
-    genres: titleData.genres.map(x => x.name),
-    imageUrl: titleData.poster,
-    seasons: await getSeasonAsync(),
-    synopsis: titleData.synopsis,
-    title: titleData.title,
-    url: location.href.split('?')[0]
-  };
+  const data = await fetchSeriesAsync();
+  const genres = data.genres.map(x => x.name);
+  const imageUrl = data.images.find(x => x.key === 'showKeyart')?.path;
+  const seasons = await getSeasonAsync();
+  const synopsis = data.longSynopsis;
+  const title = data.name;
+  const url = location.href.split('?')[0];
+  return {genres, imageUrl, seasons, synopsis, title, url};
+
+  /**
+   * Fetch the series.
+   * @returns {Promise<PageSeries>}
+   */
+  async function fetchSeriesAsync() {
+    const region = await waitForRegionAsync();
+    const seriesUrl = new URL(`/v2${location.pathname}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`);
+    return await fetch(seriesUrl.toString()).then(x => x.json());
+  }
 
   /**
    * Fetch the season.
-   * @param {string} seasonNumber
+   * @param {string} seasonId
    * @returns {Promise<PageSeriesSeason>}
    */
-  async function fetchSeasonAsync(seasonNumber) {
-    const seasonUrl = new URL(`/api/episodes/?title_id=${titleData.id}&season=${seasonNumber}&sort=order&sort_direction=ASC`, location.href);
+  async function fetchSeasonAsync(seasonId) {
+    const region = await waitForRegionAsync();
+    const seasonUrl = new URL(`/v1/seasons/${seasonId}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`);
     return await fetch(seasonUrl.toString()).then(x => x.json());
   }
 
@@ -38,21 +49,21 @@ async function evaluateSeriesAsync() {
    * @returns {Promise<Array<RemoteSeriesSeason>>}
    */
   async function getSeasonAsync() {
-    return await Promise.all(titleData.children.filter(x => x.mediaCategory === 'season').map(async (season) => {
-      const episodes = await getSeasonEpisodeAsync(season.number);
-      const title = season.title;
+    return await Promise.all(data.seasons.map(async (season) => {
+      const episodes = await getSeasonEpisodeAsync(season.id);
+      const title = season.name;
       return {episodes, title};
     }));
   }
 
   /**
    * Retrieve the season episodes.
-   * @param {string} seasonNumber
+   * @param {string} seasonId
    * @returns {Promise<Array<RemoteSeriesSeasonEpisode>>}
    */
-  async function getSeasonEpisodeAsync(seasonNumber) {
-    const season = await fetchSeasonAsync(seasonNumber);
-    const episodes = season.items.filter(x => x.audio.includes('Japanese')).map(mapSeasonEpisode);
+  async function getSeasonEpisodeAsync(seasonId) {
+    const season = await fetchSeasonAsync(seasonId);
+    const episodes = season.episodes.filter(x => x.videoList.some(y => y.spokenLanguages.some(z => z.languageCode === 'ja'))).map(mapSeasonEpisode);
     return episodes;
   }
 
@@ -62,12 +73,31 @@ async function evaluateSeriesAsync() {
    * @returns {RemoteSeriesSeasonEpisode}
    **/
   function mapSeasonEpisode(episode) {
-    const imageUrl = episode.poster;
-    const isPremium = Boolean(episode.mostRecentSvod.subscriptionRequired);
-    const name = episode.item.episodeNum;
-    const title = episode.item.episodeName;
-    const url = new URL(`${episode.item.episodeSlug}/`, location.href).toString();
+    const imageUrl = episode.images.find(x => x.key === 'showKeyart')?.path;
+    const isPremium = Boolean(episode.isSubRequired);
+    const name = episode.episodeNumber;
+    const title = episode.name;
+    const url = new URL(`${episode.slug}/`, location.href).toString();
     return {imageUrl, isPremium, name, title, url};
+  }
+
+  /**
+   * Waits for the region.
+   * @returns {Promise<string>}
+   */
+   function waitForRegionAsync() {
+    return new Promise((resolve, reject) => {
+      const endTime = Date.now() + 10000;
+      (function tick() {
+        if (typeof region !== 'undefined') {
+          resolve(region);
+        } else if (endTime >= Date.now()) {
+          setTimeout(tick, 0);
+        } else {
+          reject();
+        }
+      })();
+    });
   }
 }
 

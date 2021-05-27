@@ -1,26 +1,24 @@
 export type PageSeries = {
-  children: Array<{mediaCategory: string, number: string, title: string}>;
   genres: Array<{name: string}>;
   id: number;
-  poster: string;
-  synopsis: string;
-  title: string;
+  images: Array<{key: string, path: string}>;
+  longSynopsis: string;
+  name: string;
+  seasons: Array<{id: string, name: string}>;
 };
 
 export type PageSeriesSeason = {
-  items: Array<PageSeriesSeasonEpisode>;
+  episodes: Array<PageSeriesSeasonEpisode>;
 };
 
 export type PageSeriesSeasonEpisode = {
-  audio: Array<string>;
-  item: {episodeName: string, episodeNum: string, episodeSlug: string};
-  mostRecentSvod: {subscriptionRequired?: boolean};
-  poster: string;
+  episodeNumber: string;
+  images: Array<{key: string, path: string}>;
+  isSubRequired: boolean;
+  name: string;
+  slug: string;
   synopsis: string;
-};
-
-export type PageStream = {
-  id: string;
+  videoList: Array<{spokenLanguages: Array<{languageCode: string}>}>;
 };
 
 export type PageStreamExperience = {
