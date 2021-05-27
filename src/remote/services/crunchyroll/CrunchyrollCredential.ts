@@ -40,6 +40,7 @@ export class CrunchyrollCredential {
   private async trySubmitAsync() {
     const navigationPromise = this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
     const submitButton = '#login_submit_button'
+    await this.page.evaluate(removeBetaOptIn);
     this.page.click('#onetrust-accept-btn-handler')
       .then(() => this.page.click(submitButton))
       .catch(() => {});
@@ -47,4 +48,10 @@ export class CrunchyrollCredential {
       .catch(() => {});
     await navigationPromise;
   }
+}
+
+function removeBetaOptIn() {
+  const optin = document.querySelector('.opt-in');
+  if (!optin || !optin.parentNode) return;
+  optin.parentNode.removeChild(optin);
 }
