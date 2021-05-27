@@ -60,7 +60,7 @@ export class Funimation implements app.IProvider {
   }
 
   async seriesAsync(seriesUrl: string) {
-    const qidSeriesUrl = new URL('?qid=None', seriesUrl).toString();
+    const qidSeriesUrl = seriesUrl; // new URL('?qid=None', seriesUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(qidSeriesUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl);
@@ -71,7 +71,7 @@ export class Funimation implements app.IProvider {
   }
 
   async streamAsync(streamUrl: string) {
-    const qidStreamUrl = new URL('?qid=None&lang=japanese', streamUrl).toString();
+    const qidStreamUrl = streamUrl; // new URL('?qid=None&lang=japanese', streamUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(qidStreamUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, qidStreamUrl);

@@ -23,7 +23,7 @@ async function evaluateStreamAsync() {
     const endTime = Date.now() + 10000;
     return await new Promise((resolve, reject) => {
       (function tick() {
-        const match = player?.contentWindow?.document?.body?.innerHTML.match(/var\s*show\s*=\s*({.+});/);
+        const match = player.contentWindow?.document?.body?.innerHTML?.match(/var\s*show\s*=\s*({.+});/);
         if (match) try {
           resolve(JSON.parse(match[1]));
         } catch {
@@ -43,7 +43,7 @@ async function evaluateStreamAsync() {
    * @returns {string}
    */
    function fetchExperienceId(player) {
-    const match = player?.getAttribute('src')?.match(/\/player\/([0-9]+)\//);
+    const match = player.src.match(/\/([0-9]+)\//);
     if (match) return match[1];
     throw new Error();
   }
@@ -81,6 +81,40 @@ async function evaluateStreamAsync() {
   }
 
   /**
+   * Forces the stream to Japanese.
+   * @param {HTMLIFrameElement} player
+   * @param {PageStreamExperience} experience 
+   * @param {string} experienceId
+   * @returns {Promise<boolean>}
+   */
+  async function forceJapaneseAsync(player, experience, experienceId) {
+    return new Promise((resolve, reject) => {
+      setTimeout(reject, 10000);
+      for (const season of experience.seasons) {
+        for (const episode of season.episodes) {
+          for (const languageKey of Object.keys(episode.languages)) {
+            const language = episode.languages[languageKey];
+            if (Object.values(language.alpha).every(x => String(x.experienceId) !== experienceId)) {
+              continue;
+            } else if (languageKey.toLowerCase() === 'japanese') {
+              resolve(false);
+              break;
+            } else if (!episode.languages.japanese) {
+              resolve(false);
+              continue;
+            } else {
+              player.src = player.src.replace(/\/([0-9]+)\//, `/${Object.values(episode.languages.japanese.alpha).map(x => x.experienceId).shift()}/`);
+              player.addEventListener('load', () => resolve(true));
+              player.addEventListener('error', () => reject());
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Retrieve the data source.
    * @returns {Promise<{experience: PageStreamExperience, experienceId: string, show: PageStreamShowExperience}>}
    */
@@ -88,6 +122,7 @@ async function evaluateStreamAsync() {
     const player = await waitForPlayerAsync();
     const experience = await fetchExperienceAsync(player);
     const experienceId = fetchExperienceId(player);
+    if (await forceJapaneseAsync(player, experience, experienceId)) return await getDataSourceAsync();
     const show = await fetchShowExperienceAsync(experienceId);
     return {experience, experienceId, show};
   }
@@ -110,11 +145,9 @@ async function evaluateStreamAsync() {
    * @returns {Array<RemoteStreamSubtitle>}
    */
   function mapSubtitle(experienceId, experience) {
-    return findTextTracks(experienceId, experience).filter(x => x.src.endsWith('.vtt') && x.type === 'full').map(x => ({
-      language: mapSubtitleLanguage(x.language),
-      type: 'vtt',
-      url: x.src
-    }));
+    return findTextTracks(experienceId, experience)
+      .filter(x => x.src.endsWith('.vtt') && x.type.toLowerCase() === 'full')
+      .map(x => ({language: mapSubtitleLanguage(x.language), type: 'vtt', url: x.src}));
   }
 
   /**
