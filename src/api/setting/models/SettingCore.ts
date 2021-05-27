@@ -14,6 +14,7 @@ export class SettingCore {
     this.chromeTimeoutNavigation = api.property('chromeTimeoutNavigation', source, sourcePatch, 0);
     this.chromeViewport = api.property('chromeViewport', source, sourcePatch, '');
     this.fetchTimeout = api.property('fetchTimeout', source, sourcePatch, 0);
+    this.ffmpeg = api.property('ffmpeg', source, sourcePatch, undefined);
     this.proxyServer = api.property('proxyServer', source, sourcePatch, undefined);
   }
 
@@ -67,6 +68,11 @@ export class SettingCore {
   @clt.Type(() => Number)
   @nsg.ApiProperty()
   readonly fetchTimeout: number;
+
+  @clv.IsOptional()
+  @clv.IsString()
+  @nsg.ApiProperty()
+  readonly ffmpeg?: string;
 
   @clv.IsOptional()
   @clv.IsString()
