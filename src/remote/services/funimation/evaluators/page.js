@@ -1,46 +1,51 @@
 /**
  * Evaluate the page.
+ * @typedef {import('.').PageSearch} PageSearch
  * @typedef {import('../../..').api.RemoteSearch} RemoteSearch
  * @typedef {import('../../..').api.RemoteSearchSeries} RemoteSearchSeries
  * @returns {RemoteSearch}
  **/
 function evaluatePage() {
-  const series = mapSeries();
-  const hasMorePages = Boolean(series.length);
+  const search = getSearch();
+  const series = mapSeries(search);
+  const hasMorePages = search.count > search.offset + search.limit;
   return {hasMorePages, series};
 
   /**
-   * Map the series.
-   * @returns {Array<RemoteSearchSeries>}
+   * Get the search result.
+   * @returns {PageSearch}
    */
-  function mapSeries() {
-    return Array.from(document.querySelectorAll('.show-wrapper')).map((containerNode) => {
-      const imageUrl = processUrl(containerNode.querySelector('img'), 'data-src');
-      const title = validateStrict(containerNode.querySelector('.name a'));
-      const url = processUrl(containerNode.querySelector('.name a')).split('?')[0];
-      return {imageUrl, title, url};
-    });
+  function getSearch() {
+    const textContent = document.body.textContent;
+    if (textContent) return JSON.parse(textContent);
+    throw new Error();
   }
 
   /**
-   * Process the URL.
-   * @throws If the URL is invalid.
-   * @param {Element|string?} value 
-   * @param {string=} attributeName
-   * @returns {string}
+   * Map the series.
+   * @param {PageSearch} search
+   * @returns {Array<RemoteSearchSeries>}
    */
-  function processUrl(value, attributeName) {
-    if (typeof value === 'string') {
-      return new URL(value, location.href).toString();
-    } else if (value && value.nodeName === 'A') {
-      return processUrl((attributeName && value.getAttribute(attributeName)) ?? value.getAttribute('href'));
-    } else if (value && value.nodeName === 'IMG') {
-      return processUrl((attributeName && value.getAttribute(attributeName)) ?? value.getAttribute('src'));
-    } else {
-      throw new Error();
-    }
+  function mapSeries(search) {
+    return search.items.hits.map(data => ({
+      imageUrl: processImageUrl(data.images),
+      title: data.title,
+      url: new URL(data.showUrl, 'https://www.funimation.com/').toString()
+    }));
   }
   
+  /**
+   * Process the image.
+   * @param {Record<String, string>} images
+   * @returns {string}
+   */
+  function processImageUrl(images) {
+    const entries = Object.entries(images);
+    const keyart = entries.find(([k]) => k === 'showKeyart');
+    if (keyart) return validateStrict(keyart[1]);
+    throw new Error();
+  }
+
   /**
    * Validate the text content.
    * @param {(Element|string)?} value 

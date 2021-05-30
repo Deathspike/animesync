@@ -7,22 +7,21 @@ export class FunimationContext {
 
   static pages(): Array<app.api.RemoteProviderPage> {
     return [
-      {type: 'oneOf', id: 'popularity', label: 'Popular', options: []},
       {type: 'oneOf', id: 'date', label: 'Updated', options: []},
-      {type: 'oneOf', id: 'genres', label: 'Genres', options: [
-        {id: 'action-adventure', label: 'Action/Adventure'},
-        {id: 'comedy', label: 'Comedy'},
-        {id: 'drama', label: 'Drama'},
-        {id: 'fan-service', label: 'Fan Service'},
-        {id: 'fantasy', label: 'Fantasy'},
-        {id: 'horror', label: 'Horror'},
-        {id: 'live-action', label: 'Live-Action'},
-        {id: 'psychological', label: 'Psychological'},
-        {id: 'romance', label: 'Romance'},
-        {id: 'sci-fi', label: 'Sci Fi'},
-        {id: 'shoujo', label: 'Shoujo'},
-        {id: 'shounen', label: 'Shounen'},
-        {id: 'slice-of-life', label: 'Slice Of Life'}
+      {type: 'mixOf', id: 'genres', label: 'Genres', options: [
+        {id: 'Action/Adventure', label: 'Action/Adventure'},
+        {id: 'Comedy', label: 'Comedy'},
+        {id: 'Drama', label: 'Drama'},
+        {id: 'Fan Service', label: 'Fan Service'},
+        {id: 'Fantasy', label: 'Fantasy'},
+        {id: 'Horror', label: 'Horror'},
+        {id: 'Live-Action', label: 'Live-Action'},
+        {id: 'Psychological', label: 'Psychological'},
+        {id: 'Romance', label: 'Romance'},
+        {id: 'Sci Fi', label: 'Sci Fi'},
+        {id: 'Shoujo', label: 'Shoujo'},
+        {id: 'Shounen', label: 'Shounen'},
+        {id: 'Slice of Life', label: 'Slice Of Life'}
       ]}
     ];
   }

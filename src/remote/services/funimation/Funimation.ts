@@ -60,35 +60,34 @@ export class Funimation implements app.IProvider {
   }
 
   async seriesAsync(seriesUrl: string) {
-    const qidSeriesUrl = seriesUrl; // new URL('?qid=None', seriesUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(qidSeriesUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, qidSeriesUrl);
+      await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = FunimationRegion.series(await page.evaluate(evaluateSeriesAsync));
-      return this.composeService.series(qidSeriesUrl, series, headers);
+      return this.composeService.series(seriesUrl, series, headers);
     });
   }
 
   async streamAsync(streamUrl: string) {
-    const qidStreamUrl = streamUrl; // new URL('?qid=None&lang=japanese', streamUrl).toString();
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(qidStreamUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, qidStreamUrl);
+      await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
+      await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
-      return await this.composeService.streamAsync(qidStreamUrl, stream, headers);
+      return await this.composeService.streamAsync(streamUrl, stream, headers);
     });
   }
 }
 
 function createPageUrl(page?: app.api.RemoteProviderPage, options?: Array<string>, pageNumber = 1) {
-  if (page && page.id === 'genres') return options && options.length && page.options.find(x => x.id === options[0])
-    ? new URL(`/shows/all-shows/?${querystring.stringify({genre: options[0], audio: 'japanese', sort: 'date', p: pageNumber})}`, baseUrl)
-    : new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: 'date', p: pageNumber})}`, baseUrl);
-  return page
-    ? new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: page.id, p: pageNumber})}`, baseUrl)
-    : new URL(`/shows/all-shows/?${querystring.stringify({audio: 'japanese', sort: 'popularity', p: pageNumber})}`, baseUrl);
+  const index = 'catalog-shows';
+  const sort = 'latestAvail|desc';
+  const f = ['language|Japanese'].concat(options && options.length && options.every(x => page?.options.find(y => x === y.id)) ? options.map(x => `genre|${x}`) : []);
+  const lang = 'Japanese';
+  const limit = 25;
+  const offset = (pageNumber - 1) * 25;
+  return new URL(`/v1/search?${querystring.stringify({index, sort, f, lang, limit, offset,})}`, 'https://search.prd.funimationsvc.com');
 }
 
 const defaultHeaders = {
