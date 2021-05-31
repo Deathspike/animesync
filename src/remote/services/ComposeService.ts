@@ -41,9 +41,9 @@ export class ComposeService {
     });
   }
 
-  private async sourceAsync(manifestUrl: string, headers?: Record<string, string>) {
+  private async sourceAsync(masterUrl: string, headers?: Record<string, string>) {
     const streams = await this.agentService
-      .fetchAsync(new URL(manifestUrl), {headers})
+      .fetchAsync(new URL(masterUrl), {headers})
       .then(x => x.text())
       .then(x => app.HlsManifest.from(x).fetchStreams());
     return streams.map(x => new app.api.RemoteStreamSource({
@@ -51,7 +51,7 @@ export class ComposeService {
       resolutionX: x.resolution.x || undefined,
       resolutionY: x.resolution.y || undefined,
       type: 'hls',
-      url: this.rewriteService.hlsUrl(manifestUrl, x.url, headers)
+      url: this.rewriteService.masterUrl(masterUrl, x.url, headers)
     }));
   }
 }

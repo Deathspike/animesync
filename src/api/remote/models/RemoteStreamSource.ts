@@ -45,7 +45,7 @@ export class RemoteStreamSource {
   readonly type: 'hls';
 
   @clv.IsString()
-  @clv.IsUrl({require_tld: false})
+  /*@clv.IsUrl({require_tld: false})*/
   @nsg.ApiProperty()
   readonly url: string;
 }

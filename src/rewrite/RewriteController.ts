@@ -16,26 +16,45 @@ export class RewriteController {
     this.hlsService = hlsService;
   }
   
-  @ncm.Get(':url')
+  @ncm.Get(':emulateUrl')
   async emulateAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
     @ncm.Param() params: app.api.RewriteParamEmulate,
     @ncm.Res() response: express.Response) {
-    await this.agentService.forwardAsync(new URL(params.url), response, {headers: {...headers, ...query}});
+    await this.agentService.forwardAsync(new URL(params.emulateUrl), response, {headers: {...headers, ...query}});
   }
 
-  @ncm.Get('hls/:url')
-  async hlsAsync(
+  @ncm.Get('master/:masterUrl/:mediaUrl')
+  async masterAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamHls,
+    @ncm.Param() params: app.api.RewriteParamMaster,
     @ncm.Res() response: express.Response) {
     delete headers['range'];
-    const result = await this.agentService.fetchAsync(new URL(params.url), {headers: {...headers, ...query}});
+    const result = await this.agentService.fetchAsync(new URL(params.masterUrl), {headers: {...headers, ...query}});
     if (result.status === 200) {
-      const manifest = await result.text();
-      response.send(this.hlsService.rewrite(params.url, manifest, query));
+      const hls = app.HlsManifest.from(await result.text());
+      this.hlsService.stream(params.mediaUrl, hls);
+      this.hlsService.rewrite(params.masterUrl, hls, query);
+      response.send(hls.toString());
+    } else {
+      response.sendStatus(500);
+    }
+  }
+
+  @ncm.Get('media/:mediaUrl')
+  async mediaAsync(
+    @ncm.Headers() headers: Record<string, string>,
+    @ncm.Query() query: Record<string, string>,
+    @ncm.Param() params: app.api.RewriteParamMedia,
+    @ncm.Res() response: express.Response) {
+    delete headers['range'];
+    const result = await this.agentService.fetchAsync(new URL(params.mediaUrl), {headers: {...headers, ...query}});
+    if (result.status === 200) {
+      const hls = app.HlsManifest.from(await result.text());
+      this.hlsService.rewrite(params.mediaUrl, hls, query);
+      response.send(hls.toString());
     } else {
       response.sendStatus(500);
     }

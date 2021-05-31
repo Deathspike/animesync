@@ -4,11 +4,11 @@ import * as nsg from '@nestjs/swagger';
 
 export class RewriteParamEmulate {
   constructor(source?: RewriteParamEmulate, sourcePatch?: Partial<RewriteParamEmulate>) {
-    this.url = api.property('url', source, sourcePatch, '');
+    this.emulateUrl = api.property('emulateUrl', source, sourcePatch, '');
   }
 
   @clv.IsString()
   @clv.IsUrl()
   @nsg.ApiProperty()
-  readonly url: string;
+  readonly emulateUrl: string;
 }

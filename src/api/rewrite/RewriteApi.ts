@@ -10,13 +10,19 @@ export class RewriteApi {
 
   async emulateAsync(model: api.RewriteParamEmulate, headers?: Record<string, string>) {
     const query = api.queryString(headers);
-    const url = new URL(`/api/rewrite/${encodeURIComponent(model.url)}` + query, this.baseUrl);
+    const url = new URL(`/api/rewrite/${encodeURIComponent(model.emulateUrl)}` + query, this.baseUrl);
     return await fetch(url);
   }
 
-  async hlsAsync(model: api.RewriteParamHls, headers?: Record<string, string>) {
+  async masterAsync(model: api.RewriteParamMaster, headers?: Record<string, string>) {
     const query = api.queryString(headers);
-    const url = new URL(`/api/rewrite/${encodeURIComponent(model.url)}` + query, this.baseUrl);
+    const url = new URL(`/api/rewrite/${encodeURIComponent(model.masterUrl)}/${encodeURIComponent(model.mediaUrl)}` + query, this.baseUrl);
+    return await fetch(url);
+  }
+
+  async mediaAsync(model: api.RewriteParamMedia, headers?: Record<string, string>) {
+    const query = api.queryString(headers);
+    const url = new URL(`/api/rewrite/${encodeURIComponent(model.mediaUrl)}` + query, this.baseUrl);
     return await fetch(url);
   }
 }

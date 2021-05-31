@@ -4,15 +4,22 @@ import querystring from 'querystring';
 
 @ncm.Injectable()
 export class RewriteService {
-  emulateUrl(baseUrl: string, relativeUrl: string, headers?: Record<string, string>) {
+  emulateUrl(emulateUrl: string, relativeUrl: string, headers?: Record<string, string>) {
+    const safeEmulateUrl = encodeURIComponent(new URL(relativeUrl, emulateUrl).toString());
     const safeQuery = querystring.stringify(headers);
-    const safeUrl = encodeURIComponent(new URL(relativeUrl, baseUrl).toString());
-    return new URL(`/api/rewrite/${safeUrl}?${safeQuery}`, app.settings.server.url).toString();
+    return new URL(`/api/rewrite/${safeEmulateUrl}?${safeQuery}`, app.settings.server.url).toString();
   }
 
-  hlsUrl(baseUrl: string, relativeUrl: string, headers?: Record<string, string>) {
+  masterUrl(masterUrl: string, relativeMediaUrl: string, headers?: Record<string, string>) {
+    const safeMasterUrl = encodeURIComponent(masterUrl);
+    const safeMediaUrl = encodeURIComponent(new URL(relativeMediaUrl, masterUrl).toString());
     const safeQuery = querystring.stringify(headers);
-    const safeUrl = encodeURIComponent(new URL(relativeUrl, baseUrl).toString());
-    return new URL(`/api/rewrite/hls/${safeUrl}?${safeQuery}`, app.settings.server.url).toString();
+    return new URL(`/api/rewrite/master/${safeMasterUrl}/${safeMediaUrl}?${safeQuery}`, app.settings.server.url).toString();
+  }
+
+  mediaUrl(masterOrMediaUrl: string, relativeMediaUrl: string, headers?: Record<string, string>) {
+    const safeMediaUrl = encodeURIComponent(new URL(relativeMediaUrl, masterOrMediaUrl).toString());
+    const safeQuery = querystring.stringify(headers);
+    return new URL(`/api/rewrite/media/${safeMediaUrl}?${safeQuery}`, app.settings.server.url).toString();
   }
 }
