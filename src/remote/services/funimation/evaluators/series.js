@@ -73,7 +73,7 @@ async function evaluateSeriesAsync() {
    * @returns {RemoteSeriesSeasonEpisode}
    **/
   function mapSeasonEpisode(episode) {
-    const imageUrl = episode.images.find(x => x.key === 'showKeyart')?.path;
+    const imageUrl = episode.images.find(x => x.key === 'episodeThumbnail')?.path;
     const isPremium = Boolean(episode.isSubRequired);
     const name = episode.episodeNumber;
     const title = episode.name;
