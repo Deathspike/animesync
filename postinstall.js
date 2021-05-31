@@ -38,9 +38,6 @@ switch (process.platform) {
   case 'darwin':
     ffmpegAsync('ffmpeg', 'ffmpeg/mac/ffmpeg.gz');
     break;
-  case 'linux':
-    ffmpegAsync('ffmpeg', 'ffmpeg/linux/ffmpeg.gz');
-    break;
   case 'win32':
     ffmpegAsync('ffmpeg.exe', 'ffmpeg/windows/ffmpeg.exe.gz');
     break;

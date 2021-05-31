@@ -86,12 +86,10 @@ function ffmpeg() {
   switch (process.platform) {
     case 'darwin':
       return app.settings.core.ffmpeg ?? path.join(__dirname, '../../../static/ffmpeg');
-    case 'linux':
-      return app.settings.core.ffmpeg ?? path.join(__dirname, '../../../static/ffmpeg');
     case 'win32':
       return app.settings.core.ffmpeg ?? path.join(__dirname, '../../../static/ffmpeg.exe');
     default:
-      return app.settings.core.ffmpeg ??'ffmpeg';
+      return app.settings.core.ffmpeg ?? 'ffmpeg';
   }
 }
 

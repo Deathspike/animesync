@@ -16,30 +16,26 @@ Streaming services allow watching *anime* in a *convenient* and *legal* way. How
 
 This application is not endorsed or affliated with any streaming service. The usage of this application may be forbidden by law in your country. Usage of this application may cause a violation of *Terms of Service* between you and the streaming service. This application is not responsible for your actions.
 
-# Prerequisites
-
-* NodeJS >= 14 (http://nodejs.org/)
-* NPM >= 6 (https://www.npmjs.org/)
-
 # Install
 
 ## Windows
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Install *NodeJS* following the instructions at http://nodejs.org/
+2. Install *NodeJS* following the instructions at http://nodejs.org/ (`node` >= 14, `npm` >= 6)
 3. Run in *Command Prompt*: `npm install -g animesync`
 
 ## Mac
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Install *NodeJS* following the instructions at http://nodejs.org/
+2. Install *NodeJS* following the instructions at http://nodejs.org/ (`node` >= 14, `npm` >= 6)
 3. Run in *Terminal*: `npm install -g animesync`
 
-## Linux (Mint, Ubuntu, etc)
+## Linux (Debian, Ubuntu, Mint)
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Run in *Terminal*: `sudo apt-get install nodejs npm`
-3. Run in *Terminal*: `sudo npm install -g animesync`
+2. Install *NodeJS* following the instructions at http://nodejs.org/ (`node` >= 14, `npm` >= 6)
+3. Run in *Terminal*: `sudo apt-get install ffmpeg`
+4. Run in *Terminal*: `npm install -g animesync`
 
 # Update
 
@@ -53,10 +49,10 @@ This application is not endorsed or affliated with any streaming service. The us
 1. Ensure that `animesync` is [installed](#Install)
 2. Run in *Terminal*: `npm install -g animesync`
 
-## Linux (Mint, Ubuntu, etc)
+## Linux (Debian, Ubuntu, Mint)
 
 1. Ensure that `animesync` is [installed](#Install)
-2. Run in *Terminal*: `sudo npm install -g animesync`
+2. Run in *Terminal*: `npm install -g animesync`
 
 # Streaming Services
 
