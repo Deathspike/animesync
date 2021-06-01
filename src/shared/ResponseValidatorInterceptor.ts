@@ -4,7 +4,7 @@ import * as ncm from '@nestjs/common';
 import * as rop from 'rxjs/operators';
 import express from 'express';
 
-export class ResponseValidatorInterceptor<T> implements ncm.NestInterceptor {
+export class ResponseValidatorInterceptor<T extends object> implements ncm.NestInterceptor {
   private readonly cls: Array<ncm.Type<T>> | ncm.Type<T>;
   private readonly options?: clt.ClassTransformOptions;
 

@@ -1,3 +1,4 @@
+export * from './utilities';
 export * from './remote/models/RemoteProviderPageOption';
 export * from './remote/models/RemoteProviderPage';
 export * from './remote/models/RemoteProvider';
@@ -24,4 +25,3 @@ export * from './setting/models/SettingCredential';
 export * from './setting/models/SettingPath';
 export * from './setting/SettingApi';
 export * from './ServerApi';
-export * from './utilities';

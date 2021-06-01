@@ -24,7 +24,7 @@ export class RemoteQueryPage {
 
   @clv.IsOptional()
   @clv.IsArray()
-  @clt.Transform(x => [].concat(x))
+  @clt.Transform(x => [].concat(x.value))
   @nsg.ApiPropertyOptional({type: [String]})
   readonly options?: Array<string>;
 
