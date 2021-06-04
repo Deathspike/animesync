@@ -29,7 +29,7 @@ export class Sync {
       const inputs = [['-i', stream.sources[0].url]]
         .concat(sortedSubtitles.map(x => (['-i', x.filePath])))
         .reduce((p, c) => p.concat(c), [])
-      const mappings = [['-map', '0:v', '-map', '0:a']]
+      const mappings = [['-map', '0:v:0', '-map', '0:a:0']]
         .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
         .reduce((p, c) => p.concat(c), []);
       const metadata = sortedSubtitles
