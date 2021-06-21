@@ -29,8 +29,8 @@ export class HlsService {
       if (hls[i].type !== 'EXT-X-STREAM-INF') continue;
       for (let j = i; j < hls.length; j++) {
         if (hls[j].type) continue;
-        if (hls[j].data.split('?')[0] === mediaUrl.split('?')[0]) break;
-        hls.splice(i, j - --i);
+        if (hls[j].data.split('?')[0] === mediaUrl.split('?')[0]) mediaUrl = '';
+        else hls.splice(i, j - --i);
         break;
       }
     }
