@@ -13,7 +13,9 @@ export class SettingCore {
     this.chromeTimeoutInactive = api.property('chromeTimeoutInactive', source, sourcePatch, 0);
     this.chromeTimeoutNavigation = api.property('chromeTimeoutNavigation', source, sourcePatch, 0);
     this.chromeViewport = api.property('chromeViewport', source, sourcePatch, '');
-    this.fetchTimeout = api.property('fetchTimeout', source, sourcePatch, 0);
+    this.fetchMaximumRetries = api.property('fetchMaximumRetries', source, sourcePatch, 0);
+    this.fetchTimeoutRequest = api.property('fetchTimeoutRequest', source, sourcePatch, 0);
+    this.fetchTimeoutRetry = api.property('fetchTimeoutRetry', source, sourcePatch, 0);
     this.ffmpeg = api.property('ffmpeg', source, sourcePatch, undefined);
     this.proxyServer = api.property('proxyServer', source, sourcePatch, undefined);
   }
@@ -67,7 +69,19 @@ export class SettingCore {
   @clv.Min(1)
   @clt.Type(() => Number)
   @nsg.ApiProperty()
-  readonly fetchTimeout: number;
+  readonly fetchMaximumRetries: number;
+
+  @clv.IsNumber()
+  @clv.Min(1)
+  @clt.Type(() => Number)
+  @nsg.ApiProperty()
+  readonly fetchTimeoutRequest: number;
+
+  @clv.IsNumber()
+  @clv.Min(1)
+  @clt.Type(() => Number)
+  @nsg.ApiProperty()
+  readonly fetchTimeoutRetry: number;
 
   @clv.IsOptional()
   @clv.IsString()

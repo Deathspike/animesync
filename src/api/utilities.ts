@@ -1,8 +1,8 @@
-import {RequestInit} from 'node-fetch';
+import * as fch from 'node-fetch';
 import fetch from 'node-fetch';
 import querystring from 'querystring';
 
-export async function jsonAsync<T>(url: URL, init?: RequestInit) {
+export async function jsonAsync<T>(url: URL, init?: fch.RequestInit) {
   try {
     const response = await fetch(url, init);
     if (response.status === 200) {

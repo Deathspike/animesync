@@ -44,7 +44,7 @@ export class ComposeService {
   private async sourceAsync(masterUrl: string, headers?: Record<string, string>) {
     const streams = await this.agentService
       .fetchAsync(new URL(masterUrl), {headers})
-      .then(x => x.text())
+      .then(x => x.buffer.toString('utf8'))
       .then(x => app.HlsManifest.from(x).fetchStreams());
     return streams.map(x => new app.api.RemoteStreamSource({
       bandwidth: x.bandwidth || undefined,

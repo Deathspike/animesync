@@ -23,7 +23,9 @@ const defaultCore = new app.api.SettingCore({
   chromeTimeoutInactive: 600000,
   chromeTimeoutNavigation: 30000,
   chromeViewport: '1920x974',
-  fetchTimeout: 30000,
+  fetchMaximumRetries: 8,
+  fetchTimeoutRequest: 30000,
+  fetchTimeoutRetry: 3750,
   ffmpeg: undefined
 });
 

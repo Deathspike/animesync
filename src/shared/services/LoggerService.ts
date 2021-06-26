@@ -11,33 +11,27 @@ export class LoggerService implements ncm.LoggerService {
   }
 
   debug(value: string) {
-    this.logger.debug(value);
+    this.logger.debug(extract(value));
   }
   
   error(value: Error | string, trace?: string) {
-    if (value instanceof Error) {
-      this.logger.error(formatError(value.stack ?? value.message));
-    } else if (trace) {
-      this.logger.error(formatError(trace));
-    } else {
-      this.logger.error(formatError(value));
-    }
+    this.logger.error(extract(value, trace));
   }
 
   info(value: string) {
-    this.logger.info(value);
+    this.logger.info(extract(value));
   }
 
   log(value: string) {
-    this.logger.debug(value);
+    this.logger.debug(extract(value));
   }
   
   verbose(value: string) {
-    this.logger.debug(value);
+    this.logger.debug(extract(value));
   }
 
   warn(value: string) {
-    this.logger.debug(value);
+    this.logger.debug(extract(value));
   }
 }
 
@@ -60,10 +54,8 @@ function createLogger() {
   });
 }
 
-function formatError(value: string) {
-  if (/^Error:\s/i.test(value)) {
-    return value;
-  } else {
-    return `Error: ${value}`;
-  }
+function extract(value: any, trace?: any) {
+  return value instanceof Error
+    ? value.stack ?? value.message
+    : trace ?? value;
 }

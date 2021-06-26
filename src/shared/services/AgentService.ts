@@ -10,24 +10,38 @@ import express from 'express';
 export class AgentService implements ncm.OnModuleDestroy {
   private readonly httpAgent: app.AgentHttp;
   private readonly httpsAgent: app.AgentHttps;
+  private readonly loggerService: app.LoggerService;
   
-  constructor() {
+  constructor(loggerService: app.LoggerService) {
     this.httpAgent = new app.AgentHttp({keepAlive: true});
     this.httpsAgent = new app.AgentHttps({keepAlive: true});
+    this.loggerService = loggerService;
   }
 
   async fetchAsync(url: URL, options?: fch.RequestInit) {
-    const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
-    const headers = this.getHeaders(options && options.headers ? options.headers : {});
-    const signal = this.createSignal();
-    headers['host'] = url.host ?? '';
-    return await fetch(url, {...options, agent, headers, signal});
+    for (let i = 0; ; i++) {
+      try {
+        const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
+        const headers = this.getHeaders(options && options.headers ? options.headers : {});
+        headers['host'] = url.host ?? '';
+        const result = await fetch(url, {...options, agent, headers, signal: createSignal()});
+        const buffer = await result.buffer();
+        const status = result.status;
+        if (status >= 200 && status < 300) return {buffer, status};
+        throw new Error(`Unexpected status: ${status}`);
+      } catch (error) {
+        if (i >= app.settings.core.fetchMaximumRetries) throw error;
+        this.loggerService.debug(error);
+        await new Promise<void>((resolve) => setTimeout(resolve, app.settings.core.fetchTimeoutRetry));
+      }
+    }
   }
 
-  async forwardAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
+  async proxyAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
+    const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
     const compress = false;
     const redirect = 'manual';
-    const result = await this.fetchAsync(url, {...options, compress, redirect});
+    const result = await fetch(url, {...options, agent, compress, redirect});
     response.status(result.status);
     Object.entries(this.getHeaders(result.headers)).forEach(([k, v]) => response.header(k, v));
     result.body.pipe(response);
@@ -45,12 +59,12 @@ export class AgentService implements ncm.OnModuleDestroy {
     this.httpAgent.destroy();
     this.httpsAgent.destroy();
   }
-  
-  private createSignal() {
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), app.settings.core.fetchTimeout);
-    return controller.signal;
-  }
+}
+
+function createSignal() {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), app.settings.core.fetchTimeoutRequest);
+  return controller.signal;
 }
 
 function isIterable(object: unknown): object is Iterable<unknown> {

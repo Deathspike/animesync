@@ -15,6 +15,6 @@ export class HttpProxyMiddleware implements ncm.NestMiddleware {
     const body = request.body;
     const headers = this.agentService.getHeaders(request.headers);
     const method = request.method;
-    await this.agentService.forwardAsync(new URL(request.url), response, {body, headers, method});
+    await this.agentService.proxyAsync(new URL(request.url), response, {body, headers, method});
   }
 }

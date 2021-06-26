@@ -188,10 +188,16 @@ Options:
                                       -> 30000
   --chromeViewport [string]           Chrome viewport while headless.
                                       -> 1920x974
-  --fetchTimeout [number]             Fetch timeout in milliseconds.
+  --fetchMaximumRetries [number]      Fetch maximum retries.
+                                      -> 8
+  --fetchTimeoutRequest [number]      Fetch request timeout in milliseconds.
                                       -> 30000
+  --fetchTimeoutRetry [number]        Fetch retry timeout in milliseconds.
+                                      -> 3750
+  --ffmpeg [string]                   Path to custom ffmpeg executable.
+                                      ->
   --proxyServer [string]              Proxy server for network traffic.
-                                      -> 
+                                      ->
   -h, --help                          display help for command
 ```
 
