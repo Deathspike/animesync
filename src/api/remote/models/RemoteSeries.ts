@@ -33,6 +33,7 @@ export class RemoteSeries {
 
   @clv.IsOptional()
   @clv.IsString()
+  @clv.IsNotEmpty()
   @nsg.ApiPropertyOptional()
   readonly synopsis?: string;
   

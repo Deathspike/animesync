@@ -1,46 +1,43 @@
 import * as app from '../..';
 import * as cli from '..';
+import fs from 'fs-extra';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
-export async function downloadAsync(api: app.Server, rootPath: string, provider: app.api.RemoteProvider, series: app.api.RemoteSeries, options?: cli.IOptions) {
-  const seriesName = sanitizeFilename(series.title);
-  const tracker = new cli.Tracker(app.settings.path.library);
-  for (const season of series.seasons) {
+export async function downloadAsync(api: app.Server, seriesPath: string, series: app.api.RemoteSeries, options?: cli.IOptions) {
+  const tracker = new cli.Tracker(seriesPath);
+  await cli.updateSeriesAsync(seriesPath, series);
+  for (let seasonIndex = 0; seasonIndex < series.seasons.length; seasonIndex++) {
+    const season = series.seasons[seasonIndex];
     const seasonName = sanitizeFilename(season.title);
-    for (const episode of season.episodes) {
+    const seasonPath = path.join(seriesPath, seasonName);
+    for (let episodeIndex = 0; episodeIndex < season.episodes.length; episodeIndex++) {
       const elapsedTime = new cli.Timer();
-      const episodeName = sanitizeFilename(episode.name);
-      const episodeFile = getEpisodeFile(provider, series, seasonName, episodeName);
-      if (await tracker.existsAsync(seasonName, episodeFile) || await tracker.existsAsync(seriesName, episodeFile)) {
-        api.logger.info(`Skipping ${episodeFile}`);
+      const episode = season.episodes[episodeIndex];
+      const episodeName = sanitizeFilename(`${seasonName} ${episode.name.padStart(2, '0')} [AnimeSync]`);
+      const episodePath = path.join(seasonPath, episodeName);
+      const outputPath = `${episodePath}.mkv`;
+      if (await tracker.existsAsync(seasonName, episodeName) && await fs.pathExists(outputPath)) {
+        api.logger.info(`Skipping ${episodeName}`);
+        await cli.updateEpisodeInfoAsync(seasonPath, episodePath, seasonIndex, episodeIndex, episode);
+      } else if (await tracker.existsAsync(seasonName, episodeName)) {
+        api.logger.info(`Skipping ${episodeName}`);
       } else if (options && options.skipDownload) {
-        api.logger.info(`Tracking ${episodeFile}`);
-        await tracker.trackAsync(seriesName, episodeFile);
+        api.logger.info(`Tracking ${episodeName}`);
+        await tracker.trackAsync(seasonName, episodeName);
       } else {
-        api.logger.info(`Fetching ${episodeFile}`);
+        api.logger.info(`Fetching ${episodeName}`);
         const stream = await api.remote.streamAsync({url: episode.url});
-        if (stream.value) {
-          const sync = new cli.Sync(api, `${path.join(rootPath, seriesName, episodeFile)}.mkv`);
+        const sync = new cli.Sync(api, outputPath);
+        if (stream.value && sync) {
+          await cli.updateEpisodeInfoAsync(seasonPath, episodePath, seasonIndex, episodeIndex, episode);
           await sync.saveAsync(stream.value);
-          await tracker.trackAsync(seriesName, episodeFile);
-          api.logger.info(`Finished ${episodeFile} (${elapsedTime})`);
+          await tracker.trackAsync(seasonName, episodeName);
+          api.logger.info(`Finished ${episodeName} (${elapsedTime})`);
         } else {
-          api.logger.info(`Rejected ${episodeFile}`);
+          api.logger.info(`Rejected ${episodeName}`);
         }
       }
     }
-  }
-}
-
-function getEpisodeFile(provider: app.api.RemoteProvider, series: app.api.RemoteSeries, seasonName: string, episodeName: string) {
-  const seasonMatch = seasonName.match(/^Season\s+([0-9\.]+)$/i);
-  const seasonNumber = seasonMatch && parseFloat(seasonMatch[1]).toString().padStart(2, '0');
-  const episodeNumber = episodeName.padStart(Number(/^[0-9\.]+$/.test(episodeName)) + 1, '0');
-  if (seasonNumber) {
-    const seriesName = sanitizeFilename(series.title);
-    return `${seriesName} ${seasonNumber}x${episodeNumber} [${provider.label}]`;
-  } else {
-    return `${seasonName} ${episodeNumber} [${provider.label}]`;
   }
 }

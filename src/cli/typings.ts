@@ -4,5 +4,6 @@ export type ILibrary = {
 };
 
 export type IOptions = {
+  rootPath?: string;
   skipDownload?: true;
 };

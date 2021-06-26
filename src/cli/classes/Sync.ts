@@ -8,12 +8,12 @@ import path from 'path';
 
 export class Sync {
   private readonly api: app.Server;
-  private readonly episodePath: string;
+  private readonly outputPath: string;
   private readonly syncPath: string;
 
-  constructor(api: app.Server, episodePath: string) {
+  constructor(api: app.Server, outputPath: string) {
     this.api = api;
-    this.episodePath = episodePath;
+    this.outputPath = outputPath;
     this.syncPath = path.join(app.settings.path.sync, Date.now().toString(16) + crypto.randomBytes(24).toString('hex'));
   }
 
@@ -35,12 +35,12 @@ export class Sync {
       const metadata = sortedSubtitles
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
         .reduce((p, c) => p.concat(c), []);
-      await fs.ensureDir(path.dirname(this.episodePath));
+      await fs.ensureDir(path.dirname(this.outputPath));
       await this.spawnAsync(ffmpeg(), ['-y']
         .concat(inputs)
         .concat(mappings)
         .concat(metadata)
-        .concat(['-c', 'copy', this.episodePath]));
+        .concat(['-c', 'copy', this.outputPath]));
     } finally {
       await fs.remove(this.syncPath);
     }

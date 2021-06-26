@@ -1,26 +1,32 @@
+import childProcess from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
+import process from 'process';
 
 export class Tracker {
-  private readonly rootPath: string;
+  private readonly seriesPath: string;
 
-  constructor(libraryPath: string) {
-    this.rootPath = path.join(libraryPath, '.animesync');
+  constructor(seriesPath: string) {
+    this.seriesPath = path.join(seriesPath, '.animesync');
   }
 
-  async existsAsync(seriesName: string, episodeName: string) {
-    const directoryPath = path.join(this.rootPath, seriesName);
-    if (await fs.pathExists(directoryPath)) {
-      const fileNames = await fs.readdir(directoryPath);
-      const lowerEpisodeName = episodeName.toLowerCase();
-      return fileNames.some(x => x.toLowerCase() === lowerEpisodeName);
-    } else {
-      return false;
-    }
+  async existsAsync(seasonName: string, episodeName: string) {
+    return await fs.pathExists(path.join(this.seriesPath, seasonName, episodeName));
   }
 
-  async trackAsync(seriesName: string, episodeName: string) {
-    await fs.ensureDir(path.join(this.rootPath, seriesName));
-    await fs.writeFile(path.join(this.rootPath, seriesName, episodeName), Buffer.alloc(0));
+  async trackAsync(seasonName: string, episodeName: string) {
+    await fs.ensureDir(path.join(this.seriesPath, seasonName));
+    await fs.writeFile(path.join(this.seriesPath, seasonName, episodeName), Buffer.alloc(0));
+    await ensureHiddenAsync(this.seriesPath);
+  }
+}
+
+async function ensureHiddenAsync(seriesPath: string) {
+  if (process.platform === 'win32') {
+    await new Promise((resolve, reject) => {
+      const process = childProcess.spawn('attrib', ['+H', seriesPath]);
+      process.on('error', reject);
+      process.on('exit', resolve);
+    });
   }
 }

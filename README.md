@@ -1,12 +1,7 @@
-<p align="center">
-  <i>AnimeSync</i> will be rebranded to <i>AnimeLoyalty</i> in the future.<br />
-  None of the features will be lost.
-</p>
-
 # animesync
 
 AnimeSync is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
-A Certain Scientific Railgun 01 [Crunchyroll].mkv`.
+A Certain Scientific Railgun 01 [AnimeSync].mkv`.
 
 ## Motivation
 
@@ -77,7 +72,6 @@ Options:
 Commands:
   browser                            Launch browser.
   download [options] [seriesUrl...]  Downloads series.
-  series                             Manage series.
   server                             Runs the server.
   settings [options]                 Manage settings.
   help [command]                     display help for command
@@ -105,7 +99,7 @@ To set your *Funimation* credentials, you can use:
 
     animesync settings credential --funimationUsername YOURUSER --funimationPassword YOURPASS
 
-### Quick Download
+### Download
 
 To download a series, you can use:
 
@@ -115,31 +109,13 @@ For example, to download *A Certain Scientific Railgun* from *Crunchyroll*, you 
 
     animesync download https://www.crunchyroll.com/a-certain-scientific-railgun
 
-It is recommended to add the series to your library if the series is ongoing.
+To use a different destination directory, you can use:
 
-### Your Library
+    animesync download --rootPath /path/of/the/directory https://www.crunchyroll.com/a-certain-scientific-railgun
 
-To add a series to your library, you can use:
-
-    animesync series add <seriesUrl> [rootPath]
-
-For example, to add *A Certain Scientific Railgun* from *Crunchyroll*, you can use:
-
-    animesync series add https://www.crunchyroll.com/a-certain-scientific-railgun
-
-To download all the series in your library, you can use:
+When you want to download new episodes, you can use:
 
     animesync download
-
-To list all the series in your library, you can use:
-
-    animesync series list
-
-To remove a series from your library, you can use:
-
-    animesync series remove <seriesUrl>
-
-Please note that removing a series **does NOT delete** downloaded files.
 
 ### Filtering
 
@@ -147,7 +123,7 @@ To avoid downloading every episode, you can run:
 
     animesync download --skipDownload [seriesUrl...]
 
-Which generates tracking files in the `.animesync` folder of your library. Just delete a tracking file and run `animesync download [seriesUrl...`] to download the missing episodes.
+Which generates tracking files in the `.animesync` directory. Just delete a tracking file and run `animesync download` to download the missing episodes.
 
 ## User Settings
 

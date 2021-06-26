@@ -46,12 +46,12 @@ export class SettingService {
   }
 
   private async saveAsync() {
-    const settingsPath = path.join(os.homedir(), 'animesync', 'settings.json');
     const settingOverrides = Object.assign({},
       shallowDiff(app.settings.core, app.settings.source.defaultCore),
       shallowDiff(app.settings.credential, app.settings.source.defaultCredential),
       shallowDiff(app.settings.path, app.settings.source.defaultPath));
-    await fs.writeJson(settingsPath, settingOverrides, {spaces: 2});
+    await fs.ensureDir(path.join(os.homedir(), 'animesync'));
+    await fs.writeJson(path.join(os.homedir(), 'animesync', 'server.json'), settingOverrides, {spaces: 2});
   }
 }
 
