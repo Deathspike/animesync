@@ -57,21 +57,23 @@ function evaluateSeries() {
       const imageUrl = processUrl(episodeNode.querySelector('img'), 'data-thumbnailurl');
       const isPremium = imageUrl.endsWith('star.jpg');
       const name = processName(episodeNode.querySelector('.series-title'));
+      const synopsis = validate(bubbleData.description);
       const title = validate(bubbleData.title);
       const url = processUrl(episodeNode.querySelector('a'));
-      return {imageUrl, isPremium, name, title, url};
+      return {imageUrl, isPremium, name, synopsis, title, url};
     });
   }
 
   /**
    * Process the bubble data.
-   * @param {{name: string}} value
-   * @returns {{title: string}}
+   * @param {{description: string, name: string}} value
+   * @returns {{description: string, title: string}}
    */
   function processBubbleData(value) {
+    const description = value.description;
     const match = value.name.match(/^(?:Episode\s(.*)\s-\s)?(.*)?$/);
     const title = (match && match[2]) ?? '';
-    return {title};
+    return {description, title};
   }
 
   /**

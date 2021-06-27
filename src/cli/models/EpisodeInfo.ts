@@ -16,7 +16,7 @@ export class EpisodeInfo {
     return new EpisodeInfo({
       animesync: episode.url,
       episode: episodeIndex + 1,
-      plot: undefined,
+      plot: episode.synopsis,
       season: seasonIndex + 1,
       title: episode.title
     });

@@ -77,8 +77,9 @@ async function evaluateSeriesAsync() {
     const isPremium = Boolean(episode.isSubRequired);
     const name = episode.episodeNumber;
     const title = episode.name;
+    const synopsis = episode.synopsis;
     const url = new URL(`${episode.slug}/`, location.href).toString();
-    return {imageUrl, isPremium, name, title, url};
+    return {imageUrl, isPremium, name, title, synopsis, url};
   }
 
   /**
