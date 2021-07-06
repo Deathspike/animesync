@@ -22,13 +22,10 @@ export class AgentService implements ncm.OnModuleDestroy {
     for (let i = 0; ; i++) {
       try {
         const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
-        const headers = this.getHeaders(options && options.headers ? options.headers : {});
-        headers['host'] = url.host ?? '';
+        const headers = Object.assign(this.getHeaders(options && options.headers ? options.headers : {}), {host: url.host});
         const result = await fetch(url, {...options, agent, headers, signal: createSignal()});
-        const buffer = await result.buffer();
-        const status = result.status;
-        if (status >= 200 && status < 300) return {buffer, status};
-        throw new Error(`Unexpected status: ${status}`);
+        if (result.status >= 200 && result.status < 300) return await result.buffer();
+        throw new Error(`Unexpected status: ${result.status}`);
       } catch (error) {
         if (i >= app.settings.core.fetchMaximumRetries) throw error;
         this.loggerService.debug(error);
