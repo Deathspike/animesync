@@ -9,7 +9,7 @@ export async function downloadAsync(api: app.Server, seriesPath: string, series:
   await cli.updateSeriesAsync(seriesPath, series);
   for (let seasonIndex = 0; seasonIndex < series.seasons.length; seasonIndex++) {
     const season = series.seasons[seasonIndex];
-    const seasonName = sanitizeFilename(season.title);
+    const seasonName = getSeasonName(season);
     const seasonPath = path.join(seriesPath, seasonName);
     for (let episodeIndex = 0; episodeIndex < season.episodes.length; episodeIndex++) {
       const elapsedTime = new cli.Timer();
@@ -40,4 +40,10 @@ export async function downloadAsync(api: app.Server, seriesPath: string, series:
       }
     }
   }
+}
+
+function getSeasonName(season: app.api.RemoteSeriesSeason) {
+  const match = season.title.match(/^(Season) ([0-9]+)$/);
+  const name = match ? `${match[1]} ${match[2].padStart(2, '0')}` : season.title;
+  return sanitizeFilename(name);
 }
