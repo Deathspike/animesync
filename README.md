@@ -222,7 +222,7 @@ AnimeSync includes an `OpenAPI` server. You can run independently of downloads:
 
     animesync server
 
-Then navigate to http://localhost:6583/. Questions? Please ask.
+Then navigate to http://127.0.0.1:6583/. Questions? Please ask.
 
 # Contributions
 

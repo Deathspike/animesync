@@ -3,12 +3,15 @@ import * as clr from 'chrome-launcher';
 import * as ncm from '@nestjs/common';
 import playwright from 'playwright-core';
 
+@ncm.Injectable()
 export class BrowserService implements ncm.OnModuleDestroy {
+  private readonly contextService: app.ContextService;
   private browser?: Promise<playwright.ChromiumBrowserContext>;
   private numberOfPages: number;
   private timeoutHandle: NodeJS.Timeout;
   
-  constructor() {
+  constructor(contextService: app.ContextService) {
+    this.contextService = contextService;
     this.numberOfPages = 0;
     this.timeoutHandle = setTimeout(() => {}, 0);
   }
@@ -43,7 +46,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
       const args = ['--autoplay-policy=no-user-gesture-required', '--lang=en-US'];
       const executablePath = clr.Launcher.getFirstInstallation();
       const headless = app.settings.core.chromeHeadless;
-      const proxy = {server: app.settings.server.url};
+      const proxy = {server: this.contextService.serverUrl};
       const viewport = app.settings.core.chromeHeadless ? parseResolution(app.settings.core.chromeViewport) : undefined;
       this.browser = playwright.chromium.launchPersistentContext(app.settings.path.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
       return await this.browser;

@@ -12,9 +12,9 @@ export class AgentService implements ncm.OnModuleDestroy {
   private readonly httpsAgent: app.AgentHttps;
   private readonly loggerService: app.LoggerService;
   
-  constructor(loggerService: app.LoggerService) {
-    this.httpAgent = new app.AgentHttp({keepAlive: true});
-    this.httpsAgent = new app.AgentHttps({keepAlive: true});
+  constructor(contextService: app.ContextService, loggerService: app.LoggerService) {
+    this.httpAgent = new app.AgentHttp(contextService, {keepAlive: true});
+    this.httpsAgent = new app.AgentHttps(contextService, {keepAlive: true});
     this.loggerService = loggerService;
   }
 

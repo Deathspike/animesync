@@ -53,6 +53,5 @@ export const settings = {
   core: new app.api.SettingCore(defaultCore, settingOverrides),
   credential: new app.api.SettingCredential(defaultCredential, settingOverrides),
   path: new app.api.SettingPath(defaultPath, settingOverrides),
-  server: {port: 6583, url: `http://localhost:6583/`},
   source: {defaultCore, defaultCredential, defaultPath}
 };

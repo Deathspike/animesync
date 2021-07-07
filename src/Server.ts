@@ -8,25 +8,29 @@ import * as nsg from '@nestjs/swagger';
 export class Server extends app.api.ServerApi {
   private readonly server: npe.NestExpressApplication;
 
-  private constructor(server: npe.NestExpressApplication) {
-    super(app.settings.server.url);
+  private constructor(server: npe.NestExpressApplication, serverUrl: string) {
+    super(serverUrl);
     this.server = server;
     this.server.disable('x-powered-by');
     this.server.useLogger(this.logger);
     this.traceVersion();
   }
 
-  static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>) {
+  static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>, serverPort?: number) {
     const server = await ncr.NestFactory.create<npe.NestExpressApplication>(app.ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
     attachErrorFilter(server);
     attachRequestValidation(server);
-    await server.listen(app.settings.server.port);
-    return await handlerAsync(new Server(server)).finally(() => server.close());
+    await server.listen(serverPort ?? 0);
+    return await handlerAsync(new Server(server, await server.getUrl())).finally(() => server.close());
   }
 
   get browser() {
     return this.server.get(ash.BrowserService);
+  }
+
+  get context() {
+    return this.server.get(ash.ContextService);
   }
   
   get logger() {
