@@ -13,11 +13,9 @@ const baseUrl = 'https://www.funimation.com';
 @ncm.Injectable()
 export class Funimation implements app.IProvider {
   private readonly browserService: app.BrowserService;
-  private readonly composeService: app.ComposeService;
 
-  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
+  constructor(browserService: app.BrowserService) {
     this.browserService = browserService;
-    this.composeService = composeService;
   }
 
   contextAsync() {
@@ -44,7 +42,7 @@ export class Funimation implements app.IProvider {
       await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = FunimationRegion.search(await page.evaluate(evaluatePage));
-      return this.composeService.search(pageUrl, search, headers);
+      return new app.Composable(pageUrl, search, headers);
     });
   }
 
@@ -55,7 +53,7 @@ export class Funimation implements app.IProvider {
       await page.goto(searchUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = FunimationRegion.search(await page.evaluate(evaluateSearch));
-      return this.composeService.search(searchUrl, search, headers);
+      return new app.Composable(searchUrl, search, headers);
     });
   }
 
@@ -65,7 +63,7 @@ export class Funimation implements app.IProvider {
       await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const series = FunimationRegion.series(await page.evaluate(evaluateSeriesAsync));
-      return this.composeService.series(seriesUrl, series, headers);
+      return new app.Composable(seriesUrl, series, headers);
     });
   }
 
@@ -75,7 +73,7 @@ export class Funimation implements app.IProvider {
       await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStreamAsync);
-      return await this.composeService.streamAsync(streamUrl, stream, headers);
+      return new app.Composable(streamUrl, stream, headers);
     });
   }
 }

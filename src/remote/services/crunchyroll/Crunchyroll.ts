@@ -12,11 +12,9 @@ const baseUrl = 'https://www.crunchyroll.com';
 @ncm.Injectable()
 export class Crunchyroll implements app.IProvider {
   private readonly browserService: app.BrowserService;
-  private readonly composeService: app.ComposeService;
 
-  constructor(browserService: app.BrowserService, composeService: app.ComposeService) {
+  constructor(browserService: app.BrowserService) {
     this.browserService = browserService;
-    this.composeService = composeService;
   }
 
   contextAsync() {
@@ -43,7 +41,7 @@ export class Crunchyroll implements app.IProvider {
       await page.goto(pageUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluatePage);
-      return this.composeService.search(pageUrl, search, headers);
+      return new app.Composable(pageUrl, search, headers);
     });
   }
 
@@ -52,7 +50,7 @@ export class Crunchyroll implements app.IProvider {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const search = await page.evaluate(evaluateSearchAsync, {query, pageNumber});
-      return this.composeService.search(baseUrl, search, headers);
+      return new app.Composable(baseUrl, search, headers);
     });
   }
   
@@ -64,10 +62,10 @@ export class Crunchyroll implements app.IProvider {
       if (/\/maturity_wall\?/.test(page.url())) {
         await page.goto(`${seriesUrl}?skip_wall=1`, {waitUntil: 'domcontentloaded'});
         const series = await page.evaluate(evaluateSeries);
-        return this.composeService.series(seriesUrl, series, headers);
+        return new app.Composable(seriesUrl, series, headers);
       } else {
         const series = await page.evaluate(evaluateSeries);
-        return this.composeService.series(seriesUrl, series, headers);
+        return new app.Composable(seriesUrl, series, headers);
       }
     });
   }
@@ -78,7 +76,7 @@ export class Crunchyroll implements app.IProvider {
       await CrunchyrollCredential.tryAsync(baseUrl, page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const stream = await page.evaluate(evaluateStream);
-      return await this.composeService.streamAsync(streamUrl, stream, headers);
+      return new app.Composable(streamUrl, stream, headers);
     });
   }
 }

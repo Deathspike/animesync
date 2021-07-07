@@ -9,10 +9,12 @@ import * as nsg from '@nestjs/swagger';
 @nsg.ApiInternalServerErrorResponse()
 export class RemoteController {
   private readonly cacheService: app.CacheService;
+  private readonly composeService: app.ComposeService;
   private readonly providerService: app.ProviderService;
 
-  constructor(cacheService: app.CacheService, providerService: app.ProviderService) {
+  constructor(cacheService: app.CacheService, composeService: app.ComposeService, providerService: app.ProviderService) {
     this.cacheService = cacheService;
+    this.composeService = composeService;
     this.providerService = providerService;
   }
 
@@ -30,7 +32,7 @@ export class RemoteController {
   async pageAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
     const cacheKey = `remote/page/${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber ?? 1}`;
     const cacheTimeout = app.settings.core.cacheTimeoutPage;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider, model.page, model.options, model.pageNumber));
+    return this.composeService.search(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider, model.page, model.options, model.pageNumber)));
   }
 
   @app.ResponseValidator(app.api.RemoteSearch)
@@ -40,7 +42,7 @@ export class RemoteController {
   async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
     const cacheKey = `remote/search/${model.provider}/${model.query}/${model.pageNumber ?? 1}`;
     const cacheTimeout = app.settings.core.cacheTimeoutSearch;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider, model.query, model.pageNumber));
+    return this.composeService.search(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider, model.query, model.pageNumber)));
   }
 
   @app.ResponseValidator(app.api.RemoteSeries)
@@ -50,7 +52,7 @@ export class RemoteController {
   async seriesAsync(@ncm.Query() model: app.api.RemoteQuerySeries) {
     const cacheKey = `remote/series/${model.url}`;
     const cacheTimeout = app.settings.core.cacheTimeoutSeries;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(model.url));
+    return this.composeService.series(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(model.url)));
   }
 
   @app.ResponseValidator(app.api.RemoteStream)
@@ -60,6 +62,6 @@ export class RemoteController {
   async streamAsync(@ncm.Query() model: app.api.RemoteQueryStream) {
     const cacheKey = `remote/stream/${model.url}`;
     const cacheTimeout = app.settings.core.cacheTimeoutStream;
-    return await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(model.url));
+    return await this.composeService.streamAsync(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(model.url)));
   }
 }

@@ -11,32 +11,32 @@ export class ComposeService {
     this.rewriteService = rewriteService;
   }
 
-  search(baseUrl: string, search: app.api.RemoteSearch, headers?: Record<string, string>) {
-    return new app.api.RemoteSearch(search, {
-      series: search.series.map(series => new app.api.RemoteSearchSeries(series, {
-        imageUrl: this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers)
+  search(compose: app.IComposable<app.api.RemoteSearch>) {
+    return new app.api.RemoteSearch(compose.value, {
+      series: compose.value.series.map(series => new app.api.RemoteSearchSeries(series, {
+        imageUrl: this.rewriteService.emulateUrl(compose.url, series.imageUrl, compose.headers)
       }))
     });
   }
 
-  series(baseUrl: string, series: app.api.RemoteSeries, headers?: Record<string, string>) {
-    return new app.api.RemoteSeries(series, {
-      imageUrl: series.imageUrl && this.rewriteService.emulateUrl(baseUrl, series.imageUrl, headers),
-      seasons: series.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
+  series(compose: app.IComposable<app.api.RemoteSeries>) {
+    return new app.api.RemoteSeries(compose.value, {
+      imageUrl: compose.value.imageUrl && this.rewriteService.emulateUrl(compose.url, compose.value.imageUrl, compose.headers),
+      seasons: compose.value.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
         episodes: season.episodes.map(episode => new app.api.RemoteSeriesSeasonEpisode(episode, {
-          imageUrl: episode.imageUrl && this.rewriteService.emulateUrl(baseUrl, episode.imageUrl, headers)
+          imageUrl: episode.imageUrl && this.rewriteService.emulateUrl(compose.url, episode.imageUrl, compose.headers)
         }))
       }))
     });
   }
 
-  async streamAsync(baseUrl: string, stream: app.api.RemoteStream, headers?: Record<string, string>) {
-    return new app.api.RemoteStream(stream, {
-      sources: await Promise.all(stream.sources.map(x => this.sourceAsync(x.url, headers)))
+  async streamAsync(compose: app.IComposable<app.api.RemoteStream>) {
+    return new app.api.RemoteStream(compose.value, {
+      sources: await Promise.all(compose.value.sources.map(x => this.sourceAsync(x.url, compose.headers)))
         .then(x => x.reduce((p, c) => p.concat(c), []))
         .then(x => x.sort(app.api.RemoteStreamSource.compareFn)),
-      subtitles: stream.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
-        url: this.rewriteService.emulateUrl(baseUrl, subtitle.url, headers)
+      subtitles: compose.value.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
+        url: this.rewriteService.emulateUrl(compose.url, subtitle.url, compose.headers)
       }))
     });
   }

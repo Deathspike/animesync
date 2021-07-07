@@ -27,7 +27,7 @@ export class PluginService {
     const fileNames = await fs.readdir(app.settings.path.plugin);
     const filePaths = fileNames.map(x => path.join(app.settings.path.plugin, x));
     const plugins = await Promise.all(filePaths.map(x => this.tryPluginAsync(x)));
-    return await handlerAsync(plugins.filter(x => x).map(x => x!)).finally(() => unload(filePaths));
+    return await handlerAsync(plugins.filter(x => x?.version === 2).map(x => x!)).finally(() => unload(filePaths));
   }
   
   private async tryPluginAsync(filePath: string): Promise<app.IPlugin | undefined> {
