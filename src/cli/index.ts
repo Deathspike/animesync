@@ -3,6 +3,7 @@ export * from './classes/Sync';
 export * from './classes/Tracker';
 export * from './classes/Timer';
 export * from './downloads/download';
+export * from './downloads/rescaleSubtitle';
 export * from './downloads/updateArtwork';
 export * from './downloads/updateEpisode';
 export * from './downloads/updateSeries';
