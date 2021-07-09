@@ -1,20 +1,29 @@
+import * as app from '..';
 import * as ass from 'ass-compiler';
+import * as ncm from '@nestjs/common';
 
-export async function rescaleSubtitleAsync(value: string) {
-  const subtitle = ass.parse(value);
-  changeScale(subtitle);
-  return ass.stringify(subtitle);
+@ncm.Injectable()
+export class SubtitleService {
+  rewrite(subtitle: string, subtitleType: app.api.RewriteParamSubtitle['subtitleType']) {
+    if (subtitleType === 'ass') {
+      const content = ass.parse(subtitle);
+      changeScale(content);
+      return ass.stringify(content);
+    } else {
+      return subtitle;
+    }
+  }
 }
 
-function changeScale(subtitle: ass.ParsedASS) {
-  const primaryStyle = /^\d+$/.test(subtitle.info.PlayResY)
-    ? fetchPrimaryStyle(subtitle)
+function changeScale(content: ass.ParsedASS) {
+  const primaryStyle = /^\d+$/.test(content.info.PlayResY)
+    ? fetchPrimaryStyle(content)
     : undefined;
   if (primaryStyle && /^\d+$/.test(primaryStyle.Fontsize)) {
     const primaryFontSize = parseInt(primaryStyle.Fontsize, 10);
     const primaryMarginV = primaryStyle.MarginV;
-    const scaleY = 1 / 360 * parseInt(subtitle.info.PlayResY, 10);
-    for (const style of subtitle.styles.style) {
+    const scaleY = 1 / 360 * parseInt(content.info.PlayResY, 10);
+    for (const style of content.styles.style) {
       style.Fontsize = /^\d+$/.test(style.Fontsize)
         ? String(1 / primaryFontSize * parseInt(style.Fontsize, 10) * 16 * scaleY)
         : style.Fontsize;

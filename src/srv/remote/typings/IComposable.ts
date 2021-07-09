@@ -1,5 +1,5 @@
 export interface IComposable<T> {
+  baseUrl: string;
   headers?: Record<string, string>;
-  url: string;
   value: T;
 }

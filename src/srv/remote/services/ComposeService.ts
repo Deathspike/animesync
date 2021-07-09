@@ -14,17 +14,17 @@ export class ComposeService {
   search(compose: app.IComposable<app.api.RemoteSearch>) {
     return new app.api.RemoteSearch(compose.value, {
       series: compose.value.series.map(series => new app.api.RemoteSearchSeries(series, {
-        imageUrl: this.rewriteService.emulateUrl(compose.url, series.imageUrl, compose.headers)
+        imageUrl: this.rewriteService.emulateUrl(compose.baseUrl, series.imageUrl, compose.headers)
       }))
     });
   }
 
   series(compose: app.IComposable<app.api.RemoteSeries>) {
     return new app.api.RemoteSeries(compose.value, {
-      imageUrl: compose.value.imageUrl && this.rewriteService.emulateUrl(compose.url, compose.value.imageUrl, compose.headers),
+      imageUrl: compose.value.imageUrl && this.rewriteService.emulateUrl(compose.baseUrl, compose.value.imageUrl, compose.headers),
       seasons: compose.value.seasons.map(season => new app.api.RemoteSeriesSeason(season, {
         episodes: season.episodes.map(episode => new app.api.RemoteSeriesSeasonEpisode(episode, {
-          imageUrl: episode.imageUrl && this.rewriteService.emulateUrl(compose.url, episode.imageUrl, compose.headers)
+          imageUrl: episode.imageUrl && this.rewriteService.emulateUrl(compose.baseUrl, episode.imageUrl, compose.headers)
         }))
       }))
     });
@@ -36,14 +36,14 @@ export class ComposeService {
         .then(x => x.reduce((p, c) => p.concat(c), []))
         .then(x => x.sort(app.api.RemoteStreamSource.compareFn)),
       subtitles: compose.value.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
-        url: this.rewriteService.emulateUrl(compose.url, subtitle.url, compose.headers)
+        url: this.rewriteService.subtitleUrl(compose.baseUrl, subtitle.type, subtitle.url, compose.headers)
       }))
     });
   }
 
-  private async sourceAsync(masterUrl: string, headers?: Record<string, string>) {
+  private async sourceAsync(sourceUrl: string, headers?: Record<string, string>) {
     const streams = await this.agentService
-      .fetchAsync(new URL(masterUrl), {headers})
+      .fetchAsync(new URL(sourceUrl), {headers})
       .then(x => app.HlsManifest.from(x.toString('utf-8')))
       .then(x => x.fetchStreams());
     return streams.map(x => new app.api.RemoteStreamSource({
@@ -51,7 +51,7 @@ export class ComposeService {
       resolutionX: x.resolution.x || undefined,
       resolutionY: x.resolution.y || undefined,
       type: 'hls',
-      url: this.rewriteService.masterUrl(masterUrl, x.url, headers)
+      url: this.rewriteService.hlsMasterUrl(sourceUrl, x.url, headers)
     }));
   }
 }

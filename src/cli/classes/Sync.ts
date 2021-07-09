@@ -1,5 +1,4 @@
 import * as app from '../..';
-import * as cli from '..';
 import * as sub from 'subtitle';
 import childProcess from 'child_process';
 import crypto from 'crypto';
@@ -63,7 +62,7 @@ export class Sync {
         await fs.writeFile(subtitlePath, sub.stringifySync(sub.parseSync(subtitleData), {format: 'SRT'}));
         return this.localSubtitle(subtitle, subtitlePath);
       } else {
-        const subtitleData = await fetch(subtitle.url).then(x => x.text()).then(cli.rescaleSubtitleAsync);
+        const subtitleData = await fetch(subtitle.url).then(x => x.text());
         const subtitlePath = path.join(this.syncPath, `${i}.${subtitle.language}.${subtitle.type}`);
         await fs.writeFile(subtitlePath, subtitleData);
         return this.localSubtitle(subtitle, subtitlePath);

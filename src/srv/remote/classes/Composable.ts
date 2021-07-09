@@ -1,13 +1,13 @@
 import * as app from '..';
 
 export class Composable<T> implements app.IComposable<T> {
-  constructor(url: string, value: T, headers?: Record<string, string>) {
+  constructor(baseUrl: string, value: T, headers?: Record<string, string>) {
+    this.baseUrl = baseUrl;
     this.headers = headers;
-    this.url = url;
     this.value = value;
   }
 
+  readonly baseUrl: string;
   readonly headers?: Record<string, string>;
-  readonly url: string;
   readonly value: T;
 }
