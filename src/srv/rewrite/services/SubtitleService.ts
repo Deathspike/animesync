@@ -1,16 +1,20 @@
 import * as app from '..';
 import * as ass from 'ass-compiler';
 import * as ncm from '@nestjs/common';
+import * as sub from 'subtitle';
 
 @ncm.Injectable()
 export class SubtitleService {
   rewrite(subtitle: string, subtitleType: app.api.RewriteParamSubtitle['subtitleType']) {
-    if (subtitleType === 'ass') {
-      const content = ass.parse(subtitle);
-      changeScale(content);
-      return ass.stringify(content);
-    } else {
-      return subtitle;
+    switch (subtitleType) {
+      case 'ass':
+        const content = ass.parse(subtitle);
+        changeScale(content);
+        return ass.stringify(content);
+      case 'srt':
+        const nodes = sub.parseSync(subtitle);
+        const result = sub.stringifySync(nodes, {format: 'SRT'})
+        return result;
     }
   }
 }

@@ -147,7 +147,7 @@ async function evaluateStreamAsync() {
   function mapSubtitle(experienceId, experience) {
     return findTextTracks(experienceId, experience)
       .filter(x => x.src.endsWith('.vtt') && x.type.toLowerCase() === 'full')
-      .map(x => ({language: mapSubtitleLanguage(x.language), type: 'vtt', url: x.src}));
+      .map(x => ({language: mapSubtitleLanguage(x.language), type: 'srt', url: x.src}));
   }
 
   /**
