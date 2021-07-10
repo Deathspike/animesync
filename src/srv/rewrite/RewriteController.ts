@@ -4,6 +4,7 @@ import * as nsg from '@nestjs/swagger';
 import express from 'express';
 
 @ncm.Controller('api/rewrite')
+@ncm.UseInterceptors(app.ResponseLoggerInterceptor)
 @nsg.ApiTags('rewrite')
 @nsg.ApiBadRequestResponse()
 @nsg.ApiInternalServerErrorResponse()
@@ -33,38 +34,34 @@ export class RewriteController {
   async hlsMasterAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamHlsMaster,
-    @ncm.Res() response: express.Response) {
+    @ncm.Param() params: app.api.RewriteParamHlsMaster) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(new URL(params.masterUrl), {headers: {...headers, ...query}});
     const masterHls = app.HlsManifest.from(buffer.toString('utf8'));
     this.hlsService.stream(params.mediaUrl, masterHls);
     this.hlsService.rewrite(params.masterUrl, masterHls, query);
-    response.send(masterHls.toString());
+    return masterHls.toString();
   }
 
   @ncm.Get('hls/media/:mediaUrl')
   async hlsMediaAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamHlsMedia,
-    @ncm.Res() response: express.Response) {
+    @ncm.Param() params: app.api.RewriteParamHlsMedia) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(new URL(params.mediaUrl), {headers: {...headers, ...query}});
     const mediaHls = app.HlsManifest.from(buffer.toString('utf8'));
     this.hlsService.rewrite(params.mediaUrl, mediaHls, query);
-    response.send(mediaHls.toString());
+    return mediaHls.toString();
   }
 
   @ncm.Get('subtitle/:subtitleType/:subtitleUrl')
   async subtitleAsync(
     @ncm.Headers() headers: Record<string, string>,
     @ncm.Query() query: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamSubtitle,
-    @ncm.Res() response: express.Response) {
+    @ncm.Param() params: app.api.RewriteParamSubtitle) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(new URL(params.subtitleUrl), {headers: {...headers, ...query}});
-    const subtitle = this.subtitleService.rewrite(buffer.toString('utf8'), params.subtitleType);
-    response.send(subtitle);
+    return this.subtitleService.rewrite(buffer.toString('utf8'), params.subtitleType);
   }
 }

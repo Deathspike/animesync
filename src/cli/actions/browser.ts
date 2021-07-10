@@ -2,7 +2,7 @@ import * as app from '../..';
 
 export async function browserAsync() {
   await app.Server.usingAsync(async (api) => {
-    console.info(`Listening at ${api.context.serverUrl}`);
+    api.logger.info(`Listening at ${api.context.serverUrl}`);
     app.settings.core = new app.api.SettingCore(app.settings.core, {chromeHeadless: false});
     await api.browser.pageAsync(async (page) => {
       const context = page.context();

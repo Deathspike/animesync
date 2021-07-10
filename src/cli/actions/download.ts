@@ -6,7 +6,7 @@ import sanitizeFilename from 'sanitize-filename';
 
 export async function downloadAsync(this: cli.IOptions, urls?: Array<string>) {
   await app.Server.usingAsync(async (api) => {
-    console.info(`Listening at ${api.context.serverUrl}`);
+    api.logger.info(`Listening at ${api.context.serverUrl}`);
     await cli.CoreInfo.loadAsync()
       .then(x => urls && urls.length ? urlAsync(api, x, urls, this) : directoryAsync(api, x))
       .catch((error) => api.logger.error(error));

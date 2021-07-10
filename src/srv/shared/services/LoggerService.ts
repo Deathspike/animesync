@@ -1,57 +1,70 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
-import winston from 'winston';
-import 'winston-daily-rotate-file';
+import fs from 'fs-extra';
+import lockfile from 'proper-lockfile';
+import os from 'os';
+import path from 'path';
 
 export class LoggerService implements ncm.LoggerService {
-  private readonly logger: winston.Logger;
+  private readonly id: string;
+  private readonly queue: Array<string>;
+  private isRunning: boolean;
 
   constructor() {
-    this.logger = createLogger();
+    this.id = String(process.pid).padStart(5);
+    this.isRunning = false;
+    this.queue = [];
   }
 
   debug(value: string) {
-    this.logger.debug(extract(value));
+    this.enqueue('DEBUG', extract(value));
   }
   
   error(value: Error | string, trace?: string) {
-    this.logger.error(extract(value, trace));
+    console.error(extract(value, trace));
+    this.enqueue('ERROR', extract(value, trace));
   }
 
   info(value: string) {
-    this.logger.info(extract(value));
+    console.log(extract(value));
+    this.enqueue('INFO', extract(value));
   }
 
   log(value: string) {
-    this.logger.debug(extract(value));
+    console.log(extract(value));
+    this.enqueue('LOG', extract(value));
   }
   
   verbose(value: string) {
-    this.logger.debug(extract(value));
+    this.enqueue('DEBUG', extract(value));
   }
 
   warn(value: string) {
-    this.logger.debug(extract(value));
+    console.error(extract(value));
+    this.enqueue('WARN', extract(value));
   }
-}
 
-function createLogger() {
-  return winston.createLogger({
-    transports: [
-      new winston.transports.Console({
-        format: winston.format.printf(x => x.message),
-        level: 'info'
-      }),
-      new winston.transports.DailyRotateFile({
-        dirname: app.settings.path.logger,
-        filename: '%DATE%.log',
-        format: winston.format.combine(winston.format.timestamp(), winston.format.printf(x => `[${x.timestamp}] ${x.level.toUpperCase().padEnd(5)} ${x.message}`)),
-        level: 'debug',
-        maxFiles: 5,
-        maxSize: '20MB'
-      })
-    ]
-  });
+  private enqueue(level: string, line: string) {
+    this.queue.push(`[${new Date().toISOString()}] ${this.id} ${level.padEnd(5)} ${line}`);
+    this.tryRun();
+  }
+
+  private async runAsync() {
+    await fs.ensureDir(app.settings.path.logger);
+    const filePath = path.join(app.settings.path.logger, `${new Date().toISOString().substr(0, 10)}.log`);
+    const release = await lockfile.lock(filePath, {realpath: false, retries: {forever: true}});
+    while (this.queue.length) await fs.appendFile(filePath, this.queue.shift() + os.EOL);
+    await release();
+  }
+
+  private tryRun() {
+    if (this.isRunning) return;
+    this.isRunning = true;
+    this.runAsync().finally(() => {
+      this.isRunning = false;
+      if (this.queue.length) this.tryRun();
+    });
+  }
 }
 
 function extract(value: any, trace?: any) {
