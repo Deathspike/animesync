@@ -5,6 +5,7 @@ import {RemoteModule} from './remote';
 import {RewriteModule} from './rewrite';
 import {SettingModule} from './setting';
 import fs from 'fs-extra';
+import path from 'path';
 
 @ncm.Global()
 @ncm.Module({
@@ -13,7 +14,20 @@ import fs from 'fs-extra';
   exports: [app.AgentService, app.BrowserService, app.CacheService, app.ContextService, app.LoggerService, app.RewriteService]})
 export class ServerModule implements ncm.OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await fs.remove(app.settings.path.cache);
-    await fs.remove(app.settings.path.sync);
+    await pruneAsync(app.settings.path.cache, 3600000);
+    await pruneAsync(app.settings.path.logger, 604800000);
+    await pruneAsync(app.settings.path.sync, 14400000);
+  }
+}
+
+async function pruneAsync(directoryPath: string, timeout: number) {
+  if (!await fs.pathExists(directoryPath)) return;
+  const expireTime = Date.now() - timeout;
+  const fileNames = await fs.readdir(directoryPath);
+  const filePaths = fileNames.map(x => path.join(directoryPath, x));
+  for (const filePath of filePaths) {
+    const stat = await fs.stat(filePath);
+    const mtime = stat.mtime.getTime();
+    if (mtime < expireTime) await fs.remove(filePath);
   }
 }
