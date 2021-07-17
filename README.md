@@ -66,15 +66,16 @@ Usage: animesync [options] [command]
 AnimeSync is capable of downloading anime episodes from popular streaming services.
 
 Options:
-  -V, --version                      output the version number
-  -h, --help                         display help for command
+  -V, --version                        output the version number
+  -h, --help                           display help for command
 
 Commands:
-  browser                            Launch browser.
-  download [options] [seriesUrl...]  Downloads series.
-  server                             Runs the server.
-  settings [options]                 Manage settings.
-  help [command]                     display help for command
+  download [options] [seriesUrl...]    Downloads series.
+  update|add [options] [seriesUrl...]  Updates series.
+  browser                              Launch browser.
+  server                               Runs the server.
+  settings                             Manage settings.
+  help [command]                       display help for command
 ```
 
 ## Basic Instructions
@@ -116,6 +117,14 @@ To use a different destination directory, you can use:
 When you want to download new episodes, you can use:
 
     animesync download
+
+If you want to add a series, but don't download it yet, you can use:
+
+    animesync add [seriesUrl...]
+
+To update all metadata, you can use:
+
+    animesync update
 
 ### Filtering
 

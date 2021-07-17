@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
-export async function downloadAsync(this: cli.IOptions, urls?: Array<string>) {
+export async function updateAsync(this: cli.IOptions, urls?: Array<string>) {
   await app.Server.usingAsync(async (api) => {
     api.logger.info(`Listening at ${api.context.serverUrl}`);
     await cli.CoreInfo.loadAsync()
@@ -26,7 +26,7 @@ async function directoryAsync(api: app.Server, coreInfo: cli.CoreInfo) {
         const elapsedTime = new cli.Timer();
         const series = await api.remote.seriesAsync({url: seriesInfo.animesync});
         if (series.value) {
-          await cli.downloadAsync(api, seriesPath, series.value);
+          await cli.updateAsync(seriesPath, series.value);
           api.logger.info(`Finished ${seriesName} (${elapsedTime})`);
         } else {
           api.logger.info(`Skipping ${seriesName}`);
@@ -46,7 +46,7 @@ async function urlAsync(api: app.Server, coreInfo: cli.CoreInfo, urls: Array<str
       const seriesName = sanitizeFilename(series.value.title);
       const seriesPath = path.join(rootPath, seriesName);
       await cli.CoreInfo.registerRootPathAsync(coreInfo, rootPath);
-      await cli.downloadAsync(api, seriesPath, series.value, options);
+      await cli.updateAsync(seriesPath, series.value);
       api.logger.info(`Finished ${url} (${elapsedTime})`);
     } else {
       api.logger.info(`Rejected ${url}`);
