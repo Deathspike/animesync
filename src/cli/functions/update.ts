@@ -5,13 +5,13 @@ import {updateSeriesAsync} from './update/updateSeries';
 import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 
-export async function updateAsync(seriesPath: string, series: app.api.RemoteSeries) {
+export async function updateAsync(api: app.Server, seriesPath: string, series: app.api.RemoteSeries) {
   const workQueue: Array<cli.IUpdate> = [];
-  await checkAsync(seriesPath, series, workQueue);
+  await checkAsync(api, seriesPath, series, workQueue);
   return workQueue;
 }
 
-async function checkAsync(seriesPath: string, series: app.api.RemoteSeries, workQueue: Array<cli.IUpdate>) {
+async function checkAsync(api: app.Server, seriesPath: string, series: app.api.RemoteSeries, workQueue: Array<cli.IUpdate>) {
   await updateSeriesAsync(seriesPath, series);
   for (let seasonIndex = 0; seasonIndex < series.seasons.length; seasonIndex++) {
     const season = series.seasons[seasonIndex];
@@ -22,6 +22,7 @@ async function checkAsync(seriesPath: string, series: app.api.RemoteSeries, work
       const episodeName = fetchEpisodeName(series, season, episode);
       const episodePath = path.join(seasonPath, episodeName);
       const episodeUrl = episode.url;
+      api.logger.info(`Updating ${episodeName}`);
       await updateEpisodeAsync(seasonPath, episodePath, seasonIndex, episodeIndex, episode);
       workQueue.push({seasonName, seasonPath, episodeName, episodePath, episodeUrl});
     }

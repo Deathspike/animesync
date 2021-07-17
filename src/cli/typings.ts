@@ -9,4 +9,4 @@ export type IUpdate = {
   episodeName: string;
   episodePath: string;
   episodeUrl: string;
-}
+};

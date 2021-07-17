@@ -3,10 +3,8 @@ import * as cli from '..';
 
 export async function downloadAsync(api: app.Server, seriesPath: string, series: app.api.RemoteSeries, options?: cli.IOptions) {
   const tracker = new cli.Tracker(seriesPath);
-  const workQueue = await cli.updateAsync(seriesPath, series);
+  const workQueue = await cli.updateAsync(api, seriesPath, series);
   for (const {seasonName, episodeName, episodePath, episodeUrl} of workQueue) {
-    const elapsedTime = new cli.Timer();
-    const outputPath = `${episodePath}.mkv`;
     if (await tracker.existsAsync(seasonName, episodeName)) {
       api.logger.info(`Skipping ${episodeName}`);
     } else if (options && options.skipDownload) {
@@ -15,11 +13,10 @@ export async function downloadAsync(api: app.Server, seriesPath: string, series:
     } else {
       api.logger.info(`Fetching ${episodeName}`);
       const stream = await api.remote.streamAsync({url: episodeUrl});
-      const sync = new cli.Sync(api, outputPath);
-      if (stream.value && sync) {
+      const sync = new cli.Sync(api, `${episodePath}.mkv`);
+      if (stream.value) {
         await sync.saveAsync(stream.value);
         await tracker.trackAsync(seasonName, episodeName);
-        api.logger.info(`Finished ${episodeName} (${elapsedTime})`);
       } else {
         api.logger.info(`Rejected ${episodeName}`);
       }

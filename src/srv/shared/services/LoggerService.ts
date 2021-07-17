@@ -17,31 +17,31 @@ export class LoggerService implements ncm.LoggerService {
   }
 
   debug(value: string) {
-    this.enqueue('DEBUG', extract(value));
+    this.enqueue('DEBUG', fetchMessage(value));
   }
   
   error(value: Error | string, trace?: string) {
-    console.error(extract(value, trace));
-    this.enqueue('ERROR', extract(value, trace));
+    showMessage(value, trace);
+    this.enqueue('ERROR', fetchMessage(value, trace));
   }
 
   info(value: string) {
-    console.log(extract(value));
-    this.enqueue('INFO', extract(value));
+    showMessage(value);
+    this.enqueue('INFO', fetchMessage(value));
   }
 
   log(value: string) {
-    console.log(extract(value));
-    this.enqueue('LOG', extract(value));
+    showMessage(value);
+    this.enqueue('LOG', fetchMessage(value));
   }
   
   verbose(value: string) {
-    this.enqueue('DEBUG', extract(value));
+    this.enqueue('DEBUG', fetchMessage(value));
   }
 
   warn(value: string) {
-    console.error(extract(value));
-    this.enqueue('WARN', extract(value));
+    showMessage(value);
+    this.enqueue('WARN', fetchMessage(value));
   }
 
   private enqueue(level: string, line: string) {
@@ -67,8 +67,15 @@ export class LoggerService implements ncm.LoggerService {
   }
 }
 
-function extract(value: any, trace?: any) {
+function fetchMessage(value: any, trace?: any) {
   return value instanceof Error
     ? value.stack ?? value.message
     : trace ?? value;
+}
+
+function showMessage(value: any, trace?: any) {
+  const hours = String(new Date().getHours()).padStart(2, '0');
+  const minutes = String(new Date().getMinutes()).padStart(2, '0');
+  const seconds = String(new Date().getSeconds()).padStart(2, '0');
+  console.info(`[${hours}:${minutes}:${seconds}] ${fetchMessage(value, trace)}`);
 }
