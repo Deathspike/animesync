@@ -6,15 +6,9 @@ import tls from 'tls';
 import util from 'util';
 
 export class HttpTunnelService {
-  private nordvpn?: app.NordVpn;
-
   connect(clientSocket: net.Socket, clientUrl: string) {
     const client = new URL(clientUrl);
-    if (app.settings.core.proxyServer?.startsWith('nordvpn:')) {
-      (this.nordvpn ?? (this.nordvpn = new app.NordVpn())).getAsync(new URL(app.settings.core.proxyServer))
-        .then(x => this.connectTo(client, clientSocket, x))
-        .catch(() => clientSocket.destroy());
-    } else if (app.settings.core.proxyServer) {
+    if (app.settings.core.proxyServer) {
       this.connectTo(client, clientSocket, new URL(app.settings.core.proxyServer));
     } else {
       this.noProxy(client, clientSocket);

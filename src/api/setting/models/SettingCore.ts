@@ -76,7 +76,7 @@ export class SettingCore {
 
   @clv.IsOptional()
   @clv.IsString()
-  @clv.Matches(/^(http|https|nordvpn|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?(?:.+)$/)
+  @clv.Matches(/^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?(?:.+)$/)
   @nsg.ApiPropertyOptional()
   readonly proxyServer?: string;
 }

@@ -217,14 +217,6 @@ You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
 
 Note that *Crunchyroll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
 
-#### NordVPN
-
-If you have an account with *NordVPN*, you can use:
-
-    animesync settings core --proxyServer nordvpn://username:password@us
-
-With this configuration, `animesync` periodically queries the list of proxies provided by *NordVPN* and automatically selects the HTTPS proxy with the least amount of load. That should be the fastest proxy available at that time. The `@us` suffix stands for *USA*, and ensures the proxy server is in that country. You can use whatever country flag you desire, but I recommend *USA* for the best video availability.
-
 ## Developers
 
 AnimeSync includes an `OpenAPI` server. You can run independently of downloads:
