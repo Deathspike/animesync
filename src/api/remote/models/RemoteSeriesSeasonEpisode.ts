@@ -5,7 +5,6 @@ import * as nsg from '@nestjs/swagger';
 export class RemoteSeriesSeasonEpisode {
   constructor(source?: RemoteSeriesSeasonEpisode, sourcePatch?: Partial<RemoteSeriesSeasonEpisode>) {
     this.imageUrl = api.property('imageUrl', source, sourcePatch, undefined);
-    this.isPremium = api.property('isPremium', source, sourcePatch, false);
     this.name = api.property('name', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
     this.synopsis = api.property('synopsis', source, sourcePatch, '');
@@ -17,10 +16,6 @@ export class RemoteSeriesSeasonEpisode {
   @clv.IsUrl({require_tld: false})
   @nsg.ApiPropertyOptional()
   readonly imageUrl?: string;
-
-  @clv.IsBoolean()
-  @nsg.ApiProperty()
-  readonly isPremium: boolean;
 
   @clv.IsString()
   @clv.IsNotEmpty()

@@ -74,12 +74,11 @@ async function evaluateSeriesAsync() {
    **/
   function mapSeasonEpisode(episode) {
     const imageUrl = episode.images.find(x => x.key === 'episodeThumbnail')?.path;
-    const isPremium = Boolean(episode.isSubRequired);
     const name = episode.episodeNumber;
     const title = episode.name;
     const synopsis = episode.synopsis;
     const url = new URL(`${episode.slug}/`, location.href).toString();
-    return {imageUrl, isPremium, name, title, synopsis, url};
+    return {imageUrl, name, title, synopsis, url};
   }
 
   /**

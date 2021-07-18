@@ -1,19 +1,5 @@
-export type PageSearch = {
-  count: number;
-  limit: number;
-  offset: number;
-  items: {
-    hits: Array<{
-      images: Record<string, string>;
-      showUrl: string;
-      title: string;
-    }>
-  };
-};
-
 export type PageSeries = {
   genres: Array<{name: string}>;
-  id: number;
   images: Array<{key: string, path: string}>;
   longSynopsis: string;
   name: string;
@@ -27,7 +13,6 @@ export type PageSeriesSeason = {
 export type PageSeriesSeasonEpisode = {
   episodeNumber: string;
   images: Array<{key: string, path: string}>;
-  isSubRequired: boolean;
   name: string;
   slug: string;
   synopsis: string;

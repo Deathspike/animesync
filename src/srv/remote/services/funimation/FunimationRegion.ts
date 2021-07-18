@@ -1,14 +1,6 @@
 import * as app from '../..';
 
 export class FunimationRegion {
-  static search(search: app.api.RemoteSearch) {
-    return new app.api.RemoteSearch(search, {
-      series: search.series.map(series => new app.api.RemoteSearchSeries(series, {
-        url: normalize(series.url)
-      }))
-    });
-  }
-
   static series(series: app.api.RemoteSeries) {
     return new app.api.RemoteSeries(series, {
       url: normalize(series.url),

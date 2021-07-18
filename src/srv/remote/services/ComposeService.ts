@@ -11,14 +11,6 @@ export class ComposeService {
     this.rewriteService = rewriteService;
   }
 
-  search(compose: app.IComposable<app.api.RemoteSearch>) {
-    return new app.api.RemoteSearch(compose.value, {
-      series: compose.value.series.map(series => new app.api.RemoteSearchSeries(series, {
-        imageUrl: this.rewriteService.emulateUrl(compose.baseUrl, series.imageUrl, compose.headers)
-      }))
-    });
-  }
-
   series(compose: app.IComposable<app.api.RemoteSeries>) {
     return new app.api.RemoteSeries(compose.value, {
       imageUrl: compose.value.imageUrl && this.rewriteService.emulateUrl(compose.baseUrl, compose.value.imageUrl, compose.headers),

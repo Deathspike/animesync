@@ -15,8 +15,6 @@ function accessNpm() {
 }
 
 const defaultCore = new app.api.SettingCore({
-  cacheTimeoutPage: 3600000,
-  cacheTimeoutSearch: 300000,
   cacheTimeoutSeries: 900000,
   cacheTimeoutStream: 300000,
   chromeHeadless: true,

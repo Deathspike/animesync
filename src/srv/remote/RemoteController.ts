@@ -18,33 +18,6 @@ export class RemoteController {
     this.providerService = providerService;
   }
 
-  @app.ResponseValidator([app.api.RemoteProvider])
-  @ncm.Get()
-  @nsg.ApiResponse({status: 200, type: [app.api.RemoteProvider]})
-  async contextAsync(@ncm.Query() model: app.api.RemoteQueryContext) {
-    return await this.providerService.contextAsync(model.url);
-  }
-
-  @app.ResponseValidator(app.api.RemoteSearch)
-  @ncm.Get('page')
-  @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
-  @nsg.ApiResponse({status: 404})
-  async pageAsync(@ncm.Query() model: app.api.RemoteQueryPage) {
-    const cacheKey = `remote/page/${model.page}/${model.provider}/${model.options?.join(',')}/${model.pageNumber ?? 1}`;
-    const cacheTimeout = app.settings.core.cacheTimeoutPage;
-    return this.composeService.search(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.pageAsync(model.provider, model.page, model.options, model.pageNumber)));
-  }
-
-  @app.ResponseValidator(app.api.RemoteSearch)
-  @ncm.Get('search')
-  @nsg.ApiResponse({status: 200, type: app.api.RemoteSearch})
-  @nsg.ApiResponse({status: 404})
-  async searchAsync(@ncm.Query() model: app.api.RemoteQuerySearch) {
-    const cacheKey = `remote/search/${model.provider}/${model.query}/${model.pageNumber ?? 1}`;
-    const cacheTimeout = app.settings.core.cacheTimeoutSearch;
-    return this.composeService.search(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.searchAsync(model.provider, model.query, model.pageNumber)));
-  }
-
   @app.ResponseValidator(app.api.RemoteSeries)
   @ncm.Get('series')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSeries})
