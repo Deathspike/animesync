@@ -12,25 +12,25 @@ export class SettingCredential {
 
   @clv.IsOptional()
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiPropertyOptional()
   readonly crunchyrollUsername?: string;
 
   @clv.IsOptional()
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiPropertyOptional()
   readonly crunchyrollPassword?: string;
 
   @clv.IsOptional()
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiPropertyOptional()
   readonly funimationUsername?: string;
 
   @clv.IsOptional()
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiPropertyOptional()
   readonly funimationPassword?: string;
 }

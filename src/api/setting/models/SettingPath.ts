@@ -13,32 +13,32 @@ export class SettingPath {
   }
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly cache: string;
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly chrome: string;
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly library: string;
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly logger: string;
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly plugin: string;
 
   @clv.IsString()
-  @clv.MinLength(1)
+  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly sync: string;
 }

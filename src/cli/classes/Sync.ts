@@ -35,7 +35,7 @@ export class Sync {
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
         .reduce((p, c) => p.concat(c), []);
       await fs.ensureDir(path.dirname(this.outputPath));
-      await this.spawnAsync(ffmpeg(), ['-y']
+      await this.spawnAsync(app.settings.core.ffmpeg, ['-y']
         .concat(inputs)
         .concat(mappings)
         .concat(metadata)
@@ -65,17 +65,6 @@ export class Sync {
       process.on('exit', resolve);
     });
   }  
-}
-
-function ffmpeg() {
-  switch (process.platform) {
-    case 'darwin':
-      return app.settings.core.ffmpeg ?? path.join(__dirname, '../../../static/ffmpeg');
-    case 'win32':
-      return app.settings.core.ffmpeg ?? path.join(__dirname, '../../../static/ffmpeg.exe');
-    default:
-      return app.settings.core.ffmpeg ?? 'ffmpeg';
-  }
 }
 
 const ffmpegLanguages = {
