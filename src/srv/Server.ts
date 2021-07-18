@@ -5,6 +5,7 @@ import * as npe from '@nestjs/platform-express';
 import * as nsg from '@nestjs/swagger';
 import {ServerError} from './ServerError';
 import {ServerModule} from './ServerModule';
+const packageData = require('../../package');
 
 export class Server extends app.api.ServerApi {
   private readonly server: npe.NestExpressApplication;
@@ -14,7 +15,7 @@ export class Server extends app.api.ServerApi {
     this.server = server;
     this.server.disable('x-powered-by');
     this.server.useLogger(this.logger);
-    this.traceVersion();
+    this.logger.debug(`Running ${packageData.name} (${packageData.version})`);
   }
 
   static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>, serverPort?: number) {
@@ -37,19 +38,13 @@ export class Server extends app.api.ServerApi {
   get logger() {
     return this.server.get(app.LoggerService);
   }
-
-  private traceVersion() {
-    const name = require('../../package').name;
-    const version = require('../../package').version;
-    this.logger.debug(`Running ${name} (${version})`);
-  }
 }
 
 function attachDocumentation(server: ncm.INestApplication) {
   nsg.SwaggerModule.setup('api', server, nsg.SwaggerModule.createDocument(server, new nsg.DocumentBuilder()
-    .setDescription(require('../../package').description)
-    .setTitle(require('../../package').name)
-    .setVersion(require('../../package').version)
+    .setDescription(packageData.description)
+    .setTitle(packageData.name)
+    .setVersion(packageData.version)
     .build()));
 }
 

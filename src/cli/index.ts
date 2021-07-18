@@ -1,4 +1,3 @@
-export * from './actions';
 export * from './classes/Sync';
 export * from './classes/Tracker';
 export * from './functions/check';

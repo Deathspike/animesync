@@ -1,6 +1,13 @@
 import * as app from '../..';
+import commander from 'commander';
 
-export async function browserAsync() {
+export function createBrowser() {
+  return commander.createCommand('browser')
+    .description('Launch browser.')
+    .action(browserAsync);
+}
+
+async function browserAsync() {
   await app.Server.usingAsync(async (api) => {
     api.logger.info(`Listening at ${api.context.serverUrl}`);
     app.settings.core = new app.api.SettingCore(app.settings.core, {chromeHeadless: false});

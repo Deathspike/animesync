@@ -1,8 +1,16 @@
 import * as app from '../..';
 import * as cli from '..';
+import commander from 'commander';
 import readline from 'readline';
+const serverPort = 6583;
 
-export async function serverAsync(this: cli.IOptions) {
+export function createServer() {
+  return commander.createCommand('server')
+    .description('Runs the server.')
+    .action(serverAsync);
+}
+
+async function serverAsync(this: cli.IOptions) {
   await app.Server.usingAsync(async (api) => {
     const reader = readline.createInterface(process.stdin, process.stdout);
     api.logger.info(`Listening at ${api.context.serverUrl}`);
@@ -11,5 +19,5 @@ export async function serverAsync(this: cli.IOptions) {
       reader.close();
       resolve();
     }));
-  }, 6583);
+  }, serverPort);
 }
