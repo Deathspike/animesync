@@ -14,7 +14,8 @@ import path from 'path';
   exports: [app.AgentService, app.BrowserService, app.CacheService, app.ContextService, app.LoggerService, app.RewriteService]})
 export class ServerModule implements ncm.OnApplicationBootstrap {
   async onApplicationBootstrap() {
-    await pruneAsync(app.settings.path.cache, 3600000);
+    const cacheTimeout = Math.max(app.settings.core.cacheTimeoutSeries, app.settings.core.cacheTimeoutStream);
+    await pruneAsync(app.settings.path.cache, cacheTimeout);
     await pruneAsync(app.settings.path.logger, 604800000);
     await pruneAsync(app.settings.path.sync, 14400000);
   }
