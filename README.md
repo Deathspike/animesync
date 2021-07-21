@@ -165,24 +165,17 @@ Usage: app settings core [options]
 The core settings.
 
 Options:
-  --chromeHeadless [bool]             Chrome headless mode.
-                                      -> true
-  --chromeInactiveTimeout [number]    Chrome inactive timeout in milliseconds.
-                                      -> 600000
-  --chromeNavigationTimeout [number]  Chrome navigation timeout in milliseconds.
-                                      -> 30000
-  --chromeViewport [string]           Chrome viewport while headless.
-                                      -> 1920x974
-  --fetchMaximumRetries [number]      Fetch maximum retries.
-                                      -> 8
-  --fetchTimeoutRequest [number]      Fetch request timeout in milliseconds.
-                                      -> 30000
-  --fetchTimeoutRetry [number]        Fetch retry timeout in milliseconds.
-                                      -> 3750
-  --ffmpeg [string]                   Path to custom ffmpeg executable.
-                                      ->
-  --proxyServer [string]              Proxy server for network traffic.
-                                      ->
+  --cacheTimeoutSeries [number]       Cache timeout for series        900000
+  --cacheTimeoutStream [number]       Cache timeout for streams.      300000
+  --chromeHeadless [bool]             Chrome headless mode.           true
+  --chromeTimeoutInactive [number]    Chrome timeout for inactivity.  600000
+  --chromeTimeoutNavigation [number]  Chrome timeout for navigation.  30000
+  --chromeViewport [string]           Chrome viewport dimensions.     1920x974
+  --fetchMaximumRetries [number]      Fetch maximum retries.          8
+  --fetchTimeoutRequest [number]      Fetch timeout for requests.     30000
+  --fetchTimeoutRetry [number]        Fetch timeout for retries.      3750
+  --ffmpeg [string]                   The ffmpeg command.             /path/to/ffmpeg
+  --proxyServer [string]              The proxy server.               
   -h, --help                          display help for command
 ```
 
