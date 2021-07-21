@@ -3,6 +3,7 @@ import {createSettingsCore} from './settings/createSettingsCore';
 import {createSettingsCredential} from './settings/createSettingsCredential';
 import {createSettingsPath} from './settings/createSettingsPath';
 import commander from 'commander';
+const format = (x: number) => <T>(y: string, z: T) => `${y.padEnd(x)} ${z || '<empty>'}`;
 
 export function createSettings() {
   return commander.createCommand('settings')
@@ -10,12 +11,6 @@ export function createSettings() {
     .addCommand(createSettingsCore(format(31)).action(settingsAsync))
     .addCommand(createSettingsCredential(format(22)).action(settingsAsync))
     .addCommand(createSettingsPath(format(21)).action(settingsAsync));
-}
-
-function format(maxLength: number) {
-  return function <T>(description: string, value: T) {
-    return `${description.padEnd(maxLength)} ${value || '<empty>'}`;
-  };
 }
 
 async function settingsAsync(this: commander.Command) {

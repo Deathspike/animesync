@@ -22,7 +22,7 @@ export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
 
   onApplicationBootstrap() {
     const adapter = this.adapterHost.httpAdapter;
-    const http = adapter.getHttpServer() as http.Server;
+    const http: http.Server = adapter.getHttpServer();
     http.on('connect', this.onConnect.bind(this));
   }
 

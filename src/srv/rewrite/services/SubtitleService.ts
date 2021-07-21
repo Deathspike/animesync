@@ -39,7 +39,7 @@ function changeScale(content: ass.ParsedASS) {
 }
 
 function fetchPrimaryStyle(content: ass.ParsedASS) {
-  const result = {} as Record<string, number>;
+  const result: Record<string, number> = {};
   content.events.dialogue.forEach(c => result[c.Style] = (result[c.Style] ?? 0) + c.End - c.Start);
   const name = Object.entries(result).sort((a, b) => b[1] - a[1]).shift()?.[0];
   return content.styles.style.find(x => x.Name === name);

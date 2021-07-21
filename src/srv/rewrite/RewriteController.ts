@@ -5,6 +5,7 @@ import express from 'express';
 
 @ncm.Controller('api/rewrite')
 @ncm.UseInterceptors(app.ResponseLoggerInterceptor)
+@nsg.ApiExcludeController()
 @nsg.ApiTags('rewrite')
 @nsg.ApiBadRequestResponse()
 @nsg.ApiInternalServerErrorResponse()
