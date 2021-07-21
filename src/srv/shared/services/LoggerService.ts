@@ -21,7 +21,6 @@ export class LoggerService implements ncm.LoggerService {
   }
   
   error(value: Error | string, trace?: string) {
-    showMessage(value, trace);
     this.enqueue('ERROR', fetchMessage(value, trace));
   }
 
@@ -40,7 +39,6 @@ export class LoggerService implements ncm.LoggerService {
   }
 
   warn(value: string) {
-    showMessage(value);
     this.enqueue('WARN', fetchMessage(value));
   }
 
