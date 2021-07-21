@@ -10,11 +10,13 @@ export class AgentService implements ncm.OnModuleDestroy {
   private readonly httpAgent: app.AgentHttp;
   private readonly httpsAgent: app.AgentHttps;
   private readonly loggerService: app.LoggerService;
-  
+  private readonly timeoutHandles: Record<number, AbortController>;
+
   constructor(contextService: app.ContextService, loggerService: app.LoggerService) {
     this.httpAgent = new app.AgentHttp(contextService, {keepAlive: true});
     this.httpsAgent = new app.AgentHttps(contextService, {keepAlive: true});
     this.loggerService = loggerService;
+    this.timeoutHandles = {};
   }
 
   async emulateAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
@@ -39,13 +41,22 @@ export class AgentService implements ncm.OnModuleDestroy {
   onModuleDestroy() {
     this.httpAgent.destroy();
     this.httpsAgent.destroy();
+    Object.keys(this.timeoutHandles).forEach(x => this.expireRequest(Number(x)));
+  }
+
+  private expireRequest(timeout: number) {
+    if (!this.timeoutHandles[timeout]) return;
+    this.timeoutHandles[timeout].abort();
+    clearTimeout(timeout);
+    delete this.timeoutHandles[timeout];
   }
 
   private async proxyAsync(url: URL, options?: fch.RequestInit) {
     const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
     const controller = new AbortController();
     const headers = Object.assign(options && options.headers ? options.headers : {}, {host: url.host});
-    setTimeout(() => controller.abort(), app.settings.core.fetchTimeoutRequest);
+    const timeout: number = +setTimeout(() => this.expireRequest(timeout), app.settings.core.fetchTimeoutRequest);
+    this.timeoutHandles[timeout] = controller;
     return await fetch(url, {...options, agent, headers, signal: controller.signal});
   }
 

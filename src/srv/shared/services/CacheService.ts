@@ -7,8 +7,8 @@ import path from 'path';
 @ncm.Injectable()
 export class CacheService implements ncm.OnModuleDestroy {
   private readonly loggerService: app.LoggerService;
-  private readonly timeoutHandles: {[key: string]: NodeJS.Timeout};
-  private readonly values: {[key: string]: Promise<any> | string};
+  private readonly timeoutHandles: Record<string, NodeJS.Timeout>;
+  private readonly values: Record<string, Promise<any> | string>;
 
   constructor(loggerService: app.LoggerService) {
     this.loggerService = loggerService;
