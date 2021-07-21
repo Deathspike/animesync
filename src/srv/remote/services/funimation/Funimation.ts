@@ -3,7 +3,6 @@ import * as ncm from '@nestjs/common';
 import {evaluateSeriesAsync} from './evaluators/series';
 import {evaluateStreamAsync} from './evaluators/stream';
 import {FunimationCredential} from './FunimationCredential';
-import {FunimationRegion} from './FunimationRegion';
 const baseUrl = 'https://www.funimation.com';
 
 @ncm.Injectable()
@@ -29,7 +28,7 @@ export class Funimation implements app.IProvider {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const series = FunimationRegion.series(await page.evaluate(evaluateSeriesAsync));
+      const series = await page.evaluate(evaluateSeriesAsync);
       return new app.Composable(seriesUrl, series, headers);
     });
   }
