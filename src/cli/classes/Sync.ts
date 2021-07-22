@@ -62,9 +62,13 @@ export class Sync {
       process.stdout.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString('utf-8').trim()));
       process.stderr.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString('utf-8').trim()));
       process.on('error', reject);
-      process.on('exit', resolve);
+      process.on('exit', (exitCode) => {
+        if (exitCode === 0) return resolve();
+        this.api.logger.error(`Unexpected exit code: ${exitCode}`);
+        reject();
+      });
     });
-  }  
+  }
 }
 
 const ffmpegLanguages = {

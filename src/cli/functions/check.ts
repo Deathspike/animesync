@@ -5,7 +5,7 @@ import path from 'path';
 import sanitizeFilename from 'sanitize-filename';
 type IWorker = (seriesPath: string, series: app.api.RemoteSeries) => Promise<any>;
 
-export async function checkAsync(api: app.Server, urls: Array<string>, workAsync: IWorker, options?: cli.IOptions, ) {
+export async function checkAsync(api: app.Server, urls: Array<string>, workAsync: IWorker, options?: cli.IOptions) {
   await cli.CoreInfo.loadAsync()
     .then(coreInfo => urls && urls.length ? urlAsync(api, coreInfo, urls, workAsync, options) : directoryAsync(api, coreInfo, workAsync))
     .catch((error) => api.logger.error(error));
