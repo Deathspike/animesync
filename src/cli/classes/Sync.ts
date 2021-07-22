@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import fetch from 'node-fetch';
 import fs from 'fs-extra';
 import path from 'path';
+import which from 'which';
 
 export class Sync {
   private readonly api: app.Server;
@@ -35,7 +36,7 @@ export class Sync {
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
         .reduce((p, c) => p.concat(c), []);
       await fs.ensureDir(path.dirname(this.outputPath));
-      await this.spawnAsync(app.settings.core.ffmpeg, ['-y']
+      await this.spawnAsync(await findAsync(), ['-y']
         .concat(inputs)
         .concat(mappings)
         .concat(metadata)
@@ -69,6 +70,12 @@ export class Sync {
       });
     });
   }
+}
+
+async function findAsync() {
+  return app.settings.core.ffmpeg
+    ? app.settings.core.ffmpeg
+    : await which('ffmpeg').catch(() => path.join(__dirname, '../../../static/ffmpeg'));
 }
 
 const ffmpegLanguages = {
