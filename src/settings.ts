@@ -13,7 +13,7 @@ const defaultCore = new app.api.SettingCore({
   fetchMaximumRetries: 8,
   fetchTimeoutRequest: 30000,
   fetchTimeoutRetry: 3750,
-  ffmpeg: /^darwin|win32$/.test(process.platform) ? path.join(__dirname, '../static/ffmpeg') : 'ffmpeg'
+  ffmpeg: path.join(__dirname, '../static/ffmpeg')
 });
 
 const defaultCredential = new app.api.SettingCredential({
