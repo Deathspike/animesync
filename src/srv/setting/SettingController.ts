@@ -16,39 +16,39 @@ export class SettingController {
   @app.ResponseValidator(app.api.SettingCore)
   @ncm.Get()
   @nsg.ApiResponse({status: 200, type: app.api.SettingCore})
-  core() {
+  coreGet() {
     return app.settings.core;
   }
 
   @ncm.Put()
   @ncm.HttpCode(204)
-  async coreAsync(@ncm.Body() model: app.api.SettingCore) {
+  async corePutAsync(@ncm.Body() model: app.api.SettingCore) {
     await this.settingService.coreAsync(model);
   }
 
   @app.ResponseValidator(app.api.SettingCredential)
   @ncm.Get('credential')
   @nsg.ApiResponse({status: 200, type: app.api.SettingCredential})
-  credential() {
+  credentialGet() {
     return app.settings.credential;
   }
 
   @ncm.Put('credential')
   @ncm.HttpCode(204)
-  async credentialAsync(@ncm.Body() model: app.api.SettingCredential) {
+  async credentialPutAsync(@ncm.Body() model: app.api.SettingCredential) {
     await this.settingService.credentialAsync(model);
   }
   
   @app.ResponseValidator(app.api.SettingPath)
   @ncm.Get('path')
   @nsg.ApiResponse({status: 200, type: app.api.SettingPath})
-  path() {
+  pathGet() {
     return app.settings.path;
   }
 
   @ncm.Put('path')
   @ncm.HttpCode(204)
-  async pathAsync(@ncm.Body() model: app.api.SettingPath) {
+  async pathPutAsync(@ncm.Body() model: app.api.SettingPath) {
     await this.settingService.pathAsync(model);
   }
 }

@@ -20,21 +20,21 @@ export class RemoteStreamSource {
   
   @clv.IsOptional()
   @clv.IsNumber()
-  @clv.Min(1)
+  @clv.IsPositive()
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly bandwidth?: number;
 
   @clv.IsOptional()
   @clv.IsNumber()
-  @clv.Min(1)
+  @clv.IsPositive()
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly resolutionX?: number;
   
   @clv.IsOptional()
   @clv.IsNumber()
-  @clv.Min(1)
+  @clv.IsPositive()
   @clt.Type(() => Number)
   @nsg.ApiPropertyOptional()
   readonly resolutionY?: number;

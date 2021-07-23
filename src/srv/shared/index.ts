@@ -14,3 +14,4 @@ export * from './services/RewriteService';
 export * from './ResponseLoggerInterceptor';
 export * from './ResponseValidator';
 export * from './ResponseValidatorInterceptor';
+export * from './ValidationError';

@@ -13,7 +13,13 @@ export class ServerError implements ncm.ExceptionFilter {
   catch(error: Error, host: ncm.ArgumentsHost) {
     const request: express.Request = host.switchToHttp().getRequest();
     const response: express.Response = host.switchToHttp().getResponse();
-    if (error instanceof ncm.HttpException) {
+    if (error instanceof app.ValidationError) {
+      const message = error.stack ?? error.message;
+      const statusCode = 500;
+      const value = {statusCode, message, ...error.data};
+      response.status(statusCode).json(value);
+      this.loggerService.debug(`HTTP/${request.httpVersion} ${statusCode} ${JSON.stringify(value)}`);
+    } else if (error instanceof ncm.HttpException) {
       const message = error.stack ?? error.message;
       const statusCode = error.getStatus();
       const value = {statusCode, message};
