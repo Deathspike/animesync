@@ -7,6 +7,6 @@ import cors from 'cors'
   providers: [app.ComposeService, app.ProviderService]})
 export class RemoteModule implements ncm.NestModule {
   configure(consumer: ncm.MiddlewareConsumer) {
-    consumer.apply(cors()).forRoutes('api/remote');
+    consumer.apply(cors()).forRoutes(app.RemoteController);
   }
 }
