@@ -7,7 +7,7 @@ export class RemoteSeriesSeasonEpisode {
     this.imageUrl = api.property('imageUrl', source, sourcePatch, undefined);
     this.name = api.property('name', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
-    this.synopsis = api.property('synopsis', source, sourcePatch, '');
+    this.synopsis = api.property('synopsis', source, sourcePatch, undefined);
     this.url = api.property('url', source, sourcePatch, '');
   }
 
