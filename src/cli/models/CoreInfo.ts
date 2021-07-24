@@ -10,7 +10,7 @@ export class CoreInfo {
   }
 
   static async loadAsync() {
-    const input = await fs.readJson(path.join(os.homedir(), 'animesync', 'cli.json')).catch(() => ({}));
+    const input = await fs.readJson(path.join(os.homedir(), 'animesync', 'library.json')).catch(() => ({}));
     const value = new CoreInfo(input);
     await clv.validateOrReject(value);
     return value;
@@ -23,7 +23,7 @@ export class CoreInfo {
     if (isMissing) {
       coreInfo.rootPaths.push(rootPath);
       await fs.ensureDir(path.join(os.homedir(), 'animesync'));
-      await fs.writeJson(path.join(os.homedir(), 'animesync', 'cli.json'), coreInfo, {spaces: 2});
+      await fs.writeJson(path.join(os.homedir(), 'animesync', 'library.json'), coreInfo, {spaces: 2});
     }
   }
 

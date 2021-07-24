@@ -51,7 +51,7 @@ export class SettingService {
       shallowDiff(app.settings.credential, app.settings.source.defaultCredential),
       shallowDiff(app.settings.path, app.settings.source.defaultPath));
     await fs.ensureDir(path.join(os.homedir(), 'animesync'));
-    await fs.writeJson(path.join(os.homedir(), 'animesync', 'server.json'), settingOverrides, {spaces: 2});
+    await fs.writeJson(path.join(os.homedir(), 'animesync', 'settings.json'), settingOverrides, {spaces: 2});
   }
 }
 
