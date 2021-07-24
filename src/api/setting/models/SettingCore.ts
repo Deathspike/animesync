@@ -72,7 +72,7 @@ export class SettingCore {
   @clv.IsOptional()
   @clv.IsString()
   @clv.IsNotEmpty()
-  @nsg.ApiProperty()
+  @nsg.ApiPropertyOptional()
   readonly ffmpeg?: string;
 
   @clv.IsOptional()
