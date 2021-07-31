@@ -11,8 +11,13 @@ export class ResponseValidatorInterceptor<T extends object> implements ncm.NestI
 
   intercept(_: ncm.ExecutionContext, next: ncm.CallHandler) {
     return next.handle().pipe(rop.map(async (value: Array<T> | T) => {
-      await app.ValidationError.validateAsync(this.cls, value);
-      return value;
+      if (Array.isArray(this.cls) && Array.isArray(value)) {
+        return await app.ValidationError.validateArrayAsync(this.cls, value);
+      } else if (Array.isArray(this.cls)) {
+        return await app.ValidationError.validateArrayAsync(this.cls, [value]);
+      } else {
+        return await app.ValidationError.validateSingleAsync(this.cls, value);
+      }
     }));
   }
 }

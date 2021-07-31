@@ -18,13 +18,16 @@ export class ValidationError<T> extends Error {
     return {errors, value};
   }
 
-  static async validateAsync<T extends object>(cls: Array<ncm.Type<T>> | ncm.Type<T>, value: Array<T> | T) {
-    const validationErrors = Array.isArray(cls)
-      ? await validateArrayAsync(cls, value)
-      : await validateSingleAsync(cls, value);
-    if (validationErrors.length) {
-      throw new ValidationError('Validation failed', validationErrors, value);
-    }
+  static async validateArrayAsync<T extends object>(cls: Array<ncm.Type<T>>, value: Array<T>) {
+    const errors = await validateArrayAsync(cls, value);
+    if (errors.length) throw new ValidationError('Validation failed', errors, value);
+    return value;
+  }
+
+  static async validateSingleAsync<T extends object>(cls: ncm.Type<T>, value: T) {
+    const errors = await validateSingleAsync(cls, value);
+    if (errors.length) throw new ValidationError('Validation failed', errors, value);
+    return value;
   }
 }
 
@@ -40,15 +43,13 @@ function publishSingle(error: clv.ValidationError, result: Array<{constraints: R
   if (error.children) result.push(...publishArray(error.children, property));
 }
 
-async function validateArrayAsync<T extends object>(cls: Array<ncm.Type<T>>, value: Array<T> | T) {
-  if (!Array.isArray(value)) return [{property: '$', constraints: {array: 'Not an array'}, children: []}];
+async function validateArrayAsync<T extends object>(cls: Array<ncm.Type<T>>, value: Array<T>) {
   const validationErrors = await Promise.all(value.map(x => validateSingleAsync(cls[0], x)));
   validationErrors.forEach((x, i) => x.forEach(y => y.property = `[${i}].${y.property}`));
   return validationErrors.reduce((p, c) => p.concat(c), []);
 }
 
-async function validateSingleAsync<T extends object>(cls: ncm.Type<T>, value: Array<T> | T) {
-  if (Array.isArray(value)) return [{property: '$', constraints: {array: 'Is an array'}, children: []}];
+async function validateSingleAsync<T extends object>(cls: ncm.Type<T>, value: T) {
   if (value instanceof cls) return await clv.validate(value);
   return await clv.validate(clt.plainToClass(cls, value));
 }
