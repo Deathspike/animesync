@@ -19,9 +19,9 @@ async function directoryAsync(api: app.Server, coreInfo: cli.CoreInfo, workAsync
       const seriesInfoPath = path.join(seriesPath, 'tvshow.nfo');
       const seriesInfoXml = await fs.readFile(seriesInfoPath, 'utf8').catch(() => '');
       const seriesInfo = await cli.SeriesInfo.parseAsync(seriesInfoXml).catch(() => {});
-      if (seriesInfo && seriesInfo.animesync) {
-        api.logger.info(`Checking ${seriesName} (${seriesInfo.animesync})`);
-        const series = await api.remote.seriesAsync({url: seriesInfo.animesync});
+      if (seriesInfo && seriesInfo.url) {
+        api.logger.info(`Checking ${seriesName} (${seriesInfo.url})`);
+        const series = await api.remote.seriesAsync(seriesInfo);
         if (series.value) {
           await workAsync(seriesPath, series.value);
         } else {

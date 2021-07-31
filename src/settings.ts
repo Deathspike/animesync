@@ -30,10 +30,10 @@ const defaultPath = new app.api.SettingPath({
   sync: path.join(os.homedir(), 'animesync', 'sync')
 });
 
-const settingOverrides = 
-  fs.readJsonSync(path.join(os.homedir(), 'animesync', 'settings.json'), {throws: false}) ??
-  fs.readJsonSync(path.join(os.homedir(), 'animesync', 'server.json'), {throws: false});
-  
+const settingOverrides = fs.readJsonSync(
+  path.join(os.homedir(), 'animesync', 'settings.json'),
+  {throws: false});
+
 export const settings = {
   core: new app.api.SettingCore(defaultCore, settingOverrides),
   credential: new app.api.SettingCredential(defaultCredential, settingOverrides),

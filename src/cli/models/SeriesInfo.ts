@@ -1,53 +1,72 @@
 import * as app from '../..';
 import * as clv from 'class-validator';
+import {ValidationError} from '../../srv/shared/ValidationError';
 import xml2js from 'xml2js';
 
 export class SeriesInfo {
-  private constructor(source: SeriesInfo) {
-    this.animesync = source.animesync;
-    this.genre = new Array<string>().concat(source.genre);
-    this.plot = source.plot;
+  constructor(source: SeriesInfo) {
+    this.genres = source.genres;
+    this.synopsis = source.synopsis;
     this.title = source.title;
+    this.url = source.url;
   }
 
   static create(series: app.api.RemoteSeries) {
     return new SeriesInfo({
-      animesync: series.url,
-      genre: series.genres,
-      plot: series.synopsis,
-      title: series.title
+      genres: series.genres,
+      synopsis: series.synopsis,
+      title: series.title,
+      url: series.url,
     });
   }
 
   static async parseAsync(xml: string) {
-    const input = await xml2js.parseStringPromise(xml, {emptyTag: undefined, explicitArray: false, explicitRoot: false});
-    const value = new SeriesInfo(input);
-    await clv.validateOrReject(value);
-    return value;
+    const parsedXml: ParsedSeriesInfo = await xml2js.parseStringPromise(xml, {
+      emptyTag: undefined,
+      explicitRoot: false
+    });
+    return await ValidationError.validateSingleAsync(SeriesInfo, new SeriesInfo({
+      genres: parsedXml.genre ?? [],
+      synopsis: parsedXml.plot?.[0],
+      title: parsedXml.title?.[0] ?? '',
+      url: parsedXml.uniqueid
+        ?.filter(x => typeof x !== 'string' && x.$.type.includes('animesync'))
+        ?.map(x => typeof x !== 'string' ? x._ : '')
+        ?.[0] ?? ''
+    }));
   }
-
-  @clv.IsOptional()
-  @clv.IsString()
-  @clv.IsUrl()
-  readonly animesync?: string;
 
   @clv.IsArray()
   @clv.IsString({each: true})
   @clv.IsNotEmpty({each: true})
-  readonly genre: Array<string>;
+  readonly genres: Array<string>;
 
   @clv.IsOptional()
   @clv.IsString()
   @clv.IsNotEmpty()
-  readonly plot?: string;
+  readonly synopsis?: string;
   
   @clv.IsString()
   @clv.IsNotEmpty()
   readonly title: string;
 
+  @clv.IsString()
+  @clv.IsUrl()
+  readonly url: string;
+
   toString() {
-    const builder = new xml2js.Builder();
-    const xml = builder.buildObject({tvshow: this});
-    return xml;
+    return new xml2js.Builder().buildObject({tvshow: {
+      genre: this.genres,
+      plot: this.synopsis && [this.synopsis],
+      title: [this.title],
+      uniqueid: [{$: {type: ['animesync']}, _: this.url}]
+    } as ParsedSeriesInfo});
   }
 }
+
+type ParsedSeriesInfo = {
+  genre?: Array<string>;
+  plot?: Array<string>;
+  title?: Array<string>;
+  uniqueid?: Array<string | {$: {type: Array<string>}, _: string}>
+};
