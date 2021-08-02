@@ -24,7 +24,7 @@ export class AgentService implements ncm.OnModuleDestroy {
       const result = await this.proxyAsync(url, {...options, compress: false, redirect: 'manual'});
       const buffer = await result.buffer();
       response.status(result.status);
-      Array.from(result.headers.entries()).forEach(([k, v]) => response.setHeader(k, v));
+      Array.from(result.headers.entries()).forEach(([k, v]) => k !== 'transfer-encoding' && response.setHeader(k, v));
       response.send(buffer);
     });
   }
