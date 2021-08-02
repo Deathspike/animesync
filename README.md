@@ -27,6 +27,7 @@ The following streaming services are currently supported:
 
 * [Crunchyroll](https://www.crunchyroll.com/)
 * [Funimation](https://www.funimation.com/)
+* [Vrv](https://vrv.co/)
 
 Requests to support additional streaming services are welcome.
 

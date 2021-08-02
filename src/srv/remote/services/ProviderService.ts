@@ -3,6 +3,7 @@ import * as ncm from '@nestjs/common';
 import * as ncr from '@nestjs/core';
 import {Crunchyroll} from './crunchyroll/Crunchyroll';
 import {Funimation} from './funimation/Funimation';
+import {Vrv} from './vrv/Vrv';
 
 @ncm.Injectable()
 export class ProviderService {
@@ -11,7 +12,8 @@ export class ProviderService {
   constructor(moduleRef: ncr.ModuleRef) {
     this.providers = [
       moduleRef.create(Crunchyroll),
-      moduleRef.create(Funimation)
+      moduleRef.create(Funimation),
+      moduleRef.create(Vrv)
     ];
   }
 

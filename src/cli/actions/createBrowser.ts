@@ -1,4 +1,5 @@
 import * as app from '../..';
+import * as playwright from 'playwright-core';
 import commander from 'commander';
 
 export function createBrowser() {
@@ -13,10 +14,17 @@ async function browserAsync() {
     app.settings.core = new app.api.SettingCore(app.settings.core, {chromeHeadless: false});
     await api.browser.pageAsync(async (page) => {
       const context = page.context();
-      const pages = context.pages();
-      if (pages.length > 0) pages[0].goto('https://www.crunchyroll.com/').catch(() => {});
-      if (pages.length > 1) pages[1].goto('https://www.funimation.com/').catch(() => {});
+      const crunchyrollPromise = navigateAsync(context, 0, 'https://www.crunchyroll.com/');
+      const funimationPromise = navigateAsync(context, 1, 'https://www.funimation.com/');
+      const vrvPromise = navigateAsync(context, 2, 'https://vrv.co/');
+      await Promise.all([crunchyrollPromise, funimationPromise, vrvPromise]);
       await new Promise<void>((resolve) => context.on('close', resolve));
     });
   });
+}
+
+async function navigateAsync(context: playwright.BrowserContext, index: number, url: string) {
+  const pages = context.pages();
+  const page = pages.length > index ? pages[index] : await context.newPage();
+  await page.goto(url, {waitUntil: 'domcontentloaded'});
 }

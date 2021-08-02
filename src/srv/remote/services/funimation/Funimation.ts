@@ -28,8 +28,8 @@ export class Funimation implements app.IProvider {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const series = await page.evaluate(evaluateSeriesAsync);
-      return new app.Composable(seriesUrl, series, headers);
+      const value = await page.evaluate(evaluateSeriesAsync);
+      return new app.Composable(seriesUrl, value, headers);
     });
   }
 
@@ -38,8 +38,8 @@ export class Funimation implements app.IProvider {
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const stream = await page.evaluate(evaluateStreamAsync);
-      return new app.Composable(streamUrl, stream, headers);
+      const value = await page.evaluate(evaluateStreamAsync);
+      return new app.Composable(streamUrl, value, headers);
     });
   }
 }

@@ -30,11 +30,11 @@ export class Crunchyroll implements app.IProvider {
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       if (/\/maturity_wall\?/.test(page.url())) {
         await page.goto(`${seriesUrl}?skip_wall=1`, {waitUntil: 'domcontentloaded'});
-        const series = await page.evaluate(evaluateSeries);
-        return new app.Composable(seriesUrl, series, headers);
+        const value = await page.evaluate(evaluateSeries);
+        return new app.Composable(seriesUrl, value, headers);
       } else {
-        const series = await page.evaluate(evaluateSeries);
-        return new app.Composable(seriesUrl, series, headers);
+        const value = await page.evaluate(evaluateSeries);
+        return new app.Composable(seriesUrl, value, headers);
       }
     });
   }
@@ -44,8 +44,8 @@ export class Crunchyroll implements app.IProvider {
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await CrunchyrollCredential.tryAsync(baseUrl, page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const stream = await page.evaluate(evaluateStream);
-      return new app.Composable(streamUrl, stream, headers);
+      const value = await page.evaluate(evaluateStream);
+      return new app.Composable(streamUrl, value, headers);
     });
   }
 }
