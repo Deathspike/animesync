@@ -5,7 +5,6 @@ import xml2js from 'xml2js';
 
 export class SeriesInfo {
   constructor(source: SeriesInfo) {
-    this.genres = source.genres;
     this.synopsis = source.synopsis;
     this.title = source.title;
     this.url = source.url;
@@ -13,7 +12,6 @@ export class SeriesInfo {
 
   static create(series: app.api.RemoteSeries) {
     return new SeriesInfo({
-      genres: series.genres,
       synopsis: series.synopsis,
       title: series.title,
       url: series.url,
@@ -26,7 +24,6 @@ export class SeriesInfo {
       explicitRoot: false
     });
     return await ValidationError.validateSingleAsync(SeriesInfo, new SeriesInfo({
-      genres: parsedXml.genre ?? [],
       synopsis: parsedXml.plot?.[0],
       title: parsedXml.title?.[0] ?? '',
       url: parsedXml.uniqueid
@@ -35,11 +32,6 @@ export class SeriesInfo {
         ?.[0] ?? ''
     }));
   }
-
-  @clv.IsArray()
-  @clv.IsString({each: true})
-  @clv.IsNotEmpty({each: true})
-  readonly genres: Array<string>;
 
   @clv.IsOptional()
   @clv.IsString()
@@ -56,7 +48,6 @@ export class SeriesInfo {
 
   toString() {
     return new xml2js.Builder().buildObject({tvshow: {
-      genre: this.genres,
       plot: this.synopsis && [this.synopsis],
       title: [this.title],
       uniqueid: [{$: {type: ['animesync']}, _: this.url}]
@@ -65,7 +56,6 @@ export class SeriesInfo {
 }
 
 type ParsedSeriesInfo = {
-  genre?: Array<string>;
   plot?: Array<string>;
   title?: Array<string>;
   uniqueid?: Array<string | {$: {type: Array<string>}, _: string}>

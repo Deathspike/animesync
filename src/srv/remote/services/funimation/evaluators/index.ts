@@ -1,5 +1,4 @@
 export type PageSeries = {
-  genres: Array<{name: string}>;
   images: Array<{key: string, path: string}>;
   longSynopsis: string;
   name: string;

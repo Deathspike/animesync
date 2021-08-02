@@ -15,13 +15,12 @@ var region;
  **/
 async function evaluateSeriesAsync() {
   const data = await fetchSeriesAsync();
-  const genres = data.genres.map(x => x.name);
   const imageUrl = data.images.find(x => x.key === 'showKeyart')?.path;
   const seasons = await getSeasonAsync();
   const synopsis = data.longSynopsis;
   const title = data.name;
   const url = location.href.split('?')[0];
-  return {genres, imageUrl, seasons, synopsis, title, url};
+  return {imageUrl, seasons, synopsis, title, url};
 
   /**
    * Fetch the series.

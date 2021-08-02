@@ -12,7 +12,6 @@ var $;
  **/
 function evaluateSeries() {
   return {
-    genres: Array.from(document.querySelectorAll('#sidebar a[href*="/genres/"]')).map(validateStrict),
     imageUrl: processUrl(document.querySelector('#sidebar img')),
     seasons: mapSeason(document.querySelector('.list-of-seasons')),
     synopsis: validate(document.querySelector('#sidebar .description .more')),
