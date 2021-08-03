@@ -17,6 +17,7 @@ export type Episode = {
 };
 
 export type Season = {
+  id: string;
   title: string;
 }
 

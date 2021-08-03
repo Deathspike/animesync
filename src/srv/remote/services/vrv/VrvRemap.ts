@@ -1,8 +1,8 @@
 import * as app from '../..';
-import * as scp from './typings';
+import * as vrv from './typings';
 
 export class VrvRemap {
-  static series(seriesUrl: string, series: scp.Series, seasons: scp.Collection<scp.Season>, seasonEpisodes: Array<scp.Collection<scp.Episode>>) {
+  static series(seriesUrl: string, series: vrv.Series, seasons: vrv.Collection<vrv.Season>, seasonEpisodes: Array<vrv.Collection<vrv.Episode>>) {
     return new app.api.RemoteSeries({
       imageUrl: fetchImage(series.images, 'poster_tall'),
       seasons: seasons.items.map((x, i) => this.seriesSeason(seriesUrl, series, x, seasonEpisodes[i])).filter(hasJapaneseAudio),
@@ -12,14 +12,14 @@ export class VrvRemap {
     });
   }
 
-  static seriesSeason(seriesUrl: string, series: scp.Series, season: scp.Season, episodes: scp.Collection<scp.Episode>) {
+  static seriesSeason(seriesUrl: string, series: vrv.Series, season: vrv.Season, episodes: vrv.Collection<vrv.Episode>) {
     return new app.api.RemoteSeriesSeason({
       episodes: episodes.items.map(x => this.seriesSeasonEpisode(seriesUrl, series, x)),
       title: season.title
     });
   }
 
-  static seriesSeasonEpisode(seriesUrl: string, series: scp.Series, episode: scp.Episode) {
+  static seriesSeasonEpisode(seriesUrl: string, series: vrv.Series, episode: vrv.Episode) {
     return new app.api.RemoteSeriesSeasonEpisode({
       imageUrl: fetchImage(episode.images, 'thumbnail'),
       name: episode.episode || episode.title,
@@ -29,7 +29,7 @@ export class VrvRemap {
     });
   }
 
-  static stream(streams: scp.Streams) {
+  static stream(streams: vrv.Streams) {
     return new app.api.RemoteStream({
       sources: [{type: 'hls', url: streams.streams['adaptive_hls'][''].url}],
       subtitles: Object.values(streams.subtitles).map(x => new app.api.RemoteStreamSubtitle({language: x.locale, type: x.format, url: x.url}))
@@ -43,7 +43,7 @@ function createSlug(value: string) {
     .replace(/(\s|-)+/g, '-')
 }
 
-function fetchImage(images: Record<string, Array<Array<scp.Artwork>>>, k: string) {
+function fetchImage(images: Record<string, Array<Array<vrv.Artwork>>>, k: string) {
   return images[k]
     ?.find(Boolean)
     ?.slice()?.sort((a, b) => b.width - a.width)
