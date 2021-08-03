@@ -29,7 +29,7 @@ export class CrunchyrollBeta implements app.IProvider {
   
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto('https://crunchyroll.com/', {waitUntil: 'domcontentloaded'});
+      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await CrunchyrollBetaCredential.tryAsync(baseUrl, page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(evaluateNavigate, seriesUrl);
@@ -45,7 +45,7 @@ export class CrunchyrollBeta implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto('https://crunchyroll.com/', {waitUntil: 'domcontentloaded'});
+      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await CrunchyrollBetaCredential.tryAsync(baseUrl, page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(evaluateNavigate, streamUrl);
