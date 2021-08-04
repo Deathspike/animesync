@@ -22,19 +22,19 @@ export class RemoteController {
   @ncm.Get('series')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSeries})
   @nsg.ApiResponse({status: 404})
-  async seriesAsync(@ncm.Query() model: app.api.RemoteQuerySeries) {
-    const cacheKey = `remote/series/${model.url}`;
+  async seriesAsync(@ncm.Query() query: app.api.RemoteQuerySeries) {
+    const cacheKey = `remote/series/${query.url}`;
     const cacheTimeout = app.settings.core.cacheTimeoutSeries;
-    return this.composeService.series(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(model.url)));
+    return this.composeService.series(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(query.url)));
   }
 
   @app.ResponseValidator(app.api.RemoteStream)
   @ncm.Get('stream')
   @nsg.ApiResponse({status: 200, type: app.api.RemoteStream})
   @nsg.ApiResponse({status: 404})
-  async streamAsync(@ncm.Query() model: app.api.RemoteQueryStream) {
-    const cacheKey = `remote/stream/${model.url}`;
+  async streamAsync(@ncm.Query() query: app.api.RemoteQueryStream) {
+    const cacheKey = `remote/stream/${query.url}`;
     const cacheTimeout = app.settings.core.cacheTimeoutStream;
-    return await this.composeService.streamAsync(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(model.url)));
+    return await this.composeService.streamAsync(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(query.url)));
   }
 }
