@@ -28,8 +28,8 @@ async function evaluateSeriesAsync() {
    */
   async function fetchSeriesAsync() {
     const region = await waitForRegionAsync();
-    const seriesUrl = new URL(`/v2${location.pathname}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`);
-    return await fetch(seriesUrl.toString()).then(x => x.json());
+    const seriesUrl = new URL(`/v2${location.pathname}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`).toString();
+    return await fetch(seriesUrl).then(x => x.json());
   }
 
   /**
@@ -39,8 +39,8 @@ async function evaluateSeriesAsync() {
    */
   async function fetchSeasonAsync(seasonId) {
     const region = await waitForRegionAsync();
-    const seasonUrl = new URL(`/v1/seasons/${seasonId}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`);
-    return await fetch(seasonUrl.toString()).then(x => x.json());
+    const seasonUrl = new URL(`/v1/seasons/${seasonId}?region=${region}&deviceType=web`, `https://title-api.prd.funimationsvc.com/`).toString();
+    return await fetch(seasonUrl).then(x => x.json());
   }
 
   /**

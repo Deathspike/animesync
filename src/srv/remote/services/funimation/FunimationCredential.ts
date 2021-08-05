@@ -2,11 +2,11 @@ import * as app from '../..';
 import playwright from 'playwright-core';
 
 export class FunimationCredential {
-  private readonly loginUrl: URL;
+  private readonly loginUrl: string;
   private readonly page: playwright.Page;
 
   private constructor(baseUrl: string, page: playwright.Page) {
-    this.loginUrl = new URL('/log-in/', baseUrl);
+    this.loginUrl = new URL('/log-in/', baseUrl).toString();
     this.page = page;
   }
 

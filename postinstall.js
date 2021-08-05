@@ -7,14 +7,14 @@ let rawUrl = 'https://github.com/animeloyalty/animeloyalty-static/raw/master/';
 let staticPath = path.join(__dirname, 'static');
 
 async function checksumAsync(remotePath) {
-  return await fetch.default(new URL(path.dirname(remotePath), apiUrl))
+  return await fetch(new URL(path.dirname(remotePath), apiUrl).toString())
     .then(x => x.json())
     .then(x => x.find(x => x.name === path.basename(remotePath)).sha);
 }
 
 async function downloadAsync(localPath, remotePath) {
   return await new Promise((resolve, reject) => {
-    fetch.default(new URL(remotePath, rawUrl)).then((res) => res.body
+    fetch(new URL(remotePath, rawUrl).toString()).then((res) => res.body
       .pipe(zlib.createGunzip())
       .pipe(fs.createWriteStream(localPath))
       .on('error', reject)

@@ -6,12 +6,12 @@ import querystring from 'querystring';
 
 @ncm.Injectable()
 export class RewriteService {
-  private readonly baseUrl: URL;
+  private readonly baseUrl: string;
 
   constructor(@ncm.Inject(ncr.REQUEST) request: express.Request) {
     const host = request.headers['host'] ?? request.hostname;
     const protocol = request.headers['x-forwarded-proto'] ?? request.protocol;
-    this.baseUrl = new URL(`${protocol}://${host}/`);
+    this.baseUrl = `${protocol}://${host}/`;
   }
 
   emulateUrl(baseUrl: string, emulateUrl: string, headers?: Record<string, string>) {

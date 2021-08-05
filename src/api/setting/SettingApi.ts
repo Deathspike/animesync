@@ -8,17 +8,17 @@ export class SettingApi {
   }
 
   async coreAsync() {
-    const url = new URL('/api/setting', this.baseUrl);
+    const url = new URL('/api/setting', this.baseUrl).toString();
     return await api.jsonAsync<api.SettingCore>(url);
   }
 
   async credentialAsync() {
-    const url = new URL('/api/setting/credential', this.baseUrl);
+    const url = new URL('/api/setting/credential', this.baseUrl).toString();
     return await api.jsonAsync<api.SettingCredential>(url);
   }
 
   async pathAsync() {
-    const url = new URL('/api/setting/path', this.baseUrl);
+    const url = new URL('/api/setting/path', this.baseUrl).toString();
     return await api.jsonAsync<api.SettingPath>(url);
   }
 
@@ -26,7 +26,7 @@ export class SettingApi {
     const body = JSON.stringify(model);
     const headers = {'Content-Type': 'application/json'};
     const method = 'PUT';
-    const url = new URL('/api/setting', this.baseUrl);
+    const url = new URL('/api/setting', this.baseUrl).toString();
     return await api.jsonAsync(url, {body, method, headers});
   }
 
@@ -34,7 +34,7 @@ export class SettingApi {
     const body = JSON.stringify(model);
     const headers = {'Content-Type': 'application/json'};
     const method = 'PUT';
-    const url = new URL('/api/setting/credential', this.baseUrl);
+    const url = new URL('/api/setting/credential', this.baseUrl).toString();
     return await api.jsonAsync(url, {body, method, headers});
   }
 
@@ -42,7 +42,7 @@ export class SettingApi {
     const body = JSON.stringify(model);
     const headers = {'Content-Type': 'application/json'};
     const method = 'PUT';
-    const url = new URL('/api/setting/path', this.baseUrl);
+    const url = new URL('/api/setting/path', this.baseUrl).toString();
     return await api.jsonAsync(url, {body, method, headers});
   }
 }

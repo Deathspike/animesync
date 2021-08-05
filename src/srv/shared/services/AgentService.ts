@@ -19,7 +19,7 @@ export class AgentService implements ncm.OnModuleDestroy {
     this.timeoutHandles = {};
   }
 
-  async emulateAsync(url: URL, response: express.Response, options?: fch.RequestInit) {
+  async emulateAsync(url: string, response: express.Response, options?: fch.RequestInit) {
     return await this.retryAsync(async () => {
       const result = await this.proxyAsync(url, {...options, compress: false, redirect: 'manual'});
       const buffer = await result.buffer();
@@ -29,7 +29,7 @@ export class AgentService implements ncm.OnModuleDestroy {
     });
   }
 
-  async fetchAsync(url: URL, options?: fch.RequestInit) {
+  async fetchAsync(url: string, options?: fch.RequestInit) {
     return await this.retryAsync(async () => {
       const result = await this.proxyAsync(url, options);
       const buffer = await result.buffer();
@@ -51,10 +51,10 @@ export class AgentService implements ncm.OnModuleDestroy {
     delete this.timeoutHandles[timeout];
   }
 
-  private async proxyAsync(url: URL, options?: fch.RequestInit) {
-    const agent = url.protocol === 'https:' ? this.httpsAgent : this.httpAgent;
+  private async proxyAsync(url: string, options?: fch.RequestInit) {
+    const agent = /^https:/i.test(url) ? this.httpsAgent : this.httpAgent;
     const controller = new AbortController();
-    const headers = Object.assign(options && options.headers ? options.headers : {}, {host: url.host});
+    const headers = Object.assign(options && options.headers ? options.headers : {}, {host: new URL(url).host});
     const timeout: number = +setTimeout(() => this.expireRequest(timeout), app.settings.core.fetchTimeoutRequest);
     this.timeoutHandles[timeout] = controller;
     return await fetch(url, {...options, agent, headers, signal: controller.signal});

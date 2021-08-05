@@ -55,8 +55,8 @@ async function evaluateStreamAsync() {
    */
   async function fetchShowExperienceAsync(experienceId) {
     const id = [...Array(8)].map(() => Math.random().toString(36)[2]).join('');
-    const showExperienceUrl = new URL(`/api/showexperience/${experienceId}?pinst_id=${id}`, location.href);
-    return await fetch(showExperienceUrl.toString()).then(x => x.json());
+    const showExperienceUrl = new URL(`/api/showexperience/${experienceId}?pinst_id=${id}`, location.href).toString();
+    return await fetch(showExperienceUrl).then(x => x.json());
   }
 
   /**

@@ -6,8 +6,7 @@ import tls from 'tls';
 import util from 'util';
 
 export class HttpTunnelService {
-  connect(clientSocket: net.Socket, clientUrl: string) {
-    const client = new URL(clientUrl);
+  connect(client: URL, clientSocket: net.Socket) {
     if (app.settings.core.proxyServer) {
       this.connectTo(client, clientSocket, new URL(app.settings.core.proxyServer));
     } else {

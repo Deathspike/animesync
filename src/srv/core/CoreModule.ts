@@ -28,9 +28,9 @@ export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
 
   private onConnect(request: http.IncomingMessage, socket: net.Socket) {
     if (socket.localAddress === socket.remoteAddress && request.url) {
+      const client = new URL(`http://${request.url}`);
       const clientSocket = socket;
-      const clientUrl = `http://${request.url}`;
-      this.tunnelService.connect(clientSocket, clientUrl);
+      this.tunnelService.connect(client, clientSocket);
     } else {
       socket.destroy();
     }

@@ -18,9 +18,9 @@ export class Observer {
   }
 
   private onResponse(response: playwright.Response) {
-    const url = new URL(response.url());
+    const pathname = new URL(response.url()).pathname;
     for (const {expression, future} of this._responses) {
-      if (!expression.test(url.pathname)) continue;
+      if (!expression.test(pathname)) continue;
       future.resolve(response);
     }
   }

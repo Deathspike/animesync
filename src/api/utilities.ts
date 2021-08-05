@@ -2,12 +2,12 @@ import * as fch from 'node-fetch';
 import fetch from 'node-fetch';
 import querystring from 'querystring';
 
-export async function jsonAsync<T>(url: URL, init?: fch.RequestInit) {
+export async function jsonAsync<T>(url: string, init?: fch.RequestInit) {
   try {
     const response = await fetch(url, init);
     if (response.status === 200) {
       const statusCode: 200 = 200;
-      const value: T = await response.json();
+      const value = await response.json() as T;
       return {statusCode, value};
     } else {
       const statusCode = response.status;
