@@ -57,7 +57,7 @@ export class AgentService implements ncm.OnModuleDestroy {
     const headers = Object.assign(options && options.headers ? options.headers : {}, {host: new URL(url).host});
     const timeout: number = +setTimeout(() => this.expireRequest(timeout), app.settings.core.fetchTimeoutRequest);
     this.timeoutHandles[timeout] = controller;
-    return await fetch(url, {...options, agent, headers, signal: controller.signal});
+    return await fetch(url, app.api.unsafe({...options, agent, headers, insecureHTTPParser: true, signal: controller.signal}));
   }
 
   private async retryAsync<T>(handlerAsync: () => Promise<T>) {

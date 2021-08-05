@@ -6,7 +6,7 @@ export class VrvRemap {
     return new app.api.RemoteSeries({
       imageUrl: fetchImage(series.images, 'poster_tall'),
       seasons: seasons.items.map((x, i) => this.seriesSeason(seriesUrl, series, x, seasonEpisodes[i])).filter(hasJapaneseAudio),
-      synopsis: series.description,
+      synopsis: series.description || undefined,
       title: series.title,
       url: seriesUrl
     });
@@ -24,7 +24,7 @@ export class VrvRemap {
       imageUrl: fetchImage(episode.images, 'thumbnail'),
       name: episode.episode || episode.title,
       synopsis: episode.description || undefined,
-      title: episode.title,
+      title: episode.title || undefined,
       url: new URL(`/watch/${episode.id}/${createSlug(series.title)}:${createSlug(episode.title)}`, seriesUrl).toString()
     });
   }
