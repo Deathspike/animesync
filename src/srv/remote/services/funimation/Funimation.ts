@@ -1,8 +1,8 @@
 import * as app from '../..';
 import * as fun from './typings';
 import * as ncm from '@nestjs/common';
-import {evaluateStreamAsync} from './evaluators/stream';
 import {FunimationCredential} from './FunimationCredential';
+import {FunimationIntercept} from './FunimationIntercept';
 import {FunimationRemap} from './FunimationRemap';
 import playwright from 'playwright-core';
 const baseUrl = 'https://www.funimation.com';
@@ -44,11 +44,15 @@ export class Funimation implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
+      const [playerPromise] = new FunimationIntercept(this.agentService, page).getAsync();
+      const [streamPromise] = new app.Observer(page).getAsync(/\/showexperience\/[^\/]+\//);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
+      const player = await playerPromise;
+      const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const stream = await page.evaluate(evaluateStreamAsync);
-      return new app.Composable(streamUrl, stream, headers);
+      const value = FunimationRemap.stream(player, stream);
+      return new app.Composable(streamUrl, value, headers);
     });
   }
 
@@ -60,7 +64,7 @@ export class Funimation implements app.IProvider {
       const seasonUrl = episodesUrl.replace(/(\/seasons\/)[^\/\?]+/, (_, x) => x + season.id);
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(([k]) => !k.startsWith(':'));
-        const buffer = await this.agentService.fetchAsync(seasonUrl, {headers: {...headers, ...defaultHeaders}});
+        const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});
         seasonEpisodes.push(JSON.parse(buffer.toString('utf8')));
       } else {
         const episodes = await episodesResponse.json();

@@ -13,7 +13,7 @@ export class SubtitleService {
         return ass.stringify(content);
       case 'srt':
         const nodes = sub.parseSync(subtitle);
-        const result = sub.stringifySync(nodes, {format: 'SRT'})
+        const result = sub.stringifySync(nodes, {format: 'SRT'});
         return result;
     }
   }

@@ -1,24 +1,24 @@
 export class Future<T> {
-  private readonly _timeout: number;
-  private _hasReject?: boolean;
-  private _hasResolve?: boolean;
-  private _reject?: any;
-  private _resolve?: T;
-  private _resolver: (error?: any, value?: T) => void;
+  private readonly timeout: number;
+  private hasReject?: boolean;
+  private hasResolve?: boolean;
+  private rejectValue?: any;
+  private resolveValue?: T;
+  private resolver: (error?: any, value?: T) => void;
 
   constructor(timeout = 0) {
-    this._resolver = () => undefined;
-    this._timeout = timeout;
+    this.resolver = () => undefined;
+    this.timeout = timeout;
   }
 
   async getAsync() {
     return await new Promise<T>((resolve, reject) => {
-      if (this._hasReject) {
-        reject(this._reject);
-      } else if (this._hasResolve && typeof this._resolve !== 'undefined') {
-        resolve(this._resolve);
-      } else if (this._timeout) {
-        setTimeout(reject, this._timeout);
+      if (this.hasReject) {
+        reject(this.rejectValue);
+      } else if (this.hasResolve && typeof this.resolveValue !== 'undefined') {
+        resolve(this.resolveValue);
+      } else if (this.timeout) {
+        setTimeout(reject, this.timeout);
         this.queue(resolve, reject);
       } else {
         this.queue(resolve, reject);
@@ -26,23 +26,27 @@ export class Future<T> {
 		});
   }
 
+  get isFulfilled() {
+    return this.hasReject || this.hasResolve;
+  }
+
   reject(error: any) {
-    if (this._hasReject || this._hasResolve) return;
-    this._hasReject = true;
-    this._reject = error;
-    this._resolver(error);
+    if (this.isFulfilled) return;
+    this.hasReject = true;
+    this.rejectValue = error;
+    this.resolver(error);
   }
 
   resolve(value: T) {
-    if (this._hasReject || this._hasResolve) return;
-    this._hasResolve = true;
-		this._resolve = value;
-    this._resolver(undefined, value);
+    if (this.isFulfilled) return;
+    this.hasResolve = true;
+		this.resolveValue = value;
+    this.resolver(undefined, value);
   }
   
   private queue(resolve: (value: T) => void, reject: (error?: any) => void) {
-    const previousResolver = this._resolver;
-    this._resolver = (error, value) => {
+    const previousResolver = this.resolver;
+    this.resolver = (error, value) => {
       if (error) {
         previousResolver(error);
         reject(error);

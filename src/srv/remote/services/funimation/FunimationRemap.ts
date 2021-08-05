@@ -28,6 +28,25 @@ export class FunimationRemap {
       url: new URL(`/${locale}/shows/${series.slug}/${episode.slug}/`, seriesUrl).toString()
     });
   }
+
+  static stream(player: fun.PlayerAlpha, stream: fun.Stream) {
+    const sources = stream.items
+      .filter(x => x.videoType === 'm3u8')
+      .map(x => new app.api.RemoteStreamSource({type: 'hls', url: x.src}));
+    const subtitles = player.sources
+      .filter(x => x.type === 'application/x-mpegURL')
+      .flatMap(x => x.textTracks)
+      .filter(x => x.src.endsWith('.srt') && x.type.toLowerCase() === 'full')
+      .map(x => new app.api.RemoteStreamSubtitle({language: fetchLanguage(x.language), type: 'srt', url: x.src}));
+    return new app.api.RemoteStream({sources, subtitles});
+  }
+}
+
+function fetchLanguage(language: string) {
+  if (language === 'es') return 'es-LA';
+  if (language === 'en') return 'en-US';
+  if (language === 'pt') return 'pt-BR';
+  throw new Error();
 }
 
 function hasJapaneseAudio(episode: fun.Episode) {

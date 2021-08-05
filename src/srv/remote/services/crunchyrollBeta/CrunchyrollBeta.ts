@@ -64,7 +64,7 @@ export class CrunchyrollBeta implements app.IProvider {
       const seasonUrl = episodesUrl.replace(/((\?|&)season_id=)[^&]+/, (_, x) => x + season.id);
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(x => !x[0].startsWith(':'));
-        const buffer = await this.agentService.fetchAsync(seasonUrl, {headers: {...headers, ...defaultHeaders}});
+        const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});
         seasonEpisodes.push(JSON.parse(buffer.toString('utf8')));
       } else {
         const episodes = await episodesResponse.json();
