@@ -4,12 +4,14 @@ import playwright from 'playwright-core';
 
 export class FunimationIntercept {
   private readonly agentService: app.AgentService;
+  private readonly loggerService: app.LoggerService;
   private readonly response: app.Future<fun.PlayerAlpha>;
 
-  constructor(agentService: app.AgentService, page: playwright.Page) {
+  constructor(agentService: app.AgentService, loggerService: app.LoggerService, page: playwright.Page) {
     this.agentService = agentService;
+    this.loggerService = loggerService;
     this.response = new app.Future(app.settings.core.chromeTimeoutNavigation);
-    page.route(/\/player\/([0-9]+)\//, this.onRoute.bind(this));
+    page.route(x => /\/player\/([0-9]+)\/$/.test(x.pathname), this.onRoute.bind(this));
   }
 
   getAsync() {
@@ -17,6 +19,7 @@ export class FunimationIntercept {
   }
 
   private async onRoute(route: playwright.Route, request: playwright.Request) {
+    this.loggerService.debug(`[Funimation] Controlling ${request.url()}`);
     const headers = Object.entries(request.headers()).filter(([k]) => !k.startsWith(':'));
     const body = await this.tryRouteAsync(request.url(), headers);
     await route.fulfill({body});
@@ -29,6 +32,7 @@ export class FunimationIntercept {
     const experience = JSON.parse(text.match(/var\s*show\s*=\s*({.+});/)?.[1] ?? '') as fun.Player;
     const experienceAlpha = fetchExperienceAlpha(experienceId, experience);
     if (experienceAlpha && experienceAlpha.experienceId !== experienceId) {
+      this.loggerService.debug(`[Funimation] Replacing ${experienceId} with ${experienceAlpha.experienceId}`);
       return await this.tryRouteAsync(url.replace(/\/([0-9]+)\//, () => `/${experienceAlpha.experienceId}/`), headers);
     } else if (experienceAlpha) {
       this.response.resolve(experienceAlpha);

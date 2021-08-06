@@ -11,10 +11,12 @@ const baseUrl = 'https://www.funimation.com';
 export class Funimation implements app.IProvider {
   private readonly agentService: app.AgentService;
   private readonly browserService: app.BrowserService;
+  private readonly loggerService: app.LoggerService;
 
-  constructor(agentService: app.AgentService, browserService: app.BrowserService) {
+  constructor(agentService: app.AgentService, browserService: app.BrowserService, loggerService: app.LoggerService) {
     this.agentService = agentService;
     this.browserService = browserService;
+    this.loggerService = loggerService;
   }
 
   isSeriesAsync(seriesUrl: string) {
@@ -44,8 +46,8 @@ export class Funimation implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const [playerPromise] = new FunimationIntercept(this.agentService, page).getAsync();
-      const [streamPromise] = new app.Observer(page).getAsync(/\/showexperience\/[^\/]+\//);
+      const [playerPromise] = new FunimationIntercept(this.agentService, this.loggerService, page).getAsync();
+      const [streamPromise] = new app.Observer(page).getAsync(/\/showexperience\/[^\/]+\/$/);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
       const player = await playerPromise;
