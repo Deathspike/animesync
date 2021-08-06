@@ -3,7 +3,6 @@ import * as ncm from '@nestjs/common';
 import {CrunchyrollCredential} from './CrunchyrollCredential';
 import {evaluateSeries} from './evaluators/series';
 import {evaluateStream} from './evaluators/stream';
-const baseUrl = 'https://www.crunchyroll.com';
 
 @ncm.Injectable()
 export class Crunchyroll implements app.IProvider {
@@ -26,7 +25,7 @@ export class Crunchyroll implements app.IProvider {
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollCredential.tryAsync(baseUrl, page, seriesUrl);
+      await CrunchyrollCredential.tryAsync(page, seriesUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       if (/\/maturity_wall\?/.test(page.url())) {
         await page.goto(`${seriesUrl}?skip_wall=1`, {waitUntil: 'domcontentloaded'});
@@ -42,7 +41,7 @@ export class Crunchyroll implements app.IProvider {
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollCredential.tryAsync(baseUrl, page, streamUrl);
+      await CrunchyrollCredential.tryAsync(page, streamUrl);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = await page.evaluate(evaluateStream);
       return new app.Composable(streamUrl, value, headers);

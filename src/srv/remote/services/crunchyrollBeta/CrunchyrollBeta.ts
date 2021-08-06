@@ -2,10 +2,8 @@ import * as app from '../..';
 import * as ncm from '@nestjs/common';
 import * as vrv from '../vrv/typings';
 import {CrunchyrollBetaCredential} from './CrunchyrollBetaCredential';
-import {evaluateNavigate} from '../vrv/evaluators/navigate';
 import {VrvRemap} from '../vrv/VrvRemap';
 import playwright from 'playwright-core';
-const baseUrl = 'https://beta.crunchyroll.com';
 
 @ncm.Injectable()
 export class CrunchyrollBeta implements app.IProvider {
@@ -29,10 +27,10 @@ export class CrunchyrollBeta implements app.IProvider {
   
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollBetaCredential.tryAsync(baseUrl, page);
-      const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
-      await page.evaluate(evaluateNavigate, seriesUrl);
+      const observer = new app.Observer(page);
+      await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
+      await CrunchyrollBetaCredential.tryAsync(page, seriesUrl);
+      const [episodesPromise, seasonsPromise, seriesPromise] = observer.getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
       const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
@@ -45,10 +43,10 @@ export class CrunchyrollBeta implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollBetaCredential.tryAsync(baseUrl, page);
-      const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
-      await page.evaluate(evaluateNavigate, streamUrl);
+      const observer = new app.Observer(page);
+      await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
+      await CrunchyrollBetaCredential.tryAsync(page, streamUrl);
+      const [streamsPromise] = observer.getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = VrvRemap.stream(streams);

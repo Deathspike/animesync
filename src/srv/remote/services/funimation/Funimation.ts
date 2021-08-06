@@ -5,7 +5,6 @@ import {FunimationCredential} from './FunimationCredential';
 import {FunimationIntercept} from './FunimationIntercept';
 import {FunimationRemap} from './FunimationRemap';
 import playwright from 'playwright-core';
-const baseUrl = 'https://www.funimation.com';
 
 @ncm.Injectable()
 export class Funimation implements app.IProvider {
@@ -33,7 +32,7 @@ export class Funimation implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       const observer = new app.Observer(page);
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
+      await FunimationCredential.tryAsync(page, seriesUrl);
       const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
       const locale = await seriesPromise.then(x => x.request().url()).then(x => new URL(x).searchParams.get('locale'));
       const series = await seriesPromise.then(x => x.json() as Promise<fun.Series>);
@@ -50,7 +49,7 @@ export class Funimation implements app.IProvider {
       const observer = new app.Observer(page);
       const playerIntercept = new FunimationIntercept(this.agentService, this.loggerService, page);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
+      await FunimationCredential.tryAsync(page, streamUrl);
       const [streamPromise] = observer.getAsync(/\/showexperience\/[^\/]+\/$/);
       const player = await playerIntercept.getAsync();
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
