@@ -31,12 +31,13 @@ export class Funimation implements app.IProvider {
 
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const [episodesPromise, seriesPromise] = new app.Observer(page).getAsync(/\/seasons\/[^\/]+$/, /\/shows\/[^\/]+$/);
+      const observer = new app.Observer(page);
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, seriesUrl);
-      const seasonEpisodes: Array<fun.Season> = [];
+      const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
       const locale = await seriesPromise.then(x => x.request().url()).then(x => new URL(x).searchParams.get('locale'));
       const series = await seriesPromise.then(x => x.json() as Promise<fun.Series>);
+      const seasonEpisodes: Array<fun.Season> = [];
       await this.fetchEpisodesAsync(episodesPromise, series, seasonEpisodes);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = FunimationRemap.series(seriesUrl, series, seasonEpisodes, locale ?? undefined);
@@ -46,11 +47,12 @@ export class Funimation implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const [playerPromise] = new FunimationIntercept(this.agentService, this.loggerService, page).getAsync();
-      const [streamPromise] = new app.Observer(page).getAsync(/\/showexperience\/[^\/]+\/$/);
+      const observer = new app.Observer(page);
+      const playerIntercept = new FunimationIntercept(this.agentService, this.loggerService, page);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await FunimationCredential.tryAsync(baseUrl, page, streamUrl);
-      const player = await playerPromise;
+      const [streamPromise] = observer.getAsync(/\/showexperience\/[^\/]+\/$/);
+      const player = await playerIntercept.getAsync();
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = FunimationRemap.stream(player, stream);

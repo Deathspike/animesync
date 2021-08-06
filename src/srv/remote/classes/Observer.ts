@@ -2,24 +2,32 @@ import * as app from '..';
 import playwright from 'playwright-core';
 
 export class Observer {
-  private readonly responses: Array<{expression: RegExp, future: app.Future<playwright.Response>}>;
+  private readonly observers: Array<{expression: RegExp, future: app.Future<playwright.Response>}>;
+  private readonly responses: Array<playwright.Response>;
 
   constructor(page: playwright.Page) {
-    page.on('response', this.onResponse.bind(this));
+    this.observers = [];
     this.responses = [];
+    page.on('response', this.onResponse.bind(this));
   }
 
   getAsync(...expression: Array<RegExp>) {
-    return expression.map((expression) => {
+    return expression.map(async (expression) => {
       const future = new app.Future<playwright.Response>(app.settings.core.chromeTimeoutNavigation);
-      this.responses.push({expression, future});
-      return future.getAsync();
+      this.observers.push({expression, future});
+      this.responses.forEach(x => this.resolveResponse(x));
+      return await future.getAsync();
     });
   }
 
   private onResponse(response: playwright.Response) {
+    this.responses.push(response);
+    this.resolveResponse(response);
+  }
+
+  private resolveResponse(response: playwright.Response) {
     const pathname = new URL(response.url()).pathname;
-    for (const {expression, future} of this.responses) {
+    for (const {expression, future} of this.observers) {
       if (!expression.test(pathname)) continue;
       future.resolve(response);
     }

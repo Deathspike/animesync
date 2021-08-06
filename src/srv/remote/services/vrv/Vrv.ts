@@ -33,9 +33,9 @@ export class Vrv implements app.IProvider {
       await VrvCredential.tryAsync(baseUrl, page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(evaluateNavigate, seriesUrl);
-      const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
+      const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
       await this.fetchEpisodesAsync(episodesPromise, seasons, seasonEpisodes);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = VrvRemap.series(seriesUrl, series, seasons, seasonEpisodes);

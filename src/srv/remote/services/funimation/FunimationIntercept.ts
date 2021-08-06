@@ -1,44 +1,51 @@
 import * as app from '../..';
 import * as fun from './typings';
 import playwright from 'playwright-core';
+type PlayerPromise = Promise<{body: string, experienceAlpha: fun.PlayerAlpha}>;
 
 export class FunimationIntercept {
   private readonly agentService: app.AgentService;
   private readonly loggerService: app.LoggerService;
-  private readonly response: app.Future<fun.PlayerAlpha>;
+  private readonly observers: Array<app.Future<fun.PlayerAlpha>>;
+  private response?: PlayerPromise;
 
   constructor(agentService: app.AgentService, loggerService: app.LoggerService, page: playwright.Page) {
     this.agentService = agentService;
     this.loggerService = loggerService;
-    this.response = new app.Future(app.settings.core.chromeTimeoutNavigation);
+    this.observers = [];
     page.route(x => /\/player\/([0-9]+)\/$/.test(x.pathname), this.onRoute.bind(this));
   }
 
-  getAsync() {
-    return [this.response.getAsync()];
+  async getAsync() {
+    const future = new app.Future<fun.PlayerAlpha>(app.settings.core.chromeTimeoutNavigation);
+    this.observers.push(future);
+    this.response?.then(x => future.resolve(x.experienceAlpha));
+    return await future.getAsync();
   }
 
   private async onRoute(route: playwright.Route, request: playwright.Request) {
     this.loggerService.debug(`[Funimation] Controlling ${request.url()}`);
     const headers = Object.entries(request.headers()).filter(([k]) => !k.startsWith(':'));
-    const body = await this.tryRouteAsync(request.url(), headers);
-    await route.fulfill({body});
+    await (this.response ??= this.routeAsync(request.url(), headers))
+      .then(x => route.fulfill(x))
+      .catch(() => route.abort());
   }
 
-  private async tryRouteAsync(url: string, headers: Array<[string, string]>): Promise<string> {
-    if (this.response.isFulfilled) throw new Error();
-    const text = await this.agentService.fetchAsync(url, {headers}).then(x => x.toString('utf-8'));
+  private async routeAsync(url: string, headers: Array<[string, string]>): PlayerPromise {
+    if (this.observers.length && this.observers.every(x => x.isFulfilled)) throw new Error();
+    const body = await this.agentService.fetchAsync(url, {headers}).then(x => x.toString('utf-8'));
     const experienceId = Number(url.match(/\/([0-9]+)\//)?.[1]);
-    const experience = JSON.parse(text.match(/var\s*show\s*=\s*({.+});/)?.[1] ?? '') as fun.Player;
+    const experience = JSON.parse(body.match(/var\s*show\s*=\s*({.+});/)?.[1] ?? '') as fun.Player;
     const experienceAlpha = fetchExperienceAlpha(experienceId, experience);
     if (experienceAlpha && experienceAlpha.experienceId !== experienceId) {
       this.loggerService.debug(`[Funimation] Replacing ${experienceId} with ${experienceAlpha.experienceId}`);
-      return await this.tryRouteAsync(url.replace(/\/([0-9]+)\//, () => `/${experienceAlpha.experienceId}/`), headers);
+      return await this.routeAsync(url.replace(/\/([0-9]+)\//, () => `/${experienceAlpha.experienceId}/`), headers);
     } else if (experienceAlpha) {
-      this.response.resolve(experienceAlpha);
-      return text;
+      this.observers.forEach(x => x.resolve(experienceAlpha));
+      return {body, experienceAlpha};
     } else {
-      return text;
+      this.loggerService.error(`[Funimation] Unable to match alpha!`);
+      throw new Error();
     }
   }
 }
