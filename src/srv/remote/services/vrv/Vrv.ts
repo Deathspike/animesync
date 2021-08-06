@@ -29,11 +29,10 @@ export class Vrv implements app.IProvider {
   async seriesAsync(seriesUrl: string) {
     const baseUrl = new URL(seriesUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const observer = new app.Observer(page);
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await VrvCredential.tryAsync(page);
+      const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(evaluateNavigate, seriesUrl);
-      const [episodesPromise, seasonsPromise, seriesPromise] = observer.getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
       const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
@@ -47,11 +46,10 @@ export class Vrv implements app.IProvider {
   async streamAsync(streamUrl: string) {
     const baseUrl = new URL(streamUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const observer = new app.Observer(page);
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await VrvCredential.tryAsync(page);
+      const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(evaluateNavigate, streamUrl);
-      const [streamsPromise] = observer.getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = VrvRemap.stream(streams);
