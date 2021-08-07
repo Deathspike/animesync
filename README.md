@@ -27,7 +27,7 @@ The following streaming services are currently supported:
 
 * [Crunchyroll](https://www.crunchyroll.com/)
 * [Funimation](https://www.funimation.com/)
-* [Vrv](https://vrv.co/) (See [#42](https://github.com/animeloyalty/animesync/issues/42))
+* [Vrv](https://vrv.co/) (See [#42](https://github.com/Deathspike/animesync/issues/42))
 
 Requests to support additional streaming services are welcome.
 

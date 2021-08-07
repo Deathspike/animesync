@@ -2,8 +2,8 @@ const fetch = require('node-fetch');
 const fs = require('fs-extra');
 const path = require('path');
 const zlib = require('zlib');
-let apiUrl = 'https://api.github.com/repos/animeloyalty/animeloyalty-static/contents/';
-let rawUrl = 'https://github.com/animeloyalty/animeloyalty-static/raw/master/';
+let apiUrl = 'https://api.github.com/repos/Deathspike/animesync/contents/static/download/';
+let rawUrl = 'https://github.com/Deathspike/animesync/raw/master/static/download/';
 let staticPath = path.join(__dirname, 'static');
 
 async function checksumAsync(remotePath) {
@@ -36,12 +36,12 @@ async function ffmpegAsync(localName, remotePath) {
 
 switch (process.platform) {
   case 'darwin':
-    ffmpegAsync('ffmpeg', 'ffmpeg/mac/ffmpeg.gz');
+    ffmpegAsync('ffmpeg', 'mac/ffmpeg.gz');
     break;
   case 'linux':
-    ffmpegAsync('ffmpeg', 'ffmpeg/linux/ffmpeg.gz');
+    ffmpegAsync('ffmpeg', 'linux/ffmpeg.gz');
     break;
   case 'win32':
-    ffmpegAsync('ffmpeg.exe', 'ffmpeg/windows/ffmpeg.exe.gz');
+    ffmpegAsync('ffmpeg.exe', 'windows/ffmpeg.exe.gz');
     break;
 }
