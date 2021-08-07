@@ -1,7 +1,6 @@
 import * as app from '../..';
 import * as ncm from '@nestjs/common';
 import * as vrv from '../vrv/typings';
-import {evaluateNavigate} from '../vrv/evaluators/navigate';
 import {VrvRemap} from '../vrv/VrvRemap';
 import playwright from 'playwright-core';
 
@@ -31,7 +30,7 @@ export class CrunchyrollBeta implements app.IProvider {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
-      await page.evaluate(evaluateNavigate, seriesUrl);
+      await page.evaluate(tryNavigateEvaluator, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
       const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
@@ -48,7 +47,7 @@ export class CrunchyrollBeta implements app.IProvider {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
-      await page.evaluate(evaluateNavigate, streamUrl);
+      await page.evaluate(tryNavigateEvaluator, streamUrl);
       const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = VrvRemap.stream(streams);
@@ -89,4 +88,9 @@ async function tryLoginAsync(page: playwright.Page) {
   await page.evaluate(() => document.querySelector('.opt-in')?.remove());
   await page.click('#login_submit_button');
   await page.waitForFunction(isAuthenticated);
+}
+
+async function tryNavigateEvaluator(url: string) {
+  history.pushState(null, '', url);
+  window.dispatchEvent(new PopStateEvent('popstate'));
 }
