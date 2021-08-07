@@ -82,12 +82,14 @@ const defaultHeaders = {
 };
 
 async function tryLoginAsync(page: playwright.Page, url: string) {
-  const isAuthenticated = () => Boolean(document.querySelector('.fun'));
+  const isAuthenticated = () => Boolean(localStorage.getItem('userId'));
   if (!app.settings.credential.funimationUsername || !app.settings.credential.funimationPassword || await page.evaluate(isAuthenticated)) return;
   await page.goto(new URL('/log-in/', url).toString(), {waitUntil: 'domcontentloaded'});
   await page.type('.loginBox #email2', app.settings.credential.funimationUsername);
   await page.type('.loginBox #password2', app.settings.credential.funimationPassword);
+  const navigationPromise = page.waitForNavigation({waitUntil: 'domcontentloaded'});
   await page.click('.loginBox button[type=submit]');
   await page.waitForFunction(isAuthenticated);
+  await navigationPromise;
   await page.goto(url, {waitUntil: 'domcontentloaded'});
 }
