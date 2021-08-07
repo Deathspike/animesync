@@ -1,7 +1,6 @@
 import * as app from '../..';
 import * as ncm from '@nestjs/common';
 import * as vrv from '../vrv/typings';
-import {CrunchyrollBetaCredential} from './CrunchyrollBetaCredential';
 import {evaluateNavigate} from '../vrv/evaluators/navigate';
 import {VrvRemap} from '../vrv/VrvRemap';
 import playwright from 'playwright-core';
@@ -30,7 +29,7 @@ export class CrunchyrollBeta implements app.IProvider {
     const baseUrl = new URL(seriesUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollBetaCredential.tryAsync(page);
+      await tryLoginAsync(page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(evaluateNavigate, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
@@ -47,7 +46,7 @@ export class CrunchyrollBeta implements app.IProvider {
     const baseUrl = new URL(streamUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await CrunchyrollBetaCredential.tryAsync(page);
+      await tryLoginAsync(page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(evaluateNavigate, streamUrl);
       const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
@@ -79,3 +78,15 @@ const defaultHeaders = {
   origin: 'https://beta.crunchyroll.com',
   referer: 'https://beta.crunchyroll.com/'
 };
+
+async function tryLoginAsync(page: playwright.Page) {
+  const isAuthenticated = () => Boolean(JSON.parse(localStorage.getItem('ajs_user_id') ?? 'null'));
+  if (!app.settings.credential.crunchyrollUsername || !app.settings.credential.crunchyrollPassword || await page.evaluate(isAuthenticated)) return;
+  await page.goto('https://www.crunchyroll.com/login', {waitUntil: 'domcontentloaded'});
+  await page.click('#onetrust-accept-btn-handler', {timeout: 5000}).then(() => page.waitForNavigation({waitUntil: 'domcontentloaded'})).catch(() => {});
+  await page.type('#login_form_name', app.settings.credential.crunchyrollUsername);
+  await page.type('#login_form_password', app.settings.credential.crunchyrollPassword);
+  await page.evaluate(() => document.querySelector('.opt-in')?.remove());
+  await page.click('#login_submit_button');
+  await page.waitForFunction(isAuthenticated);
+}

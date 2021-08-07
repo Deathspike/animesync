@@ -2,7 +2,6 @@ import * as app from '../..';
 import * as ncm from '@nestjs/common';
 import * as vrv from './typings';
 import {evaluateNavigate} from './evaluators/navigate';
-import {VrvCredential} from './VrvCredential';
 import {VrvRemap} from './VrvRemap';
 import playwright from 'playwright-core';
 
@@ -30,7 +29,7 @@ export class Vrv implements app.IProvider {
     const baseUrl = new URL(seriesUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await VrvCredential.tryAsync(page);
+      await tryLoginAsync(page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(evaluateNavigate, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
@@ -47,7 +46,7 @@ export class Vrv implements app.IProvider {
     const baseUrl = new URL(streamUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
-      await VrvCredential.tryAsync(page);
+      await tryLoginAsync(page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(evaluateNavigate, streamUrl);
       const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
@@ -79,3 +78,14 @@ const defaultHeaders = {
   origin: 'https://vrv.co',
   referer: 'https://vrv.co/'
 };
+
+async function tryLoginAsync(page: playwright.Page) {
+  const isAuthenticated = () => Boolean(JSON.parse(localStorage.getItem('ajs_user_id') ?? 'null'));
+  if (!app.settings.credential.vrvUsername || !app.settings.credential.vrvPassword || await page.evaluate(isAuthenticated)) return;
+  await page.click('.erc-anonymous-user-nav');
+  await page.click('.erc-user-dropdown a.erc-user-dropdown-item:last-child');
+  await page.type('.erc-signin .email-input', app.settings.credential.vrvUsername);
+  await page.type('.erc-signin .password-input', app.settings.credential.vrvPassword);
+  await page.click('.erc-signin .signin-submit');
+  await page.waitForFunction(isAuthenticated);
+}

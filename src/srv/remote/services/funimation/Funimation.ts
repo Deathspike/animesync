@@ -1,7 +1,6 @@
 import * as app from '../..';
 import * as fun from './typings';
 import * as ncm from '@nestjs/common';
-import {FunimationCredential} from './FunimationCredential';
 import {FunimationIntercept} from './FunimationIntercept';
 import {FunimationRemap} from './FunimationRemap';
 import playwright from 'playwright-core';
@@ -32,7 +31,7 @@ export class Funimation implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       const observer = new app.Observer(page);
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(page, seriesUrl);
+      await tryLoginAsync(page, seriesUrl);
       const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
       const locale = await seriesPromise.then(x => x.request().url()).then(x => new URL(x).searchParams.get('locale'));
       const series = await seriesPromise.then(x => x.json() as Promise<fun.Series>);
@@ -49,7 +48,7 @@ export class Funimation implements app.IProvider {
       const observer = new app.Observer(page);
       const playerIntercept = new FunimationIntercept(this.agentService, this.loggerService, page);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
-      await FunimationCredential.tryAsync(page, streamUrl);
+      await tryLoginAsync(page, streamUrl);
       const [streamPromise] = observer.getAsync(/\/showexperience\/[^\/]+\/$/);
       const player = await playerIntercept.getAsync();
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
@@ -81,3 +80,14 @@ const defaultHeaders = {
   origin: 'https://www.funimation.com',
   referer: 'https://www.funimation.com/'
 };
+
+async function tryLoginAsync(page: playwright.Page, url: string) {
+  const isAuthenticated = () => Boolean(document.querySelector('.fun'));
+  if (!app.settings.credential.funimationUsername || !app.settings.credential.funimationPassword || await page.evaluate(isAuthenticated)) return;
+  await page.goto(new URL('/log-in/', url).toString(), {waitUntil: 'domcontentloaded'});
+  await page.type('.loginBox #email2', app.settings.credential.funimationUsername);
+  await page.type('.loginBox #password2', app.settings.credential.funimationPassword);
+  await page.click('.loginBox button[type=submit]');
+  await page.waitForFunction(isAuthenticated);
+  await page.goto(url, {waitUntil: 'domcontentloaded'});
+}
