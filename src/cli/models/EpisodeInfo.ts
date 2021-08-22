@@ -1,8 +1,8 @@
 import * as app from '../..';
 import * as clv from 'class-validator';
 import * as clt from 'class-transformer';
+import {EpisodeInfoXml} from './xml/EpisodeInfoXml';
 import {ValidationError} from '../../srv/shared/ValidationError';
-import xml2js from 'xml2js';
 
 export class EpisodeInfo {
   constructor(source: EpisodeInfo) {
@@ -24,20 +24,9 @@ export class EpisodeInfo {
   }
 
   static async parseAsync(xml: string) {
-    const parsedXml: ParsedEpisodeInfo = await xml2js.parseStringPromise(xml, {
-      emptyTag: undefined, 
-      explicitRoot: false
-    });
-    return await ValidationError.validateSingleAsync(EpisodeInfo, new EpisodeInfo({
-      episode: Number(parsedXml.episode?.[0]),
-      season: Number(parsedXml.season?.[0]),
-      synopsis: parsedXml.plot?.[0],
-      title: parsedXml.title?.[0],
-      url: parsedXml.uniqueid
-        ?.filter(x => typeof x !== 'string' && x.$.type.includes('animesync'))
-        ?.map(x => typeof x !== 'string' ? x._ : '')
-        ?.[0] ?? ''
-    }));
+    const episodeInfoXml = await EpisodeInfoXml.parseAsync(xml);
+    const episodeInfo = new EpisodeInfo(episodeInfoXml);
+    return await ValidationError.validateSingleAsync(EpisodeInfo, episodeInfo);
   }
 
   @clv.IsNumber()
@@ -64,20 +53,6 @@ export class EpisodeInfo {
   readonly url: string;
 
   toString() {
-    return new xml2js.Builder().buildObject({episodedetails: {
-      episode: [String(this.episode)],
-      plot: this.synopsis && [this.synopsis],
-      season: [String(this.season)],
-      title: this.title && [this.title],
-      uniqueid: [{$: {type: ['animesync']}, _: this.url}]
-    } as ParsedEpisodeInfo});
+    return EpisodeInfoXml.serialize(app.api.unsafe(this));
   }
 }
-
-type ParsedEpisodeInfo = {
-  episode?: Array<string>;
-  plot?: Array<string>;
-  season?: Array<string>;
-  title?: Array<string>;
-  uniqueid?: Array<string | {$: {type: Array<string>}, _: string}>
-};
