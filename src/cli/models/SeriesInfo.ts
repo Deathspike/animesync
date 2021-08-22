@@ -26,9 +26,11 @@ export class SeriesInfo {
     return await ValidationError.validateSingleAsync(SeriesInfo, seriesInfo);
   }
 
+  @clv.IsOptional()
   @clv.IsArray()
   @clv.IsString({each: true})
   @clv.IsNotEmpty({each: true})
+  @clv.ArrayNotEmpty()
   readonly seasons?: Array<string>;
 
   @clv.IsOptional()
