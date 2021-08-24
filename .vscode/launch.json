@@ -2,12 +2,21 @@
   "version": "0.2.0",
   "configurations": [{
     "args": ["dist/cli/app", "server"],
-    "name": "Launch Program",
+    "name": "Launch Server",
     "outFiles": ["${workspaceFolder}/dist/**/*.js"],
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
     "request": "launch",
     "runtimeArgs": ["--inspect=16583"],
+    "type": "node"
+  }, {
+    "args": ["-i"],
+    "name": "Launch Tests",
+    "outFiles": ["${workspaceRoot}/dist/**/*"],
+    "outputCapture": "std",
+    "preLaunchTask": "TypeScript",
+    "program": "${workspaceRoot}\\node_modules\\jest\\bin\\jest.js",
+    "request": "launch",
     "type": "node"
   }]
 }
