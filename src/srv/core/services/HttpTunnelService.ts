@@ -80,9 +80,9 @@ function statusHeader(statusCode: number, statusText: string) {
 }
 
 function tunnel(clientSocket: net.Socket, serverSocket: net.Socket) {
+  clientSocket.on('close', () => serverSocket.destroy());
   clientSocket.on('error', () => serverSocket.destroy());
-  clientSocket.on('end', () => serverSocket.destroy());
+  serverSocket.on('close', () => clientSocket.destroy());
   serverSocket.on('error', () => clientSocket.destroy());
-  serverSocket.on('end', () => clientSocket.destroy());
   return () => clientSocket.pipe(serverSocket) && serverSocket.pipe(clientSocket);
 }
