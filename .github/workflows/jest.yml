@@ -4,6 +4,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '15 17 * * *'
 jobs:
   test:
     runs-on: ubuntu-20.04
