@@ -27,8 +27,8 @@ async function pruneAsync(directoryPath: string, timeout: number) {
   const fileNames = await fs.readdir(directoryPath);
   const filePaths = fileNames.map(x => path.join(directoryPath, x));
   for (const filePath of filePaths) {
-    const stat = await fs.stat(filePath);
-    const mtime = stat.mtime.getTime();
+    const stat = await fs.stat(filePath).catch(() => {});
+    const mtime = stat && stat.mtime.getTime();
     if (mtime < expireTime) await fs.remove(filePath);
   }
 }
