@@ -11,13 +11,12 @@ export async function jsonAsync<T>(url: string, init?: fch.RequestInit) {
       return {statusCode, value};
     } else {
       const statusCode = response.status;
-      const value = undefined;
-      return {statusCode, value};
+      const error = await response.json();
+      return {statusCode, error};
     }
   } catch (error) {
     const statusCode = 0;
-    const value = undefined;
-    return {statusCode, value};
+    return {statusCode};
   }
 }
 
