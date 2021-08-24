@@ -10,8 +10,8 @@ const packageData = require('../../package');
 export class Server extends app.api.ServerApi {
   private readonly server: npe.NestExpressApplication;
 
-  private constructor(server: npe.NestExpressApplication, serverUrl: string) {
-    super(serverUrl);
+  private constructor(server: npe.NestExpressApplication) {
+    super(server.get(app.ContextService).serverUrl);
     this.server = server;
     this.server.disable('x-powered-by');
     this.server.useLogger(this.logger);
@@ -24,7 +24,7 @@ export class Server extends app.api.ServerApi {
     attachErrorFilter(server);
     attachRequestValidation(server);
     await server.listen(serverPort ?? 0);
-    return await handlerAsync(new Server(server, await server.getUrl())).finally(() => server.close());
+    return await handlerAsync(new Server(server)).finally(() => server.close());
   }
 
   get browser() {
