@@ -29,6 +29,7 @@ export class CrunchyrollBeta implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page);
+      await page.waitForLoadState('networkidle');
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(tryNavigateEvaluator, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
