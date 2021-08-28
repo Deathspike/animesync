@@ -6,7 +6,7 @@
   "name": "animesync",
   "repository": "git://github.com/Deathspike/animesync",
   "types": "dist",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "keywords": [
     "animesync",
     "anime",
@@ -23,7 +23,9 @@
   },
   "jest": {
     "maxWorkers": 1,
-    "testMatch": ["**/dist/**/*.test.js"],
+    "testMatch": [
+      "**/dist/**/*.test.js"
+    ],
     "testTimeout": 300000
   },
   "dependencies": {
