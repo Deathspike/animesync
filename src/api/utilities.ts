@@ -11,7 +11,7 @@ export async function jsonAsync<T>(url: string, init?: fch.RequestInit) {
       return {statusCode, value};
     } else {
       const statusCode = response.status;
-      const error = await response.json();
+      const error = await response.json() as {message: string};
       return {statusCode, error};
     }
   } catch (error) {
