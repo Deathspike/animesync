@@ -25,7 +25,7 @@ export class ComposeService {
   async streamAsync(compose: app.IComposable<app.api.RemoteStream>) {
     return new app.api.RemoteStream(compose.value, {
       sources: await Promise.all(compose.value.sources.map(x => this.sourceAsync(x.url, compose.headers)))
-        .then(x => x.reduce((p, c) => p.concat(c), []))
+        .then(x => x.flatMap(y => y))
         .then(x => x.sort(app.api.RemoteStreamSource.compareFn)),
       subtitles: compose.value.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
         url: this.rewriteService.subtitleUrl(compose.baseUrl, subtitle.type, subtitle.url, compose.headers)
@@ -36,7 +36,7 @@ export class ComposeService {
   private async sourceAsync(sourceUrl: string, headers?: Record<string, string>) {
     const streams = await this.agentService
       .fetchAsync(sourceUrl, {headers})
-      .then(x => app.HlsManifest.from(x.toString('utf-8')))
+      .then(x => app.HlsManifest.from(x.toString()))
       .then(x => x.fetchStreams());
     return streams.map(x => new app.api.RemoteStreamSource({
       bandwidth: x.bandwidth || undefined,
