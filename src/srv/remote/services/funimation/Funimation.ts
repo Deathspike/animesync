@@ -35,8 +35,7 @@ export class Funimation implements app.IProvider {
       const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
       const locale = await seriesPromise.then(x => x.request().url()).then(x => new URL(x).searchParams.get('locale'));
       const series = await seriesPromise.then(x => x.json() as Promise<fun.Series>);
-      const seasonEpisodes: Array<fun.Season> = [];
-      await this.fetchEpisodesAsync(episodesPromise, series, seasonEpisodes);
+      const seasonEpisodes = await this.fetchEpisodesAsync(episodesPromise, series);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = FunimationRemap.series(seriesUrl, series, seasonEpisodes, locale ?? undefined);
       return new app.Composable(seriesUrl, value, headers);
@@ -58,21 +57,21 @@ export class Funimation implements app.IProvider {
     });
   }
 
-  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, series: fun.Series, seasonEpisodes: Array<fun.Season>) {
+  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, series: fun.Series) {
     const episodesResponse = await episodesPromise;
     const episodesRequest = episodesResponse.request();
     const episodesUrl = episodesRequest.url();
-    for (const season of series.seasons) {
+    return await Promise.all(series.seasons.map(async (season) => {
       const seasonUrl = episodesUrl.replace(/(\/seasons\/)[^\/\?]+/, (_, x) => x + season.id);
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(([k]) => !k.startsWith(':'));
         const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});
-        seasonEpisodes.push(JSON.parse(buffer.toString('utf8')));
+        return JSON.parse(buffer.toString()) as fun.Season;
       } else {
         const episodes = await episodesResponse.json();
-        seasonEpisodes.push(episodes as fun.Season);
+        return episodes as fun.Season;
       }
-    }
+    }));
   }
 }
 

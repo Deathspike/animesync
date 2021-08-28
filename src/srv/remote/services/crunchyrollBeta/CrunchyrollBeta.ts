@@ -34,8 +34,7 @@ export class CrunchyrollBeta implements app.IProvider {
       await page.evaluate(tryNavigateEvaluator, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
-      const seasonEpisodes: Array<vrv.Collection<vrv.Episode>> = [];
-      await this.fetchEpisodesAsync(episodesPromise, seasons, seasonEpisodes);
+      const seasonEpisodes = await this.fetchEpisodesAsync(episodesPromise, seasons);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
       const value = VrvRemap.series(seriesUrl, series, seasons, seasonEpisodes);
       return new app.Composable(seriesUrl, value, headers);
@@ -56,21 +55,21 @@ export class CrunchyrollBeta implements app.IProvider {
     });
   }
 
-  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, seasons: vrv.Collection<vrv.Season>, seasonEpisodes: Array<vrv.Collection<vrv.Episode>>) {
+  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, seasons: vrv.Collection<vrv.Season>) {
     const episodesResponse = await episodesPromise;
     const episodesRequest = episodesResponse.request();
     const episodesUrl = episodesRequest.url();
-    for (const season of seasons.items) {
+    return await Promise.all(seasons.items.map(async (season) => {
       const seasonUrl = episodesUrl.replace(/((\?|&)season_id=)[^&]+/, (_, x) => x + season.id);
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(x => !x[0].startsWith(':'));
         const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});
-        seasonEpisodes.push(JSON.parse(buffer.toString('utf8')));
+        return JSON.parse(buffer.toString()) as vrv.Collection<vrv.Episode>;
       } else {
         const episodes = await episodesResponse.json();
-        seasonEpisodes.push(episodes as vrv.Collection<vrv.Episode>);
+        return episodes as vrv.Collection<vrv.Episode>;
       }
-    }
+    }));   
   }
 }
 
