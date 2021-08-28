@@ -1,7 +1,6 @@
 import childProcess from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
-import process from 'process';
 
 export class Tracker {
   private readonly seriesPath: string;

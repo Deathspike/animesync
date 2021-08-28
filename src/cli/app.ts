@@ -4,7 +4,6 @@ import {createServer} from './actions/createServer';
 import {createSettings} from './actions/createSettings';
 import {createUpdate} from './actions/createUpdate';
 import commander from 'commander';
-import process from 'process';
 const packageData = require('../../package');
 
 if (Number(process.version.match(/(\d+)\.\d+\.\d/)?.pop() ?? 0) >= Number(packageData.engines.node.match(/(\d+)\.\d+\.\d/)?.pop() ?? 0)) {

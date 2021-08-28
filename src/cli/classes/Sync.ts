@@ -28,13 +28,13 @@ export class Sync {
         .concat(foreignSubtitles);
       const inputs = [['-i', stream.sources[0].url]]
         .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
-        .reduce((p, c) => p.concat(c), [])
+        .flatMap(x => x);
       const mappings = [['-map', '0:v:0', '-map', '0:a:0']]
         .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
-        .reduce((p, c) => p.concat(c), []);
+        .flatMap(x => x);
       const metadata = sortedSubtitles
         .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
-        .reduce((p, c) => p.concat(c), []);
+        .flatMap(x => x);
       await fs.ensureDir(path.dirname(this.outputPath));
       await this.spawnAsync(await findAsync(), ['-y']
         .concat(inputs)
@@ -60,8 +60,8 @@ export class Sync {
     this.api.logger.debug(`spawn ${command} ${JSON.stringify(args)}`);
     return await new Promise<void>((resolve, reject) => {
       const process = childProcess.spawn(command, args);
-      process.stdout.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString('utf-8').trim()));
-      process.stderr.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString('utf-8').trim()));
+      process.stdout.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString().trim()));
+      process.stderr.on('data', (chunk: Buffer) => this.api.logger.debug(chunk.toString().trim()));
       process.on('error', reject);
       process.on('exit', (exitCode) => {
         if (exitCode === 0) return resolve();

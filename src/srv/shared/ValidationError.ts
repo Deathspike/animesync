@@ -46,7 +46,7 @@ function publishSingle(error: clv.ValidationError, result: Array<{constraints: R
 async function validateArrayAsync<T extends object>(cls: Array<ncm.Type<T>>, value: Array<T>) {
   const validationErrors = await Promise.all(value.map(x => validateSingleAsync(cls[0], x)));
   validationErrors.forEach((x, i) => x.forEach(y => y.property = `[${i}].${y.property}`));
-  return validationErrors.reduce((p, c) => p.concat(c), []);
+  return validationErrors.flatMap(x => x);
 }
 
 async function validateSingleAsync<T extends object>(cls: ncm.Type<T>, value: T) {

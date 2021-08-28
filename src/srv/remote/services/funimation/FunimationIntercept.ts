@@ -33,7 +33,7 @@ export class FunimationIntercept {
 
   private async routeAsync(url: string, headers: Array<[string, string]>): PlayerPromise {
     if (this.observers.length && this.observers.every(x => x.isFulfilled)) throw new Error();
-    const body = await this.agentService.fetchAsync(url, {headers}).then(x => x.toString('utf-8'));
+    const body = await this.agentService.fetchAsync(url, {headers}).then(String);
     const experienceId = Number(url.match(/\/([0-9]+)\//)?.[1]);
     const experience = JSON.parse(body.match(/var\s*show\s*=\s*({.+});/)?.[1] ?? '') as fun.Player;
     const experienceAlpha = fetchExperienceAlpha(experienceId, experience);

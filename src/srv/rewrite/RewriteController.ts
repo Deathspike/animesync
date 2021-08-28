@@ -36,7 +36,7 @@ export class RewriteController {
     @ncm.Query() query: Record<string, string>) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(params.masterUrl, {headers: {...headers, ...query}});
-    const masterHls = app.HlsManifest.from(buffer.toString('utf8'));
+    const masterHls = app.HlsManifest.from(buffer.toString());
     this.hlsService.stream(params.mediaUrl, masterHls);
     this.hlsService.rewrite(params.masterUrl, masterHls, query);
     return masterHls.toString();
@@ -49,7 +49,7 @@ export class RewriteController {
     @ncm.Query() query: Record<string, string>) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(params.mediaUrl, {headers: {...headers, ...query}});
-    const mediaHls = app.HlsManifest.from(buffer.toString('utf8'));
+    const mediaHls = app.HlsManifest.from(buffer.toString());
     this.hlsService.rewrite(params.mediaUrl, mediaHls, query);
     return mediaHls.toString();
   }
@@ -61,7 +61,7 @@ export class RewriteController {
     @ncm.Query() query: Record<string, string>) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(params.subtitleUrl, {headers: {...headers, ...query}});
-    const subtitle = buffer.toString('utf8');
+    const subtitle = buffer.toString();
     return this.subtitleService.rewrite(subtitle, params.subtitleType);
   }
 }
