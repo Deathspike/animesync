@@ -1,7 +1,8 @@
 # animesync
 
-AnimeSync is capable of downloading anime episodes from popular streaming services. Each episode is downloaded in the original video format (often `h264` in a `mp4` container) and is then bundled alongside the subtitles into a `mkv` container. The episode files are named using a simple convention, for example `
-A Certain Scientific Railgun 01 [AnimeSync].mkv`.
+![Jest](https://github.com/Deathspike/animesync/actions/workflows/jest.yml/badge.svg)
+
+AnimeSync is capable of downloading anime episodes from popular streaming services. Episodes are downloaded as `mkv` files containing the `h264` video and each subtitle. Metadata is downloaded as well, and includes posters and thumbnails. The metadata is compatible with *Jellyfin* and *Emby*.
 
 ## Motivation
 
@@ -53,13 +54,9 @@ Commands:
 
 ## Basic Instructions
 
-### Log In
+### Authentication
 
-Since streaming services require active subscriptions to access all content, you may want to log into your account. To access content, `animesync` uses a private instance of *Google Chrome*. This private instance does not share information with your normal instance, so even if you are already logged in there, `animesync` does not know of it. To launch *Google Chrome* and manually log in, you can use:
-
-    animesync browser
-
-You will see a message at the top of the window, "Chrome is being controlled by automated test software". This indicates that `animesync` is connected and controlling the browser instance. This approach works, but both *Crunchyroll* and *Funimation* occassionally log you out. To prevent that, `animesync` can be configured with credentials and log in on your behalf.
+Streaming services require paid subscriptions to access all content, so can provide `animesync` with your credentials.
 
 #### Crunchyroll
 
@@ -73,6 +70,12 @@ To set your *Funimation* credentials, you can use:
 
     animesync settings credential --funimationUsername YOURUSER --funimationPassword YOURPASS
 
+#### Vrv
+
+To set your *Vrv* credentials, you can use:
+
+    animesync settings credential --vrvUsername YOURUSER --vrvPassword YOURPASS
+
 ### Download
 
 To download a series, you can use:
@@ -83,19 +86,25 @@ For example, to download *A Certain Scientific Railgun* from *Crunchyroll*, you 
 
     animesync download https://www.crunchyroll.com/a-certain-scientific-railgun
 
-To use a different destination directory, you can use:
+But if you're in the *Crunchyroll beta*, you have to use the *beta* page, so you can use:
 
-    animesync download --rootPath /path/of/the/directory https://www.crunchyroll.com/a-certain-scientific-railgun
+    animesync download https://beta.crunchyroll.com/series/G649J4XPY/a-certain-scientific-railgun
 
-When you want to download new episodes, you can use:
+To download a series into a different directory, you can use:
+
+    animesync download --rootPath /path/of/the/directory [seriesUrl...]
+
+To download missing episodes for all your series, you can use:
 
     animesync download
 
-If you want to add a series, but don't download it yet, you can use:
+### Metadata
+
+To add a series without downloading it, you can use:
 
     animesync add [seriesUrl...]
-
-To update all metadata, you can use:
+    
+To update all your series, you can use:
 
     animesync update
 
@@ -105,7 +114,7 @@ To avoid downloading every episode, you can run:
 
     animesync download --skipDownload [seriesUrl...]
 
-Which generates tracking files in the `.animesync` directory. Just delete a tracking file and run `animesync download` to download the missing episodes.
+This generates tracker files in the `.animesync` subdirectory. Delete one and run `animesync download` to download the missing episode.
 
 ## User Settings
 
