@@ -1,6 +1,6 @@
 # animesync
 
-![Jest](https://github.com/Deathspike/animesync/actions/workflows/jest.yml/badge.svg)
+[![Jest](https://github.com/Deathspike/animesync/actions/workflows/jest.yml/badge.svg)](https://github.com/Deathspike/animesync/actions)
 
 AnimeSync is capable of downloading anime episodes from popular streaming services. Episodes are downloaded as `mkv` files containing the `h264` video and each subtitle. Metadata is downloaded as well, and includes posters and thumbnails. The metadata is compatible with *Jellyfin* and *Emby*.
 
