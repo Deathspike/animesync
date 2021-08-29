@@ -20,7 +20,7 @@ export class LibraryService {
     this.supervisor = new app.Supervisor();
   }
 
-  async contextGetAsync() {
+  async contextAsync() {
     const coreInfo = await app.CoreInfo.loadAsync(this.fileService);
     const series: Array<app.api.LibraryContextSeries> = [];
     await Promise.all(coreInfo.rootPaths.map(async (rootPath) => {
@@ -44,17 +44,11 @@ export class LibraryService {
       const seriesName = sanitizeFilename(series.value.title);
       const seriesPath = path.join(rootPath ?? app.settings.path.library, seriesName);
       await app.CoreInfo.saveAsync(this.fileService, rootPath);
-      await this.updateAsync(seriesPath, series.value);
+      await this.saveSeriesAsync(seriesPath, series.value);
     }
   }
 
-  async seriesDeleteAsync(seriesPath: string) {
-    if (this.supervisor.contains(seriesPath)) return false;
-    await this.fileService.deleteAsync(seriesPath);
-    return true;
-  }
-
-  async seriesGetAsync(seriesPath: string) {
+  async seriesAsync(seriesPath: string) {
     const seasons: Array<app.api.LibrarySeriesSeason> = [];
     const seriesInfo = await app.SeriesInfo.loadAsync(this.fileService, seriesPath);
     const seriesSeasons = seriesInfo.seasons ?? [];
@@ -71,7 +65,7 @@ export class LibraryService {
         const episodeValue = createValue(episodePath, episodeInfo);
         if (episodeInfo && episodeValue) {
           const active = this.supervisor.contains(episodePath);
-          const available = await this.episodeGetAsync(episodePath).then(x => this.fileService.existsAsync(x.filePath));
+          const available = await this.episodeAsync(episodePath).then(x => this.fileService.existsAsync(x.filePath));
           episodes.push(new app.api.LibrarySeriesSeasonEpisode({...episodeValue, active, available}));
         }
       }));
@@ -82,13 +76,19 @@ export class LibraryService {
     return new app.api.LibrarySeries(seriesValue);
   }
 
+  async seriesDeleteAsync(seriesPath: string) {
+    if (this.supervisor.contains(seriesPath)) return false;
+    await this.fileService.deleteAsync(seriesPath);
+    return true;
+  }
+
   async seriesPutAsync(seriesPath: string) {
     const seriesInfo = await app.SeriesInfo.loadAsync(this.fileService, seriesPath);
     const series = await this.remoteService.seriesAsync(seriesInfo);
     if (series.error) {
       throw new ncm.HttpException(series.error.message, series.statusCode);
     } else if (series.value) {
-      await this.updateAsync(seriesPath, series.value);
+      await this.saveSeriesAsync(seriesPath, series.value);
     }
   }
 
@@ -98,19 +98,20 @@ export class LibraryService {
       .catch(() => {});
   }
 
-  async episodeDeleteAsync(episodePath: string) {
-    const value = await this.episodeGetAsync(episodePath);
-    await this.fileService.deleteAsync(value.filePath);
-  }
-
-  episodeGetAsync(episodePath: string) {
+  episodeAsync(episodePath: string) {
     const filePath = `${episodePath}.mkv`;
     return Promise.resolve({filePath});
   }
 
+  async episodeDeleteAsync(episodePath: string) {
+    const value = await this.episodeAsync(episodePath);
+    await this.fileService.deleteAsync(value.filePath);
+  }
+
   async episodePutAsync(episodePath: string) {
-    const value = await this.episodeGetAsync(episodePath);
-    return await this.downloadAsync(episodePath, value.filePath);
+    const episodeInfo = await app.EpisodeInfo.loadAsync(this.fileService, episodePath);
+    const value = await this.episodeAsync(episodePath);
+    return await this.saveEpisodeAsync(episodePath, value.filePath, episodeInfo.url);
   }
 
   async episodeImageAsync(episodePath: string) {
@@ -119,16 +120,15 @@ export class LibraryService {
       .catch(() => {});
   }
 
-  private async downloadAsync(episodePath: string, filePath: string) {
+  private async saveEpisodeAsync(episodePath: string, filePath: string, url: string) {
+    const incompletePath = `${episodePath}.incomplete`;
     return await this.supervisor.createOrAttachAsync(filePath, async () => {
-      const episodeInfo = await app.EpisodeInfo.loadAsync(this.fileService, episodePath);
-      const incompletePath = `${episodePath}.incomplete`;
       const runner = new app.Runner(this.fileService, this.loggerService, this.remoteService);
-      await runner.runAsync(filePath, incompletePath, episodeInfo.url);
+      await runner.runAsync(filePath, incompletePath, url);
     });
   }
 
-  private async updateAsync(seriesPath: string, series: app.api.RemoteSeries) {
+  private async saveSeriesAsync(seriesPath: string, series: app.api.RemoteSeries) {
     await this.supervisor.createOrAttachAsync(seriesPath, async () => {
       await app.SeriesInfo.saveAsync(this.fileService, seriesPath, app.SeriesInfo.from(series));
       await app.SeriesImage.saveAsync(this.imageService, seriesPath, series).catch(() => {});

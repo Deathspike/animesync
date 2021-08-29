@@ -16,7 +16,7 @@ export class SettingController {
   @app.ResponseValidator(app.api.SettingCore)
   @ncm.Get()
   @nsg.ApiResponse({status: 200, type: app.api.SettingCore})
-  coreGet() {
+  core() {
     return app.settings.core;
   }
 
@@ -29,7 +29,7 @@ export class SettingController {
   @app.ResponseValidator(app.api.SettingCredential)
   @ncm.Get('credential')
   @nsg.ApiResponse({status: 200, type: app.api.SettingCredential})
-  credentialGet() {
+  credential() {
     return app.settings.credential;
   }
 
@@ -42,7 +42,7 @@ export class SettingController {
   @app.ResponseValidator(app.api.SettingPath)
   @ncm.Get('path')
   @nsg.ApiResponse({status: 200, type: app.api.SettingPath})
-  pathGet() {
+  path() {
     return app.settings.path;
   }
 
