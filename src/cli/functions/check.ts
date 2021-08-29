@@ -1,47 +1,28 @@
 import * as app from '../..';
 import * as cli from '..';
-import fs from 'fs-extra';
-import path from 'path';
-import sanitizeFilename from 'sanitize-filename';
-type IWorker = (seriesPath: string, series: app.api.RemoteSeries) => Promise<any>;
+type Worker = (series: app.api.LibraryContextSeries, sourceUrl?: string) => Promise<void>;
 
-export async function checkAsync(api: app.Server, urls: Array<string>, workAsync: IWorker, options?: cli.IOptions) {
-  await cli.CoreInfo.loadAsync()
-    .then(coreInfo => urls && urls.length ? urlAsync(api, coreInfo, urls, workAsync, options) : directoryAsync(api, coreInfo, workAsync))
-    .catch((error) => api.logger.error(error));
+export async function checkAsync(api: app.Server, urls: Array<string>, workAsync: Worker, options?: cli.Options) {
+  return urls && urls.length
+    ? await urlAsync(api, urls, workAsync, options)
+    : await contextAsync(api, workAsync);
 }
 
-async function directoryAsync(api: app.Server, coreInfo: cli.CoreInfo, workAsync: IWorker) {
-  for (const rootPath of coreInfo.rootPaths) {
-    if (!await fs.pathExists(rootPath)) continue;
-    for (const seriesName of await fs.readdir(rootPath)) {
-      const seriesPath = path.join(rootPath, seriesName);
-      const seriesInfoPath = path.join(seriesPath, 'tvshow.nfo');
-      const seriesInfoXml = await fs.readFile(seriesInfoPath, 'utf8').catch(() => '');
-      const seriesInfo = await cli.SeriesInfo.parseAsync(seriesInfoXml).catch(() => {});
-      if (seriesInfo && seriesInfo.url) {
-        api.logger.info(`Checking ${seriesName} (${seriesInfo.url})`);
-        const series = await api.remote.seriesAsync(seriesInfo);
-        if (series.value) {
-          await workAsync(seriesPath, series.value);
-        } else {
-          api.logger.info(`Rejected ${seriesName}`);
-        }
-      }
-    }
-  }
+async function contextAsync(api: app.Server, workAsync: Worker) {
+  const context = await api.library.contextAsync();
+  const series = context.value ? context.value.series : [];
+  await series.reduce((p, c) => p.then(async () => workAsync(c)), Promise.resolve());
 }
 
-async function urlAsync(api: app.Server, coreInfo: cli.CoreInfo, urls: Array<string>, workAsync: IWorker, options?: cli.IOptions) {
+async function urlAsync(api: app.Server, urls: Array<string>, workAsync: Worker, options?: cli.Options) {
   for (const url of urls) {
     api.logger.info(`Checking ${url}`);
-    const series = await api.remote.seriesAsync({url});
-    if (series.value) {
-      const rootPath = (options && options.rootPath) ?? app.settings.path.library;
-      const seriesName = sanitizeFilename(series.value.title);
-      const seriesPath = path.join(rootPath, seriesName);
-      await cli.CoreInfo.registerRootPathAsync(coreInfo, rootPath);
-      await workAsync(seriesPath, series.value);
+    const rootPath = options && options.rootPath;
+    const response = await api.library.contextPostAsync({rootPath, url});
+    if (response.success) {
+      const context = await api.library.contextAsync();
+      const series = context.value?.series.find(x => x.url === url);
+      if (series) await workAsync(series, url);
     } else {
       api.logger.info(`Rejected ${url}`);
     }

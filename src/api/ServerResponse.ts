@@ -1,12 +1,13 @@
 import fetch from 'node-fetch';
+type ErrorResponse = {message: string};
 
 export class ServerResponse<T> {
-  private readonly expected: number;
+  private readonly requiredCode: number;
   private readonly response: fetch.Response;
   private readonly result?: any;
 
-  private constructor(expected: number, response: fetch.Response, result?: any) {
-    this.expected = expected;
+  private constructor(requiredCode: number, response: fetch.Response, result?: any) {
+    this.requiredCode = requiredCode;
     this.response = response;
     this.result = result;
   }
@@ -30,16 +31,18 @@ export class ServerResponse<T> {
   }
 
   get error() {
-    if (this.statusCode === this.expected) return undefined;
-    return this.result as {message: string};
+    return this.success ? undefined : this.result as ErrorResponse;
   }
 
   get statusCode() {
     return this.response.status;
   }
 
+  get success() {
+    return this.response.status === this.requiredCode;
+  }
+
   get value() {
-    if (this.statusCode !== this.expected) return undefined;
-    return this.result as T;
+    return this.success ? this.result as T : undefined;
   }
 }

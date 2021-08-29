@@ -10,7 +10,7 @@ export function createServer() {
     .action(serverAsync);
 }
 
-async function serverAsync(this: cli.IOptions) {
+async function serverAsync(this: cli.Options) {
   await app.Server.usingAsync(async (api) => {
     const reader = readline.createInterface(process.stdin, process.stdout);
     api.logger.info(`Listening at ${api.context.serverUrl}`);
