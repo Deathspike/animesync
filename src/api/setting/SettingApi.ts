@@ -9,40 +9,34 @@ export class SettingApi {
 
   async coreAsync() {
     const url = new URL('/api/setting', this.baseUrl).toString();
-    return await api.jsonAsync<api.SettingCore>(url);
+    return await api.ServerResponse.jsonAsync<api.SettingCore>(url);
+  }
+
+  async corePutAsync(model: api.SettingCore) {
+    const options = api.ServerResponse.options('PUT', model);
+    const url = new URL('/api/setting', this.baseUrl).toString();
+    return await api.ServerResponse.emptyAsync(url, options);
   }
 
   async credentialAsync() {
     const url = new URL('/api/setting/credential', this.baseUrl).toString();
-    return await api.jsonAsync<api.SettingCredential>(url);
+    return await api.ServerResponse.jsonAsync<api.SettingCredential>(url);
+  }
+
+  async credentialPutAsync(model: api.SettingCredential) {
+    const options = api.ServerResponse.options('PUT', model);
+    const url = new URL('/api/setting/credential', this.baseUrl).toString();
+    return await api.ServerResponse.emptyAsync(url, options);
   }
 
   async pathAsync() {
     const url = new URL('/api/setting/path', this.baseUrl).toString();
-    return await api.jsonAsync<api.SettingPath>(url);
+    return await api.ServerResponse.jsonAsync<api.SettingPath>(url);
   }
 
-  async updateCoreAsync(model: api.SettingCore) {
-    const body = JSON.stringify(model);
-    const headers = {'Content-Type': 'application/json'};
-    const method = 'PUT';
-    const url = new URL('/api/setting', this.baseUrl).toString();
-    return await api.jsonAsync(url, {body, method, headers});
-  }
-
-  async updateCredentialAsync(model: api.SettingCredential) {
-    const body = JSON.stringify(model);
-    const headers = {'Content-Type': 'application/json'};
-    const method = 'PUT';
-    const url = new URL('/api/setting/credential', this.baseUrl).toString();
-    return await api.jsonAsync(url, {body, method, headers});
-  }
-
-  async updatePathAsync(model: api.SettingPath) {
-    const body = JSON.stringify(model);
-    const headers = {'Content-Type': 'application/json'};
-    const method = 'PUT';
+  async pathPutAsync(model: api.SettingPath) {
+    const options = api.ServerResponse.options('PUT', model);
     const url = new URL('/api/setting/path', this.baseUrl).toString();
-    return await api.jsonAsync(url, {body, method, headers});
+    return await api.ServerResponse.emptyAsync(url, options);
   }
 }

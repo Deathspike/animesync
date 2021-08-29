@@ -4,8 +4,8 @@ const credential = new app.api.SettingCredential(app.settings.credential);
 
 describe('Vrv', () => {
   beforeAll(() => app.Server.usingAsync(async (api) => {
-    await api.setting.updateCoreAsync(new app.api.SettingCore(core, fetchCore()));
-    await api.setting.updateCredentialAsync(new app.api.SettingCredential(credential, fetchCredential()));
+    await api.setting.corePutAsync(new app.api.SettingCore(core, fetchCore()));
+    await api.setting.credentialPutAsync(new app.api.SettingCredential(credential, fetchCredential()));
   }));
 
   it('Series', () => app.Server.usingAsync(async (api) => {
@@ -32,8 +32,8 @@ describe('Vrv', () => {
   }));
   
   afterAll(() => app.Server.usingAsync(async (api) => {
-    await api.setting.updateCoreAsync(core);
-    await api.setting.updateCredentialAsync(credential);
+    await api.setting.corePutAsync(core);
+    await api.setting.credentialPutAsync(credential);
   }));
 });
 

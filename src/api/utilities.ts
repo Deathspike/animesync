@@ -1,24 +1,4 @@
-import * as fch from 'node-fetch';
-import fetch from 'node-fetch';
 import querystring from 'querystring';
-
-export async function jsonAsync<T>(url: string, init?: fch.RequestInit) {
-  try {
-    const response = await fetch(url, init);
-    if (response.status === 200) {
-      const statusCode: 200 = 200;
-      const value = await response.json() as T;
-      return {statusCode, value};
-    } else {
-      const statusCode = response.status;
-      const error = await response.json() as {message: string};
-      return {statusCode, error};
-    }
-  } catch (error) {
-    const statusCode = 0;
-    return {statusCode};
-  }
-}
 
 export function queryString(model?: Record<string, string>) {
   if (!model) return querystring.stringify();

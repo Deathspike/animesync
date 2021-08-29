@@ -22,7 +22,7 @@ async function settingsAsync(this: commander.Command) {
     const credential = await credentialPromise.then(x => x.value && new app.api.SettingCredential(x.value));
     const path = await pathPromise.then(x => x.value && new app.api.SettingPath(x.value));
     if (core && credential && path && (unifySettings(this, core) || unifySettings(this, credential) || unifySettings(this, path))) {
-      await Promise.all([api.setting.updateCoreAsync(core), api.setting.updateCredentialAsync(credential), api.setting.updatePathAsync(path)]);
+      await Promise.all([api.setting.corePutAsync(core), api.setting.credentialPutAsync(credential), api.setting.pathPutAsync(path)]);
     } else {
       this.outputHelp();
     }

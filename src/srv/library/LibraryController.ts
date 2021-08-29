@@ -18,8 +18,8 @@ export class LibraryController {
   @app.ResponseValidator(app.api.LibraryContext)
   @ncm.Get()
   @nsg.ApiResponse({status: 200, type: app.api.LibraryContext})
-  async contextGetAsync() {
-    return await this.libraryService.contextGetAsync();
+  async contextAsync() {
+    return await this.libraryService.contextAsync();
   }
 
   @ncm.Post()
@@ -36,8 +36,17 @@ export class LibraryController {
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
   async contextPutAsync() {
-    const context = await this.libraryService.contextGetAsync();
+    const context = await this.libraryService.contextAsync();
     await context.series.reduce((p, c) => p.then(() => this.libraryService.seriesPutAsync(c.path)), Promise.resolve());
+  }
+
+  @app.ResponseValidator(app.api.LibrarySeries)
+  @ncm.Get(':seriesId')
+  @ncm.HttpCode(200)
+  @nsg.ApiResponse({status: 200, type: app.api.LibrarySeries})
+  @nsg.ApiResponse({status: 404})
+  async seriesAsync(@ncm.Param() params: app.api.LibraryParamSeries) {
+    return await this.fetchSeriesAsync(params.seriesId);
   }
 
   @ncm.Delete(':seriesId')
@@ -49,15 +58,6 @@ export class LibraryController {
     const series = await this.fetchSeriesAsync(params.seriesId);
     if (await this.libraryService.seriesDeleteAsync(series.path)) return;
     app.error.conflict();
-  }
-
-  @app.ResponseValidator(app.api.LibrarySeries)
-  @ncm.Get(':seriesId')
-  @ncm.HttpCode(200)
-  @nsg.ApiResponse({status: 200, type: app.api.LibrarySeries})
-  @nsg.ApiResponse({status: 404})
-  async seriesGetAsync(@ncm.Param() params: app.api.LibraryParamSeries) {
-    return await this.fetchSeriesAsync(params.seriesId);
   }
 
   @ncm.Put(':seriesId')
@@ -76,99 +76,59 @@ export class LibraryController {
   async seriesImageAsync(@ncm.Param() params: app.api.LibraryParamSeries, @ncm.Response() response: express.Response) {
     const series = await this.fetchSeriesAsync(params.seriesId);
     const value = await this.libraryService.seriesImageAsync(series.path) ?? app.error.notFound();
+    response.attachment(value.filePath);
     response.sendFile(value.filePath, () => response.status(404).end());
   }
   
-  @nsg.ApiBasicAuth() // NotYetImplemented
-  @ncm.Delete(':seriesId/:seasonId')
-  @ncm.HttpCode(204)
-  @nsg.ApiResponse({status: 204})
-  @nsg.ApiResponse({status: 404})
-  async seasonDeleteAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeason) {
-    console.log(params);
-    throw new ncm.UnauthorizedException();
-  }
-
-  @nsg.ApiBasicAuth() // NotYetImplemented
-  @app.ResponseValidator(app.api.LibrarySeriesSeason)
-  @ncm.Get(':seriesId/:seasonId')
-  @ncm.HttpCode(200)
-  @nsg.ApiResponse({status: 200, type: app.api.LibrarySeriesSeason})
-  @nsg.ApiResponse({status: 404})
-  async seasonGetAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeason) {
-    console.log(params);
-    throw new ncm.UnauthorizedException();
-  }
-
-  @nsg.ApiBasicAuth() // NotYetImplemented
-  @ncm.Put(':seriesId/:seasonId')
-  @ncm.HttpCode(204)
-  @nsg.ApiResponse({status: 204})
-  @nsg.ApiResponse({status: 404})
-  async seasonPutAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeason) {
-    console.log(params);
-    throw new ncm.UnauthorizedException();
-  }
-
-  @nsg.ApiBasicAuth() // NotYetImplemented
-  @ncm.Get(':seriesId/:seasonId/image')
-  @ncm.HttpCode(200)
-  @nsg.ApiNotImplementedResponse()
-  @nsg.ApiResponse({status: 200})
-  @nsg.ApiResponse({status: 404})
-  async seasonImageAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeason) {
-    console.log(params);
-    throw new ncm.UnauthorizedException();
-  }
-
-  @ncm.Delete(':seriesId/:seasonId/:episodeId')
-  @ncm.HttpCode(204)
-  @nsg.ApiResponse({status: 204})
-  @nsg.ApiResponse({status: 404})
-  async episodeDeleteAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeasonEpisode) {
-    const match = await this.fetchEpisodeAsync(params.seriesId, params.seasonId, params.episodeId);
-    await this.libraryService.episodeDeleteAsync(match.episode.path);
-  }
-
-  @ncm.Get(':seriesId/:seasonId/:episodeId')
+  @ncm.Get(':seriesId/:episodeId')
   @ncm.HttpCode(200)
   @nsg.ApiResponse({status: 200})
   @nsg.ApiResponse({status: 404})
-  async episodeGetAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeasonEpisode, @ncm.Response() response: express.Response) {
-    const match = await this.fetchEpisodeAsync(params.seriesId, params.seasonId, params.episodeId);
-    const value = await this.libraryService.episodeGetAsync(match.episode.path);
+  async episodeAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode, @ncm.Response() response: express.Response) {
+    const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
+    const value = await this.libraryService.episodeAsync(match.episode.path);
+    response.attachment(value.filePath);
     response.sendFile(value.filePath, () => response.status(404).end());
   }
 
-  @ncm.Put(':seriesId/:seasonId/:episodeId')
+  @ncm.Delete(':seriesId/:episodeId')
   @ncm.HttpCode(204)
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
-  async episodePutAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeasonEpisode) {
-    const match = await this.fetchEpisodeAsync(params.seriesId, params.seasonId, params.episodeId);
+  async episodeDeleteAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode) {
+    const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
+    await this.libraryService.episodeDeleteAsync(match.episode.path);
+  }
+
+  @ncm.Put(':seriesId/:episodeId')
+  @ncm.HttpCode(204)
+  @nsg.ApiResponse({status: 204})
+  @nsg.ApiResponse({status: 404})
+  async episodePutAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode) {
+    const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
     await this.libraryService.episodePutAsync(match.episode.path);
   }
 
-  @ncm.Get(':seriesId/:seasonId/:episodeId/image')
+  @ncm.Get(':seriesId/:episodeId/image')
   @ncm.HttpCode(200)
   @nsg.ApiResponse({status: 200})
   @nsg.ApiResponse({status: 404})
-  async episodeImageAsync(@ncm.Param() params: app.api.LibraryParamSeriesSeasonEpisode, @ncm.Response() response: express.Response) {
-    const match = await this.fetchEpisodeAsync(params.seriesId, params.seasonId, params.episodeId);
+  async episodeImageAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode, @ncm.Response() response: express.Response) {
+    const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
     const value = await this.libraryService.episodeImageAsync(match.episode.path) ?? app.error.notFound();
+    response.attachment(value.filePath);
     response.sendFile(value.filePath, () => response.status(404).end());
   }
 
   private async fetchSeriesAsync(seriesId: string) {
-    const context = await this.libraryService.contextGetAsync();
+    const context = await this.libraryService.contextAsync();
     const series = context.series.find(x => x.id === seriesId) ?? app.error.notFound();
-    return await this.libraryService.seriesGetAsync(series.path);
+    return await this.libraryService.seriesAsync(series.path);
   }
   
-  private async fetchEpisodeAsync(seriesId: string, seasonId: string, episodeId: string) {
+  private async fetchEpisodeAsync(seriesId: string, episodeId: string) {
     const series = await this.fetchSeriesAsync(seriesId);
-    const season = series.seasons.find(x => x.id === seasonId) ?? app.error.notFound();
-    const episode = season.episodes.find(x => x.id === episodeId) ?? app.error.notFound();
-    return {series, season, episode};
+    const episode = series.seasons.flatMap(x => x.episodes).find(x => x.id === episodeId) ?? app.error.notFound();
+    return {series, episode};
   }
 }
