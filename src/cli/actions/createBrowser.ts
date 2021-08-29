@@ -10,7 +10,7 @@ export function createBrowser() {
 
 async function browserAsync() {
   await app.Server.usingAsync(async (api) => {
-    api.logger.info(`Listening at ${api.context.serverUrl}`);
+    api.logger.info(`Listening at ${app.settings.server.url}`);
     app.settings.core = new app.api.SettingCore(app.settings.core, {chromeHeadless: false});
     await api.browser.pageAsync(async (page) => {
       const context = page.context();

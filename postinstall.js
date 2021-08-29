@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 let apiUrl = 'https://api.github.com/repos/Deathspike/animesync/contents/static/download/';
@@ -24,13 +24,13 @@ async function downloadAsync(localPath, remotePath) {
 
 async function ffmpegAsync(localName, remotePath) {
   const hashPath = path.join(staticPath, `${localName}.cks`);
-  const localHash = await fs.readFile(hashPath, 'utf8').catch(() => {});
+  const localHash = await fs.promises.readFile(hashPath).then(String).catch(() => {});
   const remoteHash = await checksumAsync(remotePath);
   if (localHash !== remoteHash) {
-    await fs.ensureDir(staticPath);
+    await fs.promises.mkdir(staticPath, {recursive: true});
     await downloadAsync(path.join(staticPath, localName), remotePath);
-    await fs.chmod(path.join(staticPath, localName), '755');
-    await fs.writeFile(hashPath, remoteHash);
+    await fs.promises.chmod(path.join(staticPath, localName), '755');
+    await fs.promises.writeFile(hashPath, remoteHash);
   }
 }
 

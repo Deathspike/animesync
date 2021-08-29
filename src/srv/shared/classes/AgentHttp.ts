@@ -3,16 +3,13 @@ import http from 'http';
 import net from 'net';
 
 export class AgentHttp extends http.Agent {
-  private readonly contextService: app.ContextService;
-
-  constructor(contextService: app.ContextService, options?: http.AgentOptions) {
+  constructor(options?: http.AgentOptions) {
     options = options || {};
     super(options);
-    this.contextService = contextService;
   }
 
   createConnection(options: net.TcpSocketConnectOpts, callback: (error?: Error, socket?: net.Socket) => void) {
-    app.AgentConnector.createAsync(this.contextService, String(options.host), options.port)
+    app.AgentConnector.createAsync(String(options.host), options.port)
       .then((socket) => callback(undefined, this.superCreateConnection(options, socket)))
       .catch((error) => callback(error))
   }

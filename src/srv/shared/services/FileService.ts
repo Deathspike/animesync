@@ -4,6 +4,12 @@ import path from 'path';
 
 @ncm.Injectable()
 export class FileService {
+  async appendAsync(filePath: string, value: Buffer | string) {
+    const dirPath = path.dirname(filePath);
+    await fs.promises.mkdir(dirPath, {recursive: true});
+    await fs.promises.appendFile(filePath, value);
+  }
+
   async deleteAsync(filePath: string) {
     const options = {force: true, recursive: true, maxRetries: 50};
     await fs.promises.rm(filePath, options);

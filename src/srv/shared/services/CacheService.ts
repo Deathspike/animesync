@@ -1,17 +1,18 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
 import crypto from 'crypto';
-import fs from 'fs-extra';
 import path from 'path';
 
 @ncm.Injectable()
 export class CacheService implements ncm.OnModuleDestroy {
   private readonly loggerService: app.LoggerService;
+  private readonly fileService: app.FileService;
   private readonly timeoutHandles: Record<string, NodeJS.Timeout>;
   private readonly values: Record<string, Promise<any> | string>;
 
-  constructor(loggerService: app.LoggerService) {
+  constructor(loggerService: app.LoggerService, fileService: app.FileService) {
     this.loggerService = loggerService;
+    this.fileService = fileService;
     this.timeoutHandles = {};
     this.values = {};
   }
@@ -25,7 +26,7 @@ export class CacheService implements ncm.OnModuleDestroy {
       clearTimeout(this.timeoutHandles[key]);
       delete this.timeoutHandles[key];
       delete this.values[key];
-      await fs.remove(valueOrPath);
+      await this.fileService.deleteAsync(valueOrPath);
     }
   }
 
@@ -34,7 +35,7 @@ export class CacheService implements ncm.OnModuleDestroy {
     if (valueOrPath instanceof Promise) {
       return await valueOrPath as T;
     } else if (valueOrPath) {
-      return await fs.readJson(valueOrPath) as T;
+      return await this.fileService.readAsync(valueOrPath).then(String).then(JSON.parse) as T;
     } else {
       return await this.addAsync(key, timeout, valueFactory());
     }
@@ -51,8 +52,7 @@ export class CacheService implements ncm.OnModuleDestroy {
       this.values[key] = valuePromise;
       const value = await valuePromise;
       const valuePath = path.join(app.settings.path.cache, `${Date.now().toString(16) + crypto.randomBytes(24).toString('hex')}.json`);
-      await fs.ensureDir(app.settings.path.cache);
-      await fs.writeJson(valuePath, value, {spaces: 2});
+      await this.fileService.writeAsync(valuePath, JSON.stringify(value));
       this.timeoutHandles[key] = setTimeout(() => this.expireAsync(key).catch((error) => this.loggerService.error(error)), timeout);
       this.values[key] = valuePath;
       return value;

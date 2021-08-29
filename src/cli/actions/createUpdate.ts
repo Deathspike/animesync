@@ -12,7 +12,7 @@ export function createUpdate() {
 
 async function checkAsync(this: cli.Options, urls: Array<string>) {
   await app.Server.usingAsync(async (api) => {
-    api.logger.info(`Listening at ${api.context.serverUrl}`);
+    api.logger.info(`Listening at ${app.settings.server.url}`);
     await cli.checkAsync(api, urls, updateAsync.bind(cli, api), this);
   });
 }

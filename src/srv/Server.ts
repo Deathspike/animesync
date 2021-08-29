@@ -11,19 +11,18 @@ export class Server extends app.api.ServerApi {
   private readonly server: npe.NestExpressApplication;
 
   private constructor(server: npe.NestExpressApplication) {
-    super(server.get(app.ContextService).serverUrl);
+    super(app.settings.server.url);
     this.server = server;
     this.server.disable('x-powered-by');
-    this.server.useLogger(this.logger);
     this.logger.debug(`Running ${packageData.name} (${packageData.version})`);
   }
 
-  static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>, serverPort?: number) {
+  static async usingAsync<T>(handlerAsync: (server: Server) => Promise<T>) {
     const server = await ncr.NestFactory.create<npe.NestExpressApplication>(ServerModule, {bodyParser: false, logger: false});
     attachDocumentation(server);
     attachErrorFilter(server);
     attachRequestValidation(server);
-    await server.listen(serverPort ?? 0);
+    await server.listen(app.settings.server.port);
     return await handlerAsync(new Server(server)).finally(() => server.close());
   }
 
@@ -31,10 +30,6 @@ export class Server extends app.api.ServerApi {
     return this.server.get(app.BrowserService);
   }
 
-  get context() {
-    return this.server.get(app.ContextService);
-  }
-  
   get logger() {
     return this.server.get(app.LoggerService);
   }

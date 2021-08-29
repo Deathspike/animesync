@@ -20,9 +20,9 @@ export class AgentConnector {
     this.socket = socket;
   }
   
-  static async createAsync(contextService: app.ContextService, hostname: string, port: number) {
+  static async createAsync(hostname: string, port: number) {
     return await new Promise<net.Socket>((resolve, reject) => {
-      const socket = net.connect(contextService.serverPort, contextService.serverIp);
+      const socket = net.connect(app.settings.server.port);
       const agent = new AgentConnector(reject, resolve, socket);
       agent.connect(hostname, port);
     });
