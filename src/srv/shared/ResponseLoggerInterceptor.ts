@@ -12,13 +12,13 @@ export class ResponseLoggerInterceptor<T> implements ncm.NestInterceptor {
   }
 
   intercept(context: ncm.ExecutionContext, next: ncm.CallHandler) {
-    this.traceRequest(context);
+    const requestId = this.traceRequest(context);
     return next.handle().pipe(rop.map((value: T) => {
       if (value instanceof Promise) {
-        value.then((value) => this.traceResponse(context, value));
+        value.then((value) => this.traceResponse(context, requestId, value));
         return value;
       } else {
-        this.traceResponse(context, value);
+        this.traceResponse(context, requestId, value);
         return value;
       }
     }));
@@ -26,12 +26,14 @@ export class ResponseLoggerInterceptor<T> implements ncm.NestInterceptor {
 
   private traceRequest(context: ncm.ExecutionContext) {
     const request: express.Request = context.switchToHttp().getRequest();
-    this.loggerService.debug(`HTTP/${request.httpVersion} ${request.method} ${request.url}`);
+    const requestId = Date.now().toString(16).substr(-6);
+    this.loggerService.debug(`[${requestId}] HTTP/${request.httpVersion} ${request.method} ${request.url}`);
+    return requestId;
   }
 
-  private traceResponse<T>(context: ncm.ExecutionContext, value: T) {
+  private traceResponse<T>(context: ncm.ExecutionContext, requestId: string, value: T) {
     const request: express.Request = context.switchToHttp().getRequest();
     const response: express.Response = context.switchToHttp().getResponse();
-    this.loggerService.debug(`HTTP/${request.httpVersion} ${response.statusCode} ${JSON.stringify(value)}`);
+    this.loggerService.debug(`[${requestId}] HTTP/${request.httpVersion} ${response.statusCode} ${JSON.stringify(value)}`);
   }
 }
