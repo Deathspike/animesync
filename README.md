@@ -100,11 +100,11 @@ To download missing episodes for all your series, you can use:
 
 ### Metadata
 
-To add a series without downloading it, you can use:
+To add a series without downloading episodes, you can use:
 
     animesync add [seriesUrl...]
     
-To update all your series, you can use:
+To update metadata for all your series, you can use:
 
     animesync update
 
@@ -114,52 +114,17 @@ To avoid downloading every episode, you can run:
 
     animesync download --skipDownload [seriesUrl...]
 
-This generates tracker files in the `.animesync` subdirectory. Delete one and run `animesync download` to download the missing episode.
+This generates tracker files in the `.animesync` directory. Delete one and run `animesync download` to download it.
 
-## User Settings
+## Settings
 
 To check the settings, you can use:
 
     animesync settings
 
-You will see something similar to:
+To check a settings section, you can use:
 
-```
-Usage: animesync settings [options] [command]
-
-Manage settings.
-
-Options:
-  -h, --help            display help for command
-
-Commands:
-  core [options]        The core settings.
-  credential [options]  The credential settings.
-  path [options]        The path settings.
-  help [command]        display help for command
-```
-
-Each section holds its own settings that can be configured. For example, `core` has these values:
-
-```
-Usage: app settings core [options]
-
-The core settings.
-
-Options:
-  --cacheTimeoutSeries [number]       Cache timeout for series        900000
-  --cacheTimeoutStream [number]       Cache timeout for streams.      300000
-  --chromeHeadless [bool]             Chrome headless mode.           true
-  --chromeTimeoutInactive [number]    Chrome timeout for inactivity.  600000
-  --chromeTimeoutNavigation [number]  Chrome timeout for navigation.  30000
-  --chromeViewport [string]           Chrome viewport dimensions.     1920x974
-  --fetchMaximumRetries [number]      Fetch maximum retries.          8
-  --fetchTimeoutRequest [number]      Fetch timeout for requests.     30000
-  --fetchTimeoutRetry [number]        Fetch timeout for retries.      3750
-  --ffmpeg [string]                   The ffmpeg command.             /path/to/ffmpeg
-  --proxyServer [string]              The proxy server.               
-  -h, --help                          display help for command
-```
+    animesync settings [section]
 
 To change a setting, you can use an option flag. For example:
 
