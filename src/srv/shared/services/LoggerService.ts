@@ -1,18 +1,17 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
-import fs from 'fs-extra';
-import lockfile from 'proper-lockfile';
 import os from 'os';
 import path from 'path';
 
+@ncm.Injectable()
 export class LoggerService implements ncm.LoggerService {
-  private readonly id: string;
+  private readonly fileService: app.FileService;
   private readonly queue: Array<string>;
   private isRunning: boolean;
 
-  constructor() {
-    this.id = String(process.pid).padStart(5);
+  constructor(fileService: app.FileService) {
     this.isRunning = false;
+    this.fileService = fileService;
     this.queue = [];
   }
 
@@ -43,25 +42,19 @@ export class LoggerService implements ncm.LoggerService {
   }
 
   private enqueue(level: string, line: string) {
-    this.queue.push(`[${new Date().toISOString()}] ${this.id} ${level.padEnd(5)} ${line}`);
+    this.queue.push(`[${new Date().toISOString()}] ${level.padEnd(5)} ${line}`);
     this.tryRun();
   }
 
   private async runAsync() {
-    await fs.ensureDir(app.settings.path.logger);
     const filePath = path.join(app.settings.path.logger, `${new Date().toISOString().substr(0, 10)}.log`);
-    const release = await lockfile.lock(filePath, {realpath: false, retries: {forever: true}});
-    while (this.queue.length) await fs.appendFile(filePath, this.queue.shift() + os.EOL);
-    await release();
+    while (this.queue.length) await this.fileService.appendAsync(filePath, this.queue.shift() + os.EOL);
   }
 
   private tryRun() {
     if (this.isRunning) return;
     this.isRunning = true;
-    this.runAsync().finally(() => {
-      this.isRunning = false;
-      if (this.queue.length) this.tryRun();
-    });
+    this.runAsync().finally(() => this.isRunning = false);
   }
 }
 

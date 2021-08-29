@@ -1,6 +1,5 @@
 import * as app from '..';
 import * as ncm from '@nestjs/common';
-import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 
@@ -9,11 +8,13 @@ export class SettingService {
   private readonly agentService: app.AgentService;
   private readonly browserService: app.BrowserService;
   private readonly cacheService: app.CacheService;
+  private readonly fileService: app.FileService;
 
-  constructor(agentService: app.AgentService, browserService: app.BrowserService, cacheService: app.CacheService) {
+  constructor(agentService: app.AgentService, browserService: app.BrowserService, cacheService: app.CacheService, fileService: app.FileService) {
     this.agentService = agentService;
     this.browserService = browserService;
     this.cacheService = cacheService;
+    this.fileService = fileService;
   }
 
   async coreAsync(core: app.api.SettingCore) {
@@ -42,16 +43,16 @@ export class SettingService {
     const browserPromise = this.browserService.onModuleDestroy();
     const cachePromise = this.cacheService.onModuleDestroy();
     await Promise.all([agentPromise, browserPromise, cachePromise]);
-    await fs.remove(app.settings.path.chrome);
+    await this.fileService.deleteAsync(app.settings.path.chrome);
   }
 
   private async saveAsync() {
+    const filePath = path.join(os.homedir(), 'animesync', 'settings.json');
     const settingOverrides = Object.assign({},
       shallowDiff(app.settings.core, app.settings.source.defaultCore),
       shallowDiff(app.settings.credential, app.settings.source.defaultCredential),
       shallowDiff(app.settings.path, app.settings.source.defaultPath));
-    await fs.ensureDir(path.join(os.homedir(), 'animesync'));
-    await fs.writeJson(path.join(os.homedir(), 'animesync', 'settings.json'), settingOverrides, {spaces: 2});
+    await this.fileService.writeAsync(filePath, JSON.stringify(settingOverrides, null, 2));
   }
 }
 

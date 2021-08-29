@@ -1,5 +1,5 @@
 import * as app from '.';
-import fs from 'fs-extra';
+import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
@@ -30,13 +30,15 @@ const defaultPath = new app.api.SettingPath({
   sync: path.join(os.homedir(), 'animesync', 'sync')
 });
 
-const settingOverrides = fs.readJsonSync(
-  path.join(os.homedir(), 'animesync', 'settings.json'),
-  {throws: false});
+const settingOverrides = (() => {
+  const filePath = path.join(os.homedir(), 'animesync', 'settings.json');
+  return fs.existsSync(filePath) && JSON.parse(fs.readFileSync(filePath, 'utf8'));
+})();
 
 export const settings = {
   core: new app.api.SettingCore(defaultCore, settingOverrides),
   credential: new app.api.SettingCredential(defaultCredential, settingOverrides),
   path: new app.api.SettingPath(defaultPath, settingOverrides),
+  server: {port: 6583, url: `http://127.0.0.1:6583/`},
   source: {defaultCore, defaultCredential, defaultPath}
 };

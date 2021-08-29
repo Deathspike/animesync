@@ -6,7 +6,6 @@ export * from './models/EpisodeImage';
 export * from './models/EpisodeInfo';
 export * from './models/SeriesImage';
 export * from './models/SeriesInfo';
-export * from './services/FileService';
 export * from './services/ImageService';
 export * from './services/RemoteService';
 export * from './services/LibraryService';
