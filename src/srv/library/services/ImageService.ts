@@ -11,12 +11,12 @@ export class ImageService {
 
   async findAsync(imagePath: string) {
     const values = await Promise.all(Object.keys(extensions).map(x => this.fileService.existsAsync(imagePath + x).then(y => y ? imagePath + x : undefined)));
-    const filePath = values.find(Boolean) ?? app.error.notFound();
+    const filePath = values.find(Boolean) ?? app.throwNotFound();
     return {filePath};
   }
 
   async saveAsync(imagePath: string, value: Buffer) {
-    const match = Object.entries(extensions).find(([_, v]) => v(value)) ?? app.error.notFound();
+    const match = Object.entries(extensions).find(([_, v]) => v(value)) ?? app.throwNotFound();
     const filePath = imagePath + match[0];
     await Promise.all(Object.keys(extensions).map(x => this.fileService.deleteAsync(imagePath + x)));
     await this.fileService.writeAsync(filePath, value);

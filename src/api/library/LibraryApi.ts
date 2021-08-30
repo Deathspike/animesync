@@ -67,4 +67,9 @@ export class LibraryApi {
     const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/image`, this.baseUrl).toString();
     return Promise.resolve(url);
   }
+
+  episodeSubtitleAsync(model: api.LibraryParamSeriesEpisode) {
+    const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/subtitle`, this.baseUrl).toString();
+    return Promise.resolve(url);
+  }
 }

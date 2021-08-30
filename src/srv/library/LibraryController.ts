@@ -57,7 +57,7 @@ export class LibraryController {
   async seriesDeleteAsync(@ncm.Param() params: app.api.LibraryParamSeries) {
     const series = await this.fetchSeriesAsync(params.seriesId);
     if (await this.libraryService.seriesDeleteAsync(series.path)) return;
-    app.error.conflict();
+    throw new ncm.ConflictException();
   }
 
   @ncm.Put(':seriesId')
@@ -75,9 +75,9 @@ export class LibraryController {
   @nsg.ApiResponse({status: 404})
   async seriesImageAsync(@ncm.Param() params: app.api.LibraryParamSeries, @ncm.Response() response: express.Response) {
     const series = await this.fetchSeriesAsync(params.seriesId);
-    const value = await this.libraryService.seriesImageAsync(series.path) ?? app.error.notFound();
-    response.attachment(value.filePath);
-    response.sendFile(value.filePath, () => response.status(404).end());
+    const value = await this.libraryService.seriesImageAsync(series.path) ?? app.throwNotFound();
+    response.attachment(value);
+    response.sendFile(value, () => response.status(404).end());
   }
   
   @ncm.Get(':seriesId/:episodeId')
@@ -87,8 +87,8 @@ export class LibraryController {
   async episodeAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode, @ncm.Response() response: express.Response) {
     const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
     const value = await this.libraryService.episodeAsync(match.episode.path);
-    response.attachment(value.filePath);
-    response.sendFile(value.filePath, () => response.status(404).end());
+    response.attachment(value);
+    response.sendFile(value, () => response.status(404).end());
   }
 
   @ncm.Delete(':seriesId/:episodeId')
@@ -115,20 +115,31 @@ export class LibraryController {
   @nsg.ApiResponse({status: 404})
   async episodeImageAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode, @ncm.Response() response: express.Response) {
     const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
-    const value = await this.libraryService.episodeImageAsync(match.episode.path) ?? app.error.notFound();
-    response.attachment(value.filePath);
-    response.sendFile(value.filePath, () => response.status(404).end());
+    const value = await this.libraryService.episodeImageAsync(match.episode.path) ?? app.throwNotFound();
+    response.attachment(value);
+    response.sendFile(value, () => response.status(404).end());
+  }
+  
+  @ncm.Get(':seriesId/:episodeId/subtitle')
+  @ncm.HttpCode(200)
+  @nsg.ApiResponse({status: 200})
+  @nsg.ApiResponse({status: 404})
+  async episodeSubtitleAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode, @ncm.Response() response: express.Response) {
+    const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
+    const value = await this.libraryService.episodeSubtitleAsync(match.episode.path);
+    response.attachment(value);
+    response.sendFile(value, () => response.status(404).end());
   }
 
   private async fetchSeriesAsync(seriesId: string) {
     const context = await this.libraryService.contextAsync();
-    const series = context.series.find(x => x.id === seriesId) ?? app.error.notFound();
+    const series = context.series.find(x => x.id === seriesId) ?? app.throwNotFound();
     return await this.libraryService.seriesAsync(series.path);
   }
   
   private async fetchEpisodeAsync(seriesId: string, episodeId: string) {
     const series = await this.fetchSeriesAsync(seriesId);
-    const episode = series.seasons.flatMap(x => x.episodes).find(x => x.id === episodeId) ?? app.error.notFound();
+    const episode = series.seasons.flatMap(x => x.episodes).find(x => x.id === episodeId) ?? app.throwNotFound();
     return {series, episode};
   }
 }

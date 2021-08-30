@@ -5,8 +5,8 @@ import path from 'path';
 @ncm.Injectable()
 export class FileService {
   async appendAsync(filePath: string, value: Buffer | string) {
-    const dirPath = path.dirname(filePath);
-    await fs.promises.mkdir(dirPath, {recursive: true});
+    const directoryPath = path.dirname(filePath);
+    await fs.promises.mkdir(directoryPath, {recursive: true});
     await fs.promises.appendFile(filePath, value);
   }
 
@@ -15,8 +15,12 @@ export class FileService {
     await fs.promises.rm(filePath, options);
   }
 
-  async existsAsync(resourcePath: string) {
-    return await fs.promises.access(resourcePath).then(() => true, () => false);
+  async ensureAsync(directoryPath: string) {
+    await fs.promises.mkdir(directoryPath, {recursive: true});
+  }
+
+  async existsAsync(path: string) {
+    return await fs.promises.access(path).then(() => true, () => false);
   }
 
   async listAsync(directoryPath: string) {
@@ -32,10 +36,10 @@ export class FileService {
   }
 
   async writeAsync(filePath: string, value: Buffer | string) {
-    const dirPath = path.dirname(filePath);
-    const tmpPath = `${filePath}.tmp`;
-    await fs.promises.mkdir(dirPath, {recursive: true});
-    await fs.promises.writeFile(tmpPath, value);
-    await fs.promises.rename(tmpPath, filePath);
+    const directoryPath = path.dirname(filePath);
+    const temporaryPath = `${filePath}.tmp`;
+    await fs.promises.mkdir(directoryPath, {recursive: true});
+    await fs.promises.writeFile(temporaryPath, value);
+    await fs.promises.rename(temporaryPath, filePath);
   }
 }
