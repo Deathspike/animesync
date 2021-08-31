@@ -1,12 +1,31 @@
 {
   "version": "2.0.0",
   "tasks": [{
-    "group": {"isDefault": true, "kind": "build"},
     "isBackground": true,
     "label": "TypeScript",
     "option": "watch",
     "problemMatcher": ["$tsc-watch"],
     "tsconfig": "tsconfig.json",
     "type": "typescript"
+  }, {
+    "dependsOn": ["TypeScript"],
+    "group": {"isDefault": true, "kind": "build"},
+    "isBackground": true,
+    "label": "Webpack",
+    "script": "dev",
+    "type": "npm",
+    "problemMatcher": [{
+      "background": {
+        "activeOnStart": true,
+        "beginsPattern": ".",
+        "endsPattern": "compiled (with|successfully)"
+      },
+      "pattern": [{
+        "regexp": ".",
+        "file": 1,
+        "location": 2,
+        "message": 3
+      }]      
+    }]
   }]
 }

@@ -1,21 +1,31 @@
 {
   "version": "0.2.0",
+  "compounds": [{
+    "name": "Client & Server",
+    "configurations": ["Server", "Client"]
+  }],
   "configurations": [{
+    "name": "Client",
+    "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+    "outputCapture": "std",
+    "preLaunchTask": "Webpack",
+    "request": "launch",
+    "type": "pwa-chrome",
+    "url": "http://localhost:8080/"
+  }, {
     "args": ["bin/animesync", "server"],
-    "name": "Launch Server",
+    "name": "Server",
     "outFiles": ["${workspaceFolder}/dist/**/*.js"],
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
     "request": "launch",
-    "runtimeArgs": ["--inspect=16583"],
     "type": "node"
   }, {
-    "args": ["-i"],
-    "name": "Launch Tests",
+    "args": ["node_modules/jest/bin/jest.js"],
+    "name": "Tests",
     "outFiles": ["${workspaceRoot}/dist/**/*"],
     "outputCapture": "std",
     "preLaunchTask": "TypeScript",
-    "program": "${workspaceRoot}\\node_modules\\jest\\bin\\jest.js",
     "request": "launch",
     "type": "node"
   }]

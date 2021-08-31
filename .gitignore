@@ -1,4 +1,5 @@
 /dist
+/public/app.min.js
 /node_modules
 /static/ffmpeg*
 /*.tgz

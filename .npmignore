@@ -2,4 +2,5 @@
 /.vscode
 /src
 /static
+/webpack*
 /tsconfig.json
