@@ -4,15 +4,15 @@ import * as nsg from '@nestjs/swagger';
 
 export class RemoteStreamSubtitle {
   constructor(source?: RemoteStreamSubtitle, sourcePatch?: Partial<RemoteStreamSubtitle>) {
-    this.language = api.property('language', source, sourcePatch, 'en-US');
+    this.language = api.property('language', source, sourcePatch, 'eng');
     this.type = api.property('type', source, sourcePatch, 'srt');
     this.url = api.property('url', source, sourcePatch, '');
   }
 
   @clv.IsString()
-  @clv.IsIn(['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'tr-TR'])
-  @nsg.ApiProperty({enum: ['ar-ME', 'de-DE', 'en-US', 'es-ES', 'es-LA', 'fr-FR', 'it-IT', 'pt-BR', 'ru-RU', 'tr-TR']})
-  readonly language: 'ar-ME' | 'de-DE' | 'en-US' | 'es-ES' | 'es-LA' | 'fr-FR' | 'it-IT' | 'pt-BR' | 'ru-RU' | 'tr-TR';
+  @clv.IsIn(['ara', 'eng', 'fre', 'ger', 'ita', 'por', 'rus', 'spa', 'spa-419', 'tur'])
+  @nsg.ApiProperty({enum: ['ara', 'eng', 'fre', 'ger', 'ita', 'por', 'rus', 'spa', 'spa-419', 'tur']})
+  readonly language: 'ara' | 'eng' | 'fre' | 'ger' | 'ita' | 'por' | 'rus' | 'spa' | 'spa-419' | 'tur';
 
   @clv.IsString()
   @clv.IsIn(['ass', 'srt'])

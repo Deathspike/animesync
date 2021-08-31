@@ -29,20 +29,17 @@ export class Runner {
   }
 
   private async saveAsync(filePath: string, incompletePath: string, subtitlePath: string, stream: app.api.RemoteStream) {
-    const mappedSubtitles = stream.subtitles
-      .map(x => ({...x, language: ffmpegLanguages[x.language]}))
-      .sort((a, b) => a.language.localeCompare(b.language));
-    const sortedSubtitles = await Promise.all(mappedSubtitles
+    const subtitles = await Promise.all(stream.subtitles
       .filter(x => x.language === 'eng')
-      .concat(mappedSubtitles.filter(x => x.language !== 'eng'))
+      .concat(stream.subtitles.filter(x => x.language !== 'eng').sort((a, b) => a.language.localeCompare(b.language)))
       .map(x => this.subtitleAsync(filePath, x.language, x.type, x.url)));
     const inputs = [['-i', stream.sources[0].url]]
-      .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
+      .concat(subtitles.map(x => (['-i', x.subtitlePath])))
       .flatMap(x => x);
     const mappings = [['-map', '0:v:0', '-map', '0:a:0']]
-      .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
+      .concat(subtitles.map((_, i) => ['-map', String(i + 1)]))
       .flatMap(x => x);
-    const metadata = sortedSubtitles
+    const metadata = subtitles
       .map((x, i) => [`-metadata:s:s:${i}`, `language=${x.language}`])
       .flatMap(x => x);
     const runnable = ['-y']
@@ -66,16 +63,3 @@ export class Runner {
     return {subtitlePath, language};
   }
 }
-
-const ffmpegLanguages = {
-  'ar-ME': 'ara',
-  'de-DE': 'ger',
-  'en-US': 'eng',
-  'es-ES': 'spa',
-  'es-LA': 'spa-419',
-  'fr-FR': 'fre',
-  'it-IT': 'ita',
-  'pt-BR': 'por',
-  'ru-RU': 'rus',
-  'tr-TR': 'tur'
-};

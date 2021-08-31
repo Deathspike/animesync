@@ -22,7 +22,7 @@ export type PlayerAlpha = {
   sources: Array<{
     type: string;
     textTracks: Array<{
-      language: string;
+      language: 'es' | 'en' | 'pt';
       src: string;
       type: string;
     }>;

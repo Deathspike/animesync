@@ -54,16 +54,16 @@ function evaluateStream() {
    * @return {RemoteStreamSubtitle['language']}
    */
   function mapSubtitleLanguage(language) {
-    if (language === 'arME') return 'ar-ME';
-    if (language === 'frFR') return 'fr-FR';
-    if (language === 'deDE') return 'de-DE';
-    if (language === 'enUS') return 'en-US';
-    if (language === 'esLA') return 'es-LA';
-    if (language === 'esES') return 'es-ES';
-    if (language === 'itIT') return 'it-IT';
-    if (language === 'ptBR') return 'pt-BR';
-    if (language === 'ruRU') return 'ru-RU';
-    if (language === 'trTR') return 'tr-TR';
+    if (language === 'arME') return 'ara';
+    if (language === 'frFR') return 'fre';
+    if (language === 'deDE') return 'ger';
+    if (language === 'enUS') return 'eng';
+    if (language === 'esLA') return 'spa-419';
+    if (language === 'esES') return 'spa';
+    if (language === 'itIT') return 'ita';
+    if (language === 'ptBR') return 'por';
+    if (language === 'ruRU') return 'rus';
+    if (language === 'trTR') return 'tur';
     throw new Error();
   }
   

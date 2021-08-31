@@ -29,5 +29,11 @@ export type Series = {
 
 export type Streams = {
   streams: Record<string, Record<string, {hardsub_locale: string, url: string}>>;
-  subtitles: Record<string, {format: any, locale: any, url: string}>;
+  subtitles: Record<string, Subtitle>;
+};
+
+export type Subtitle = {
+  format: 'ass';
+  locale: 'ar-ME' | 'fr-FR' | 'de-DE' | 'en-US' | 'es-LA' | 'es-ES' | 'it-IT' | 'pt-BR' | 'ru-RU' | 'tr-TR';
+  url: string;
 };
