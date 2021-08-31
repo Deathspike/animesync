@@ -21,6 +21,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
       const browser = await (this.browser ?? this.launchAsync());
       page = await browser.newPage();
       page.setDefaultNavigationTimeout(app.settings.core.chromeTimeoutNavigation);
+      page.setDefaultTimeout(app.settings.core.chromeTimeoutAction);
       const userAgent = await page.evaluate(() => navigator.userAgent).then(x => x.replace(/Headless/, ''));
       const session = await browser.newCDPSession(page);
       await session.send('Emulation.setUserAgentOverride', {userAgent});
@@ -61,7 +62,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
       if (this.numberOfPages) return;
       delete this.browser;
       browser?.close().catch(() => {});
-    }, app.settings.core.chromeTimeoutInactive);
+    }, app.settings.core.chromeTimeout);
   }
 }
 

@@ -5,7 +5,8 @@ import path from 'path';
 
 const defaultCore = new app.api.SettingCore({
   chromeHeadless: true,
-  chromeTimeoutInactive: 600000,
+  chromeTimeout: 300000,
+  chromeTimeoutAction: 30000,
   chromeTimeoutNavigation: 30000,
   chromeViewport: '1920x974',
   fetchMaximumRetries: 8,

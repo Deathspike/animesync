@@ -6,7 +6,8 @@ import * as nsg from '@nestjs/swagger';
 export class SettingCore {
   constructor(source?: SettingCore, sourcePatch?: Partial<SettingCore>) {
     this.chromeHeadless = api.property('chromeHeadless', source, sourcePatch, false);
-    this.chromeTimeoutInactive = api.property('chromeTimeoutInactive', source, sourcePatch, 0);
+    this.chromeTimeout = api.property('chromeTimeout', source, sourcePatch, 0);
+    this.chromeTimeoutAction = api.property('chromeTimeoutAction', source, sourcePatch, 0);
     this.chromeTimeoutNavigation = api.property('chromeTimeoutNavigation', source, sourcePatch, 0);
     this.chromeViewport = api.property('chromeViewport', source, sourcePatch, '');
     this.fetchMaximumRetries = api.property('fetchMaximumRetries', source, sourcePatch, 0);
@@ -24,7 +25,13 @@ export class SettingCore {
   @clv.IsPositive()
   @clt.Type(() => Number)
   @nsg.ApiProperty()
-  readonly chromeTimeoutInactive: number;
+  readonly chromeTimeout: number;
+
+  @clv.IsNumber()
+  @clv.IsPositive()
+  @clt.Type(() => Number)
+  @nsg.ApiProperty()
+  readonly chromeTimeoutAction: number;
 
   @clv.IsNumber()
   @clv.IsPositive()
