@@ -1,11 +1,14 @@
 import * as app from '.';
 import * as ncm from '@nestjs/common';
 import * as ncr from '@nestjs/core';
+import * as nss from '@nestjs/serve-static';
 import http from 'http';
 import net from 'net';
+import path from 'path';
+const rootPath = path.join(__dirname, '../../../public');
 
 @ncm.Module({
-  controllers: [app.CoreController],
+  imports: [nss.ServeStaticModule.forRoot({rootPath})],
   providers: [app.HttpTunnelService]})
 export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
   private readonly adapterHost: ncr.HttpAdapterHost;

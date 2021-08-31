@@ -8,6 +8,7 @@ let alias = {
 };
 
 module.exports = {
+  devServer: {historyApiFallback: true},
   entry: './dist/client/app',
   output: {filename: 'app.min.js', path: `${__dirname}/public`},
   resolve: {alias},

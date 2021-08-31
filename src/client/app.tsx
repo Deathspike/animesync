@@ -1,20 +1,22 @@
-import * as api from '../api';
+import * as app from '.';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as ReactRouter from 'react-router-dom';
+const packageData = require('../../package.json');
 
-class App extends React.Component<{context: api.LibraryContext}> {
-  render() {
-    return (
-      <div>
-        {this.props.context.series.map(x => <div key={x.id}>{x.title}</div>)}
-      </div>
-    );
-  }
+function App() {
+  return (
+    <ReactRouter.BrowserRouter>
+      <ReactRouter.Switch>
+        <ReactRouter.Route exact strict path="/library/" component={app.library.main.Controller} />
+        <ReactRouter.Route exact strict path="/library/:seriesId/" component={app.library.series.Controller} />
+        <ReactRouter.Redirect to="/library/" />
+      </ReactRouter.Switch>
+    </ReactRouter.BrowserRouter>
+  )
 }
 
 (function() {
-  const server = new api.ServerApi(`http://${window.location.hostname}:6583/`);
-  server.library.contextAsync()
-    .then(x => ReactDOM.render(<App context={x.value!} />, document.getElementById('container')))
-    .catch((error) => console.error(error));
+  document.title = `${packageData.name} (${packageData.version})`;
+  ReactDOM.render(<App />, document.getElementById('container'));
 })();
