@@ -34,8 +34,8 @@ export class BrowserService implements ncm.OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    const browser = await this.browser;
     clearTimeout(this.timeoutHandle);
+    const browser = await this.browser;
     delete this.browser;
     await browser?.close().catch(() => {});
   }

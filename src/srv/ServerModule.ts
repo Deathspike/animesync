@@ -11,14 +11,4 @@ import {SettingModule} from './setting';
   imports: [CoreModule, LibraryModule, RemoteModule, RewriteModule, SettingModule],
   providers: [app.AgentService, app.BrowserService, app.FileService, app.LoggerService, app.RewriteService],
   exports: [app.AgentService, app.BrowserService, app.FileService, app.LoggerService, app.RewriteService]})
-export class ServerModule implements ncm.OnApplicationBootstrap {
-  private readonly fileService: app.FileService;
-
-  constructor(fileService: app.FileService) {
-    this.fileService = fileService;
-  }
-
-  async onApplicationBootstrap() {
-    await this.fileService.deleteAsync(app.settings.path.sync);
-  }
-}
+export class ServerModule {}

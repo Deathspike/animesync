@@ -49,9 +49,6 @@ function attachErrorFilter(server: ncm.INestApplication) {
 }
 
 function attachRequestValidation(server: ncm.INestApplication) {
-  server.useGlobalPipes(new ncm.ValidationPipe({
-    forbidNonWhitelisted: true,
-    forbidUnknownValues: true,
-    transform: true
-  }));
+  const options = {forbidNonWhitelisted: true, forbidUnknownValues: true, transform: true}
+  server.useGlobalPipes(new ncm.ValidationPipe(options));
 }

@@ -21,7 +21,7 @@ export class AgentService implements ncm.OnModuleDestroy {
 
   async emulateAsync(url: string, response: express.Response, options?: fch.RequestInit) {
     return await this.retryAsync(async () => {
-      const result = await this.proxyAsync(url, {...options, compress: false, redirect: 'manual'});
+      const result = await this.requestAsync(url, {...options, compress: false, redirect: 'manual'});
       const buffer = await result.buffer();
       response.status(result.status);
       Array.from(result.headers.entries()).forEach(([k, v]) => k !== 'transfer-encoding' && response.setHeader(k, v));
@@ -31,7 +31,7 @@ export class AgentService implements ncm.OnModuleDestroy {
 
   async fetchAsync(url: string, options?: fch.RequestInit) {
     return await this.retryAsync(async () => {
-      const result = await this.proxyAsync(url, options);
+      const result = await this.requestAsync(url, options);
       const buffer = await result.buffer();
       if (result.status === 200) return buffer;
       throw new Error(`Unexpected status: ${result.status}`);
@@ -51,7 +51,7 @@ export class AgentService implements ncm.OnModuleDestroy {
     delete this.timeoutHandles[timeout];
   }
 
-  private async proxyAsync(url: string, options?: fch.RequestInit) {
+  private async requestAsync(url: string, options?: fch.RequestInit) {
     const agent = /^https:/i.test(url) ? this.httpsAgent : this.httpAgent;
     const controller = new AbortController();
     const headers = Object.assign(options && options.headers ? options.headers : {}, {host: new URL(url).host});
