@@ -4,8 +4,6 @@ import commander from 'commander';
 export function createSettingsCore(format: <T>(description: string, value: T) => string) {
   return commander.createCommand('core')
     .description('The core settings.')
-    .option('--cacheTimeoutSeries [number]', format('Cache timeout for series', app.settings.core.cacheTimeoutSeries), Number)
-    .option('--cacheTimeoutStream [number]', format('Cache timeout for streams.', app.settings.core.cacheTimeoutStream), Number)
     .option('--chromeHeadless [bool]', format('Chrome headless mode.', app.settings.core.chromeHeadless), x => /^yes|true|1/.test(x))
     .option('--chromeTimeoutInactive [number]', format('Chrome timeout for inactivity.', app.settings.core.chromeTimeoutInactive), Number)
     .option('--chromeTimeoutNavigation [number]', format('Chrome timeout for navigation.', app.settings.core.chromeTimeoutNavigation), Number)

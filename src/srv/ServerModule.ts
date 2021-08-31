@@ -9,8 +9,8 @@ import {SettingModule} from './setting';
 @ncm.Global()
 @ncm.Module({
   imports: [CoreModule, LibraryModule, RemoteModule, RewriteModule, SettingModule],
-  providers: [app.AgentService, app.BrowserService, app.CacheService, app.FileService, app.LoggerService, app.RewriteService],
-  exports: [app.AgentService, app.BrowserService, app.CacheService, app.FileService, app.LoggerService, app.RewriteService]})
+  providers: [app.AgentService, app.BrowserService, app.FileService, app.LoggerService, app.RewriteService],
+  exports: [app.AgentService, app.BrowserService, app.FileService, app.LoggerService, app.RewriteService]})
 export class ServerModule implements ncm.OnApplicationBootstrap {
   private readonly fileService: app.FileService;
 
@@ -19,7 +19,6 @@ export class ServerModule implements ncm.OnApplicationBootstrap {
   }
 
   async onApplicationBootstrap() {
-    await this.fileService.deleteAsync(app.settings.path.cache);
     await this.fileService.deleteAsync(app.settings.path.sync);
   }
 }

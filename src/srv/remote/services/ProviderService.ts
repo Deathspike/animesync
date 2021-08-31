@@ -9,26 +9,27 @@ import {Vrv} from './vrv/Vrv';
 @ncm.Injectable()
 export class ProviderService {
   private readonly providers: Array<Promise<app.IProvider>>;
+  private readonly supervisor: app.Supervisor;
 
   constructor(moduleRef: ncr.ModuleRef) {
-    this.providers = [
-      moduleRef.create(Crunchyroll),
-      moduleRef.create(CrunchyrollBeta),
-      moduleRef.create(Funimation),
-      moduleRef.create(Vrv)
-    ];
+    this.providers = [moduleRef.create(Crunchyroll), moduleRef.create(CrunchyrollBeta), moduleRef.create(Funimation), moduleRef.create(Vrv)];
+    this.supervisor = new app.Supervisor();
   }
 
   async seriesAsync(seriesUrl: string) {
-    const provider = await this.findAsync(x => x.isSeriesAsync(seriesUrl));
-    if (provider) return await provider.seriesAsync(seriesUrl);
-    throw new ncm.NotFoundException();
+    return await this.supervisor.createOrAttachAsync(seriesUrl, async () => {
+      const provider = await this.findAsync(x => x.isSeriesAsync(seriesUrl));
+      if (provider) return await provider.seriesAsync(seriesUrl);
+      throw new ncm.NotFoundException();
+    });
   }
 
   async streamAsync(streamUrl: string) {
-    const provider = await this.findAsync(x => x.isStreamAsync(streamUrl));
-    if (provider) return await provider.streamAsync(streamUrl);
-    throw new ncm.NotFoundException();
+    return await this.supervisor.createOrAttachAsync(streamUrl, async () => {
+      const provider = await this.findAsync(x => x.isStreamAsync(streamUrl));
+      if (provider) return await provider.streamAsync(streamUrl);
+      throw new ncm.NotFoundException();
+    });
   }
   
   private async findAsync<T>(getAsync: (provider: app.IProvider) => Promise<T>) {

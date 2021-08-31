@@ -4,8 +4,6 @@ import os from 'os';
 import path from 'path';
 
 const defaultCore = new app.api.SettingCore({
-  cacheTimeoutSeries: 900000,
-  cacheTimeoutStream: 300000,
   chromeHeadless: true,
   chromeTimeoutInactive: 600000,
   chromeTimeoutNavigation: 30000,
@@ -23,7 +21,6 @@ const defaultCredential = new app.api.SettingCredential({
 });
 
 const defaultPath = new app.api.SettingPath({
-  cache: path.join(os.homedir(), 'animesync', 'cache'),
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
   library: path.join(os.homedir(), 'animesync', 'library'),
   logger: path.join(os.homedir(), 'animesync', 'logger'),

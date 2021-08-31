@@ -8,12 +8,10 @@ import * as nsg from '@nestjs/swagger';
 @nsg.ApiBadRequestResponse()
 @nsg.ApiInternalServerErrorResponse()
 export class RemoteController {
-  private readonly cacheService: app.CacheService;
   private readonly composeService: app.ComposeService;
   private readonly providerService: app.ProviderService;
 
-  constructor(cacheService: app.CacheService, composeService: app.ComposeService, providerService: app.ProviderService) {
-    this.cacheService = cacheService;
+  constructor(composeService: app.ComposeService, providerService: app.ProviderService) {
     this.composeService = composeService;
     this.providerService = providerService;
   }
@@ -23,9 +21,8 @@ export class RemoteController {
   @nsg.ApiResponse({status: 200, type: app.api.RemoteSeries})
   @nsg.ApiResponse({status: 404})
   async seriesAsync(@ncm.Query() query: app.api.RemoteQuerySeries) {
-    const cacheKey = `remote/series/${query.url}`;
-    const cacheTimeout = app.settings.core.cacheTimeoutSeries;
-    return this.composeService.series(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.seriesAsync(query.url)));
+    const value = await this.providerService.seriesAsync(query.url);
+    return this.composeService.series(value);
   }
 
   @app.ResponseValidator(app.api.RemoteStream)
@@ -33,8 +30,7 @@ export class RemoteController {
   @nsg.ApiResponse({status: 200, type: app.api.RemoteStream})
   @nsg.ApiResponse({status: 404})
   async streamAsync(@ncm.Query() query: app.api.RemoteQueryStream) {
-    const cacheKey = `remote/stream/${query.url}`;
-    const cacheTimeout = app.settings.core.cacheTimeoutStream;
-    return await this.composeService.streamAsync(await this.cacheService.getAsync(cacheKey, cacheTimeout, () => this.providerService.streamAsync(query.url)));
+    const value = await this.providerService.streamAsync(query.url);
+    return this.composeService.streamAsync(value);
   }
 }

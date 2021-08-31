@@ -7,13 +7,11 @@ import path from 'path';
 export class SettingService {
   private readonly agentService: app.AgentService;
   private readonly browserService: app.BrowserService;
-  private readonly cacheService: app.CacheService;
   private readonly fileService: app.FileService;
 
-  constructor(agentService: app.AgentService, browserService: app.BrowserService, cacheService: app.CacheService, fileService: app.FileService) {
+  constructor(agentService: app.AgentService, browserService: app.BrowserService, fileService: app.FileService) {
     this.agentService = agentService;
     this.browserService = browserService;
-    this.cacheService = cacheService;
     this.fileService = fileService;
   }
 
@@ -39,10 +37,8 @@ export class SettingService {
   }
 
   private async restartAsync() {
-    const agentPromise = this.agentService.onModuleDestroy();
-    const browserPromise = this.browserService.onModuleDestroy();
-    const cachePromise = this.cacheService.onModuleDestroy();
-    await Promise.all([agentPromise, browserPromise, cachePromise]);
+    this.agentService.onModuleDestroy();
+    await this.browserService.onModuleDestroy();
     await this.fileService.deleteAsync(app.settings.path.chrome);
   }
 

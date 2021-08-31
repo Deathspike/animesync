@@ -2,7 +2,6 @@ export * from '../shared';
 export * from './classes/Runner';
 export * from './classes/SubtitleBundler';
 export * from './classes/SubtitleExtractor';
-export * from './classes/Supervisor';
 export * from './models/CoreInfo';
 export * from './models/EpisodeImage';
 export * from './models/EpisodeInfo';

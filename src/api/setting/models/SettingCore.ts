@@ -5,8 +5,6 @@ import * as nsg from '@nestjs/swagger';
 
 export class SettingCore {
   constructor(source?: SettingCore, sourcePatch?: Partial<SettingCore>) {
-    this.cacheTimeoutSeries = api.property('cacheTimeoutSeries', source, sourcePatch, 0);
-    this.cacheTimeoutStream = api.property('cacheTimeoutStream', source, sourcePatch, 0);
     this.chromeHeadless = api.property('chromeHeadless', source, sourcePatch, false);
     this.chromeTimeoutInactive = api.property('chromeTimeoutInactive', source, sourcePatch, 0);
     this.chromeTimeoutNavigation = api.property('chromeTimeoutNavigation', source, sourcePatch, 0);
@@ -17,18 +15,6 @@ export class SettingCore {
     this.ffmpeg = api.property('ffmpeg', source, sourcePatch, undefined);
     this.proxyServer = api.property('proxyServer', source, sourcePatch, undefined);
   }
-
-  @clv.IsNumber()
-  @clv.IsPositive()
-  @clt.Type(() => Number)
-  @nsg.ApiProperty()
-  readonly cacheTimeoutSeries: number;
-
-  @clv.IsNumber()
-  @clv.IsPositive()
-  @clt.Type(() => Number)
-  @nsg.ApiProperty()
-  readonly cacheTimeoutStream: number;
 
   @clv.IsBoolean()
   @nsg.ApiProperty()
