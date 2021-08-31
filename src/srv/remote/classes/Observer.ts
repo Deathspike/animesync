@@ -13,10 +13,10 @@ export class Observer {
 
   getAsync(...expression: Array<RegExp>) {
     return expression.map(async (expression) => {
-      const future = new app.Future<playwright.Response>(app.settings.core.chromeTimeoutNavigation);
+      const future = new app.Future<playwright.Response>();
       this.observers.push({expression, future});
       this.responses.forEach(x => this.resolveResponse(x));
-      return await future.getAsync();
+      return await future.getAsync(app.settings.core.chromeTimeoutNavigation);
     });
   }
 

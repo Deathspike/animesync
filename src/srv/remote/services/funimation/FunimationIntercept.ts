@@ -17,10 +17,10 @@ export class FunimationIntercept {
   }
 
   async getAsync() {
-    const future = new app.Future<fun.PlayerAlpha>(app.settings.core.chromeTimeoutNavigation);
+    const future = new app.Future<fun.PlayerAlpha>();
     this.observers.push(future);
     this.response?.then(x => future.resolve(x.experienceAlpha));
-    return await future.getAsync();
+    return await future.getAsync(app.settings.core.chromeTimeoutNavigation);
   }
 
   private async onRoute(route: playwright.Route, request: playwright.Request) {
@@ -32,7 +32,6 @@ export class FunimationIntercept {
   }
 
   private async routeAsync(url: string, headers: Array<[string, string]>): PlayerPromise {
-    if (this.observers.length && this.observers.every(x => x.isFulfilled)) throw new Error();
     const body = await this.agentService.fetchAsync(url, {headers}).then(String);
     const experienceId = Number(url.match(/\/([0-9]+)\//)?.[1]);
     const experience = JSON.parse(body.match(/var\s*show\s*=\s*({.+});/)?.[1] ?? '') as fun.Player;
