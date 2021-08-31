@@ -105,8 +105,10 @@ export class LibraryService {
   }
 
   async episodeDeleteAsync(episodePath: string) {
+    if (this.supervisor.contains(episodePath)) return false;
     await this.fileService.deleteAsync(await this.episodeSubtitleAsync(episodePath));
     await this.fileService.deleteAsync(await this.episodeAsync(episodePath));
+    return true;
   }
 
   async episodePutAsync(episodePath: string) {

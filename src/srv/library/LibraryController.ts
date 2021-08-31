@@ -95,9 +95,11 @@ export class LibraryController {
   @ncm.HttpCode(204)
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
+  @nsg.ApiResponse({status: 409})
   async episodeDeleteAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode) {
     const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
-    await this.libraryService.episodeDeleteAsync(match.episode.path);
+    if (await this.libraryService.episodeDeleteAsync(match.episode.path)) return;
+    throw new ncm.ConflictException();
   }
 
   @ncm.Put(':seriesId/:episodeId')
