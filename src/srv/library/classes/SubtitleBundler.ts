@@ -11,13 +11,13 @@ export class SubtitleBundler {
     this.syncPath = syncPath;
   }
 
-  async runAsync(filePath: string) {
+  async runAsync(subtitlePath: string) {
     const fileNames = await this.fileService.listAsync(this.syncPath);
     const zip = new JSZip();
     if (fileNames.length) {
       await Promise.all(fileNames.map(x => this.saveAsync(x, zip)));
       const value = await zip.generateAsync({type: 'nodebuffer'});
-      await this.fileService.writeAsync(filePath, value);
+      await this.fileService.writeAsync(subtitlePath, value);
     }
   }
 

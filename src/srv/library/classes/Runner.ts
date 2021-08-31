@@ -30,14 +30,14 @@ export class Runner {
 
   private async saveAsync(filePath: string, incompletePath: string, subtitlePath: string, stream: app.api.RemoteStream) {
     const mappedSubtitles = stream.subtitles
-      .sort((a, b) => a.language.localeCompare(b.language))
-      .map(x => ({...x, language: ffmpegLanguages[x.language]}));
+      .map(x => ({...x, language: ffmpegLanguages[x.language]}))
+      .sort((a, b) => a.language.localeCompare(b.language));
     const sortedSubtitles = await Promise.all(mappedSubtitles
       .filter(x => x.language === 'eng')
       .concat(mappedSubtitles.filter(x => x.language !== 'eng'))
-      .map((x, i) => this.subtitleAsync(i, x.language, x.type, x.url)));
+      .map(x => this.subtitleAsync(filePath, x.language, x.type, x.url)));
     const inputs = [['-i', stream.sources[0].url]]
-      .concat(sortedSubtitles.map(x => (['-i', x.filePath])))
+      .concat(sortedSubtitles.map(x => (['-i', x.subtitlePath])))
       .flatMap(x => x);
     const mappings = [['-map', '0:v:0', '-map', '0:a:0']]
       .concat(sortedSubtitles.map((_, i) => ['-map', String(i + 1)]))
@@ -59,11 +59,11 @@ export class Runner {
     }
   }
 
-  private async subtitleAsync(index: number, language: string, type: string, url: string) {
-    const filePath = path.join(this.syncPath, `${index}.${language}.${type}`);
+  private async subtitleAsync(filePath: string, language: string, type: string, url: string) {
+    const subtitlePath = path.join(this.syncPath, `${path.parse(filePath).name}.${language}.${type}`);
     const value = await fetch(url).then(x => x.buffer());
-    await this.fileService.writeAsync(filePath, value);
-    return {filePath, language};
+    await this.fileService.writeAsync(subtitlePath, value);
+    return {subtitlePath, language};
   }
 }
 
@@ -72,7 +72,7 @@ const ffmpegLanguages = {
   'de-DE': 'ger',
   'en-US': 'eng',
   'es-ES': 'spa',
-  'es-LA': 'spa',
+  'es-LA': 'spa-419',
   'fr-FR': 'fre',
   'it-IT': 'ita',
   'pt-BR': 'por',
