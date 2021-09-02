@@ -1,4 +1,5 @@
 import * as app from '.';
+import * as mobx from 'mobx';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as ReactRouter from 'react-router-dom';
@@ -18,5 +19,6 @@ function App() {
 
 (function() {
   document.title = `${packageData.name} (${packageData.version})`;
+  mobx.configure({enforceActions: 'never'});
   ReactDOM.render(<App />, document.getElementById('container'));
 })();

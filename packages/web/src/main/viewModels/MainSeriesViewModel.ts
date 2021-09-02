@@ -2,18 +2,25 @@ import * as app from '..';
 import * as mobx from 'mobx';
 
 export class MainSeriesViewModel {
+  private readonly series: app.api.LibraryContextSeries;
+
   constructor(series: app.api.LibraryContextSeries) {
-    this.id = series.id;
-    this.title = series.title;
-    this.url = series.id + '/';
+    mobx.makeObservable(this);
+    this.series = series;
   }
 
-  @mobx.observable
-  id: string;
+  @mobx.computed
+  get id() {
+    return this.series.id;
+  }
 
-  @mobx.observable
-  title: string;
+  @mobx.computed
+  get title() {
+    return this.series.title;
+  }
 
-  @mobx.observable
-  url: string;
+  @mobx.computed
+  get url() {
+    return this.series.id + '/';
+  }
 }

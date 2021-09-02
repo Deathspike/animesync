@@ -7,7 +7,7 @@ export class MainView extends React.Component<{vm: app.MainViewModel}> {
   render() {
     return (
       <div>
-        {this.props.vm.series.map(x => <app.SeriesView key={x.id} vm={x} />)}
+        {this.props.vm.series.map(x => <app.MainSeriesView key={x.id} vm={x} />)}
       </div>
     );
   }

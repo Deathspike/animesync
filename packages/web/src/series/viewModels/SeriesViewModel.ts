@@ -2,6 +2,8 @@ import * as app from '..';
 import * as mobx from 'mobx';
 
 export class SeriesViewModel {
+  private readonly seriesId: string;
+  
   constructor(seriesId: string) {
     mobx.makeObservable(this);
     this.seriesId = seriesId;
@@ -9,20 +11,20 @@ export class SeriesViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const series = await app.server.library.seriesAsync(this);
+    const series = await app.server.library.seriesAsync({seriesId: this.seriesId});
     if (series.value) {
-      console.log(series.value);
-      this.isLoaded = true;
+      this.seasons = series.value.seasons.map(x => new app.SeriesSeasonViewModel(this.seriesId, x));
+      this.title = series.value.title;
     } else if (series.statusCode === 404) {
-      location.replace( new URL('..', location.href).toString());
+      // Handle not found.
     } else {
-      // TODO: Handle error.
+      // Handle error.
     }
   }
 
   @mobx.observable
-  isLoaded = false;
+  seasons = new Array<app.SeriesSeasonViewModel>();
 
   @mobx.observable
-  seriesId: string;
+  title = '';
 }

@@ -11,10 +11,6 @@ export class SeriesController extends React.Component<{match: {params: {seriesId
   }
 
   render() {
-    return this.vm.isLoaded && (
-      <div>
-        TODO {this.vm.seriesId}
-      </div>
-    );
+    return <app.SeriesView vm={this.vm} />;
   }
 }

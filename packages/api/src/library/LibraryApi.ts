@@ -41,14 +41,12 @@ export class LibraryApi {
     return await api.ServerResponse.emptyAsync(url, options);
   }
 
-  seriesImageAsync(model: api.LibraryParamSeries) {
-    const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/image`, this.baseUrl).toString();
-    return Promise.resolve(url);
+  seriesImageUrl(model: api.LibraryParamSeries) {
+    return new URL(`/api/library/${encodeURIComponent(model.seriesId)}/image`, this.baseUrl).toString();
   }
 
-  episodeAsync(model: api.LibraryParamSeriesEpisode) {
-    const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}`, this.baseUrl).toString();
-    return Promise.resolve(url);
+  episodeUrl(model: api.LibraryParamSeriesEpisode) {
+    return new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}`, this.baseUrl).toString();
   }
 
   async episodeDeleteAsync(model: api.LibraryParamSeriesEpisode) {
@@ -63,13 +61,11 @@ export class LibraryApi {
     return await api.ServerResponse.emptyAsync(url, options);
   }
 
-  episodeImageAsync(model: api.LibraryParamSeriesEpisode) {
-    const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/image`, this.baseUrl).toString();
-    return Promise.resolve(url);
+  episodeImageUrl(model: api.LibraryParamSeriesEpisode) {
+    return new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/image`, this.baseUrl).toString();
   }
 
-  episodeSubtitleAsync(model: api.LibraryParamSeriesEpisode) {
-    const url = new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/subtitle`, this.baseUrl).toString();
-    return Promise.resolve(url);
+  episodeSubtitleUrl(model: api.LibraryParamSeriesEpisode) {
+    return new URL(`/api/library/${encodeURIComponent(model.seriesId)}/${encodeURIComponent(model.episodeId)}/subtitle`, this.baseUrl).toString();
   }
 }

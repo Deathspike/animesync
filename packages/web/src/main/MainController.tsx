@@ -11,6 +11,6 @@ export class MainController extends React.Component {
   }
 
   render() {
-    return this.vm.isLoaded && <app.MainView vm={this.vm} />;
+    return <app.MainView vm={this.vm} />;
   }
 }
