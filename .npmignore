@@ -1,6 +1,5 @@
 /.github
 /.vscode
-/src
 /static
-/webpack*
-/tsconfig.json
+/test
+/tsconfig*

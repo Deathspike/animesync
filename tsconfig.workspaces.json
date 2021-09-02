@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    {"path": "packages/api"},
+    {"path": "packages/web"},
+    {"path": "packages/srv"},
+    {"path": "packages/cli"},
+    {"path": "."}
+  ]
+}

@@ -1,17 +1,13 @@
 {
-  "compileOnSave": true,
+  "include": ["test"],
   "compilerOptions": {
-    "allowJs": true,
     "alwaysStrict": true,
-    "checkJs": true,
-    "declaration": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "jsx": "react",
     "lib": ["DOM", "ES2019"],
     "module": "CommonJS",
     "noImplicitAny": true,
@@ -28,9 +24,5 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "ES2019"
-  },
-  "include": [
-    "src",
-    "typings"
-  ]
+  }
 }

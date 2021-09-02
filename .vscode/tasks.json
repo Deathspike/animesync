@@ -1,18 +1,18 @@
 {
   "version": "2.0.0",
   "tasks": [{
+    "group": {"isDefault": true, "kind": "build"},
     "isBackground": true,
     "label": "TypeScript",
     "option": "watch",
     "problemMatcher": ["$tsc-watch"],
-    "tsconfig": "tsconfig.json",
+    "tsconfig": "tsconfig.workspaces.json",
     "type": "typescript"
   }, {
     "dependsOn": ["TypeScript"],
-    "group": {"isDefault": true, "kind": "build"},
     "isBackground": true,
     "label": "Webpack",
-    "script": "dev",
+    "script": "serve",
     "type": "npm",
     "problemMatcher": [{
       "background": {

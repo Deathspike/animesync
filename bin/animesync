@@ -1,6 +1,4 @@
 #!/usr/bin/env node
 const path = require('path');
 const fs = require('fs');
-let animesync = require(path.join(path.dirname(fs.realpathSync(__filename)), '..'));
-let commander = animesync.cli.create();
-commander.parse();
+require(path.join(path.dirname(fs.realpathSync(__filename)), '..')).create().parse();

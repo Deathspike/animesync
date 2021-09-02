@@ -1,0 +1,12 @@
+{
+  "name": "@animesync/cli",
+  "private": true,
+  "main": "dist",
+  "types": "dist",
+  "dependencies": {
+    "commander": "6.2.1"
+  },
+  "scripts": {
+    "prepare": "rimraf dist"
+  }
+}
