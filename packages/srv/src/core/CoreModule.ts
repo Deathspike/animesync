@@ -7,6 +7,7 @@ import net from 'net';
 import path from 'path';
 
 @ncm.Module({
+  controllers: [app.CoreController],
   imports: [createStaticModule()],
   providers: [app.HttpTunnelService]})
 export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
