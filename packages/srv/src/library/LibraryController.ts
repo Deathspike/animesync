@@ -26,7 +26,7 @@ export class LibraryController {
   @ncm.HttpCode(204)
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
-  async contextPostAsync(@ncm.Body() model: app.api.LibraryContentSeries) {
+  async contextPostAsync(@ncm.Body() model: app.api.LibraryCreateSeries) {
     const rootPath = model.rootPath ?? app.settings.path.library;
     await this.libraryService.contextPostAsync(rootPath, model.url);
   }

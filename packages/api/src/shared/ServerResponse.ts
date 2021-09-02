@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-type ErrorResponse = {message: string};
+type ErrorResult = {message: string};
 
 export class ServerResponse<T> {
   private readonly requiredCode: number;
@@ -31,7 +31,7 @@ export class ServerResponse<T> {
   }
 
   get error() {
-    return this.success ? undefined : this.result as ErrorResponse;
+    return this.success ? undefined : this.result as ErrorResult;
   }
 
   get statusCode() {

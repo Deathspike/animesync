@@ -1,4 +1,4 @@
-import * as api from '../..';
+import * as api from '..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
@@ -20,7 +20,7 @@ export class RemoteStreamSubtitle {
   readonly type: 'ass' | 'srt';
 
   @clv.IsString()
-  @clv.IsUrl(api.unsafe({require_tld: false, validate_length: false}))
+  @clv.IsUrl({require_tld: false})
   @nsg.ApiProperty()
   readonly url: string;
 }

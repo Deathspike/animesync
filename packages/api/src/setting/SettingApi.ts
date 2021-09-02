@@ -1,4 +1,4 @@
-import * as api from '..';
+import * as api from '.';
 
 export class SettingApi {
   private readonly baseUrl: string;

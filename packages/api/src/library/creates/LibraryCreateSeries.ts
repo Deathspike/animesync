@@ -1,9 +1,9 @@
-import * as api from '../..';
+import * as api from '..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
-export class LibraryContentSeries {
-  constructor(source?: LibraryContentSeries, sourcePatch?: Partial<LibraryContentSeries>) {
+export class LibraryCreateSeries {
+  constructor(source?: LibraryCreateSeries, sourcePatch?: Partial<LibraryCreateSeries>) {
     this.rootPath = api.property('rootPath', source, sourcePatch, undefined);
     this.url = api.property('url', source, sourcePatch, '');
   }

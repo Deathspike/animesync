@@ -1,4 +1,4 @@
-import * as api from '../..';
+import * as api from '..';
 import * as clv from 'class-validator';
 import * as clt from 'class-transformer';
 import * as nsg from '@nestjs/swagger';

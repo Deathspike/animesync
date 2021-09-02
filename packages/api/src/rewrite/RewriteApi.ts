@@ -1,4 +1,4 @@
-import * as api from '..';
+import * as api from '.';
 import fetch from 'node-fetch';
 
 export class RewriteApi {

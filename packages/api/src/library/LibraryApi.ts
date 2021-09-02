@@ -1,4 +1,4 @@
-import * as api from '..';
+import * as api from '.';
 
 export class LibraryApi {
   private readonly baseUrl: string;
@@ -12,7 +12,7 @@ export class LibraryApi {
     return await api.ServerResponse.jsonAsync<api.LibraryContext>(url);
   } 
 
-  async contextPostAsync(model: api.LibraryContentSeries) {
+  async contextPostAsync(model: api.LibraryCreateSeries) {
     const options = api.ServerResponse.options('POST', model);
     const url = new URL('/api/library', this.baseUrl).toString();
     return await api.ServerResponse.emptyAsync(url, options);
