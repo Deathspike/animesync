@@ -4,7 +4,7 @@
   "main": "dist",
   "types": "dist",
   "dependencies": {
-    "@nestjs/swagger": "5.0.4",
+    "@nestjs/swagger": "5.0.9",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
     "node-fetch": "3.0.0-beta.9"
