@@ -1,7 +1,7 @@
 import * as app from '..';
 import * as mobx from 'mobx';
 
-export class SeriesViewModel {
+export class MainSeriesViewModel {
   constructor(series: app.api.LibraryContextSeries) {
     this.id = series.id;
     this.title = series.title;

@@ -1,8 +1,7 @@
 import * as app from '..';
 import * as mobx from 'mobx';
-const api = app.core.server;
 
-export class MainViewModel {
+export class SeriesViewModel {
   constructor(seriesId: string) {
     mobx.makeObservable(this);
     this.seriesId = seriesId;
@@ -10,7 +9,7 @@ export class MainViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const series = await api.library.seriesAsync(this);
+    const series = await app.server.library.seriesAsync(this);
     if (series.value) {
       console.log(series.value);
       this.isLoaded = true;

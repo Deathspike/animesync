@@ -8,9 +8,9 @@ function App() {
   return (
     <ReactRouter.BrowserRouter>
       <ReactRouter.Switch>
-        <ReactRouter.Route exact strict path="/library/" component={app.library.main.Controller} />
-        <ReactRouter.Route exact strict path="/library/:seriesId/" component={app.library.series.Controller} />
-        <ReactRouter.Redirect to="/library/" />
+        <ReactRouter.Route exact strict path="/web/" component={app.MainController} />
+        <ReactRouter.Route exact strict path="/web/:seriesId/" component={app.SeriesController} />
+        <ReactRouter.Redirect to="/web/" />
       </ReactRouter.Switch>
     </ReactRouter.BrowserRouter>
   )

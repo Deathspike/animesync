@@ -1,6 +1,5 @@
 import * as app from '..';
 import * as mobx from 'mobx';
-const api = app.core.server;
 
 export class MainViewModel {
   constructor() {
@@ -9,9 +8,9 @@ export class MainViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const context = await api.library.contextAsync();
+    const context = await app.server.library.contextAsync();
     if (context.value) {
-      this.series = context.value.series.map(x => new app.SeriesViewModel(x));
+      this.series = context.value.series.map(x => new app.MainSeriesViewModel(x));
       this.isLoaded = true;
     } else {
       // TODO: Handle error.
@@ -22,5 +21,5 @@ export class MainViewModel {
   isLoaded = false;
 
   @mobx.observable
-  series = [] as Array<app.SeriesViewModel>;
+  series = [] as Array<app.MainSeriesViewModel>;
 }

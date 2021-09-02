@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactRouter from 'react-router-dom';
 
 @mobxReact.observer
-export class SeriesView extends React.Component<{vm: app.SeriesViewModel}> {
+export class SeriesView extends React.Component<{vm: app.MainSeriesViewModel}> {
   render() {
     return (
       <div>
