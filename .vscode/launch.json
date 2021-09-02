@@ -12,7 +12,7 @@
     "request": "launch",
     "type": "pwa-chrome",
     "url": "http://localhost:8080/",
-    "webRoot": "${workspaceFolder}/packages/web/dist"
+    "webRoot": "${workspaceFolder}/packages"
   }, {
     "args": ["bin/animesync", "server"],
     "name": "Server",
