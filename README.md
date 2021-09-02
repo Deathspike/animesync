@@ -17,7 +17,7 @@ This application is not endorsed or affliated with any streaming service. The us
 AnimeSync can be installed on *Linux*, *Mac* and *Windows*:
 
 1. Install *Chrome* following the instructions at https://www.google.com/chrome/
-2. Install *NodeJS* following the instructions at http://nodejs.org/ (`node` >= 14, `npm` >= 6)
+2. Install *NodeJS* following the instructions at http://nodejs.org/ (`node` >= 16, `npm` >= 7)
 3. Run in *Command Prompt*/*Terminal*: `npm install -g animesync`
 
 Repeat step three to update to the latest version.
