@@ -17,7 +17,7 @@ async function browserAsync() {
       const funimationPromise = context.newPage().then(x => x.goto('https://www.funimation.com/', {waitUntil: 'domcontentloaded'}));
       const vrvPromise = context.newPage().then(x => x.goto('https://vrv.co/', {waitUntil: 'domcontentloaded'}));
       await Promise.all([crunchyrollPromise, funimationPromise, vrvPromise]);
-      await new Promise<void>((resolve) => context.on('close', resolve));
+      await new Promise<void>((resolve) => context.on('close', () => resolve()));
     });
   });
 }
