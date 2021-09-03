@@ -4,8 +4,5 @@
   "types": "dist",
   "dependencies": {
     "commander": "6.2.1"
-  },
-  "scripts": {
-    "prepare": "rimraf dist"
   }
 }

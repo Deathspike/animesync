@@ -17,7 +17,6 @@
     "webpack-dev-server": "4.0.0"
   },
   "scripts": {
-    "prepare": "rimraf dist && rimraf public/app.min.js",
     "webpack:build": "webpack build --config webpack.production.js",
     "webpack:serve": "webpack serve --config webpack.development.js"
   }
