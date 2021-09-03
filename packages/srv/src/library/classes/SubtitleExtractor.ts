@@ -50,6 +50,6 @@ export class SubtitleExtractor {
 
 async function textAsync(filePath: string) {
   const result: Array<Buffer> = [];
-  await app.ffmpegAsync(['-i', filePath], (chunk: Buffer) => result.push(chunk));
+  await app.ffmpegAsync(['-i', filePath], (chunk) => result.push(chunk));
   return Buffer.concat(result).toString();
 }
