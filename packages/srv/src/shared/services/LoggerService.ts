@@ -2,11 +2,12 @@ import * as app from '..';
 import * as ncm from '@nestjs/common';
 import os from 'os';
 import path from 'path';
+type LoggerLine = {value: string, zoneId?: string};
 
 @ncm.Injectable()
 export class LoggerService implements ncm.LoggerService {
   private readonly fileService: app.FileService;
-  private readonly queue: Array<string>;
+  private readonly queue: Array<LoggerLine>;
   private isRunning: boolean;
 
   constructor(fileService: app.FileService) {
@@ -15,40 +16,49 @@ export class LoggerService implements ncm.LoggerService {
     this.queue = [];
   }
 
-  debug(value: string) {
-    this.enqueue('DEBUG', fetchMessage(value));
+  debug(value: string, zoneId?: string) {
+    this.enqueue('DEBUG', fetchMessage(value), zoneId);
   }
   
-  error(value: Error | string, trace?: string) {
-    this.enqueue('ERROR', fetchMessage(value, trace));
+  error(value: Error | string, trace?: string, zoneId?: string) {
+    this.enqueue('ERROR', fetchMessage(value, trace), zoneId);
   }
 
-  info(value: string) {
+  info(value: string, zoneId?: string) {
     showMessage(value);
-    this.enqueue('INFO', fetchMessage(value));
+    this.enqueue('INFO', fetchMessage(value), zoneId);
   }
 
-  log(value: string) {
+  log(value: string, zoneId?: string) {
     showMessage(value);
-    this.enqueue('LOG', fetchMessage(value));
+    this.enqueue('LOG', fetchMessage(value), zoneId);
   }
   
-  verbose(value: string) {
-    this.enqueue('DEBUG', fetchMessage(value));
+  verbose(value: string, zoneId?: string) {
+    this.enqueue('DEBUG', fetchMessage(value), zoneId);
   }
 
-  warn(value: string) {
-    this.enqueue('WARN', fetchMessage(value));
+  warn(value: string, zoneId?: string) {
+    this.enqueue('WARN', fetchMessage(value), zoneId);
   }
 
-  private enqueue(level: string, line: string) {
-    this.queue.push(`[${new Date().toISOString()}] ${level.padEnd(5)} ${line}`);
+  private enqueue(level: string, line: string, zoneId?: string) {
+    const value = `[${new Date().toISOString()}] ${level.padEnd(5)} ${line.trim()}`;
+    this.queue.push({value, zoneId});
     this.tryRun();
   }
 
   private async runAsync() {
-    const filePath = path.join(app.settings.path.logger, `${new Date().toISOString().substr(0, 10)}.log`);
-    while (this.queue.length) await this.fileService.appendAsync(filePath, this.queue.shift() + os.EOL);
+    while (this.queue.length) {
+      const line = this.queue.shift();
+      if (line) {
+        const fileDate = new Date().toISOString().substr(0, 10);
+        const fileName = line.zoneId ? `${fileDate}.${line.zoneId}.log` : `${fileDate}.log`;
+        await this.fileService.appendAsync(path.join(app.settings.path.logger, fileName), line.value + os.EOL);
+      } else {
+        break;
+      }
+    }
   }
 
   private tryRun() {

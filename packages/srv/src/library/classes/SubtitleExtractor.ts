@@ -26,7 +26,7 @@ export class SubtitleExtractor {
 
   private async matchAsync(filePath: string, subtitles: Array<[string, string]>) {
     const expression = /Stream #0:([0-9]+)(?:\((.+)\)): Subtitle: (ass|subrip)/gm;    
-    const text = await textAsync(filePath);
+    const text = await this.textAsync(filePath);
     let match: RegExpMatchArray | null;
     while (match = expression.exec(text)) {
       const id = match[1];
@@ -39,17 +39,17 @@ export class SubtitleExtractor {
   private async saveAsync(filePath: string, subtitlePath: string, subtitles: Array<[string, string]>) {
     const mappings = subtitles.map(([k, v]) => ['-map', `0:${k}`, v]).flatMap(x => x);
     const runnable = ['-y', '-i', filePath].concat(mappings);
-    if (await app.ffmpegAsync(runnable, (chunk) => this.loggerService.debug(chunk.toString()))) {
+    if (await app.ffmpegAsync(this.loggerService, runnable)) {
       throw new Error();
     } else {
       const bundler = new app.SubtitleBundler(this.fileService, this.syncPath);
       await bundler.runAsync(subtitlePath);
     }
   }
-}
-
-async function textAsync(filePath: string) {
-  const result: Array<Buffer> = [];
-  await app.ffmpegAsync(['-i', filePath], (chunk) => result.push(chunk));
-  return Buffer.concat(result).toString();
+  
+  private async textAsync(filePath: string) {
+    const result: Array<Buffer> = [];
+    await app.ffmpegAsync(this.loggerService, ['-y', '-i', filePath], (chunk) => result.push(chunk));
+    return Buffer.concat(result).toString();
+  }
 }

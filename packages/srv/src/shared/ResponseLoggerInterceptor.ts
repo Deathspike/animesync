@@ -41,5 +41,5 @@ export class ResponseLoggerInterceptor<T> implements ncm.NestInterceptor {
 
 function fetchId(request: express.Request) {
   const requestKey = '__ResponseLoggerRequestId';
-  return request.params[requestKey] ??= Date.now().toString(16).substr(-5);
+  return request.params[requestKey] ??= Date.now().toString(16).substr(-7);
 }

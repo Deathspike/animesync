@@ -47,7 +47,7 @@ export class Runner {
       .concat(mappings)
       .concat(metadata)
       .concat(['-c', 'copy', '-f', 'matroska', incompletePath]);
-    if (await app.ffmpegAsync(runnable, (chunk) => this.loggerService.debug(chunk.toString()))) {
+    if (await app.ffmpegAsync(this.loggerService, runnable)) {
       throw new Error();
     } else {
       const bundler = new app.SubtitleBundler(this.fileService, this.syncPath);
