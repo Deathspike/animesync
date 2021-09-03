@@ -1,5 +1,5 @@
 import './version';
-export * from '../../srv';
+export * from '../../srv/dist';
 export * from './actions/createBrowser';
 export * from './actions/createDownload';
 export * from './actions/createServer';

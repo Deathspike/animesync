@@ -1,7 +1,5 @@
 {
   "private": true,
-  "main": "dist",
-  "types": "dist",
   "dependencies": {
     "@nestjs/swagger": "5.0.9",
     "class-transformer": "0.4.0",

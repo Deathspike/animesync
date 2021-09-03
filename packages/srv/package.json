@@ -1,7 +1,5 @@
 {
   "private": true,
-  "main": "dist",
-  "types": "dist",
   "dependencies": {
     "@nestjs/common": "8.0.6",
     "@nestjs/core": "8.0.6",
