@@ -115,7 +115,7 @@ export class LibraryService {
     const episodeInfo = await app.EpisodeInfo.loadAsync(this.fileService, episodePath);
     const filePath = await this.episodeAsync(episodePath);
     const subtitlePath = await this.episodeSubtitleAsync(episodePath);
-    return await this.saveEpisodeAsync(episodePath, filePath, subtitlePath, episodeInfo.url);
+    await this.saveEpisodeAsync(episodePath, filePath, subtitlePath, episodeInfo.url);
   }
 
   async episodeImageAsync(episodePath: string) {
@@ -127,8 +127,12 @@ export class LibraryService {
 
   async episodeSubtitleAsync(episodePath: string) {
     const subtitlePath = `${episodePath}.zip`;
-    if (!await this.fileService.existsAsync(subtitlePath)) await this.saveSubtitleAsync(episodePath, subtitlePath);
-    return subtitlePath;
+    if (await this.fileService.existsAsync(subtitlePath)) {
+      return subtitlePath;
+    } else {
+      await this.saveSubtitleAsync(episodePath, subtitlePath);
+      return subtitlePath;
+    }
   }
 
   private async saveEpisodeAsync(episodePath: string, filePath: string, subtitlePath: string, url: string) {
