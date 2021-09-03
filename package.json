@@ -34,9 +34,16 @@
     "typescript": "4.3.5"
   },
   "scripts": {
-    "build": "npm run build -w packages/web",
-    "prepare": "rimraf dist && tsc -b tsconfig.workspaces.json && npm run build",
-    "serve": "npm run serve -w packages/web",
+    "prepack": "npm run repo:prune && npm run repo:build && node prepack",
+    "prepare": "npm run repo:prune && npm run repo:build",
+    "postinstall": "node packages/srv/postinstall",
+    "postpack": "node postpack",
+    "repo:build": "npm run tsc:build && npm run webpack:build",
+    "repo:prune": "rimraf dist && rimraf packages/**/dist",
+    "tsc:build": "tsc -b tsconfig.workspaces.json",
+    "tsc:watch": "tsc -b tsconfig.workspaces.json -w",
+    "webpack:build": "npm run webpack:build -w packages/web",
+    "webpack:serve": "npm run webpack:serve -w packages/web",
     "test": "jest"
   },
   "workspaces": [

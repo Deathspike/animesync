@@ -41,7 +41,6 @@ export class CoreModule implements ncm.OnApplicationBootstrap, ncm.NestModule {
 }
 
 function createStaticModule() {
-  const htmlPath = require.resolve('@animesync/web/public/index.html');
-  const rootPath = path.dirname(htmlPath);
+  const rootPath = path.join(__dirname, '../../../web/public');
   return nss.ServeStaticModule.forRoot({rootPath});
 }

@@ -1,2 +1,2 @@
-export * as api from '@animesync/api';
+export * as api from '../../../api';
 export * from './server';

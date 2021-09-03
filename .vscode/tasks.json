@@ -12,7 +12,7 @@
     "dependsOn": ["TypeScript"],
     "isBackground": true,
     "label": "Webpack",
-    "script": "serve",
+    "script": "webpack:serve",
     "type": "npm",
     "problemMatcher": [{
       "background": {

@@ -1,5 +1,5 @@
 import './version';
-export * from '@animesync/srv';
+export * from '../../srv';
 export * from './actions/createBrowser';
 export * from './actions/createDownload';
 export * from './actions/createServer';

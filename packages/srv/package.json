@@ -1,5 +1,4 @@
 {
-  "name": "@animesync/srv",
   "private": true,
   "main": "dist",
   "types": "dist",

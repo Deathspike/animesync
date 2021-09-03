@@ -1,5 +1,4 @@
 {
-  "name": "@animesync/web",
   "private": true,
   "main": "dist",
   "types": "dist",
@@ -18,8 +17,8 @@
     "webpack-dev-server": "4.0.0"
   },
   "scripts": {
-    "build": "webpack build --config webpack.production.js",
-    "install": "rimraf dist && rimraf public/app.min.js",
-    "serve": "webpack serve --config webpack.development.js"
+    "prepare": "rimraf dist && rimraf public/app.min.js",
+    "webpack:build": "webpack build --config webpack.production.js",
+    "webpack:serve": "webpack serve --config webpack.development.js"
   }
 }

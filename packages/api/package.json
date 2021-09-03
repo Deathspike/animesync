@@ -1,5 +1,4 @@
 {
-  "name": "@animesync/api",
   "private": true,
   "main": "dist",
   "types": "dist",
