@@ -6,7 +6,7 @@
     "label": "TypeScript",
     "option": "watch",
     "problemMatcher": ["$tsc-watch"],
-    "tsconfig": "tsconfig.workspaces.json",
+    "tsconfig": "tsconfig.json",
     "type": "typescript"
   }, {
     "dependsOn": ["TypeScript"],
