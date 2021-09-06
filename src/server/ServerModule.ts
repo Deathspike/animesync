@@ -27,6 +27,9 @@ async function pruneAsync(directoryPath: string, timeout: number) {
   for (const filePath of filePaths) {
     const stat = await fs.promises.stat(filePath).catch(() => {});
     const mtime = stat && stat.mtime.getTime();
-    if (mtime < expireAt) await fs.promises.rm(filePath, {force: true});
+    if (mtime < expireAt) {
+      const options = {force: true, recursive: true, maxRetries: 50};
+      await fs.promises.rm(filePath, options);
+    }
   }
 }
