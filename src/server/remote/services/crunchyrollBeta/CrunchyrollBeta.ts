@@ -81,7 +81,9 @@ const defaultHeaders = {
 async function tryLoginAsync(page: playwright.Page) {
   const isAuthenticated = () => Boolean(JSON.parse(localStorage.getItem('ajs_user_id') ?? 'null'));
   if (!app.settings.credential.crunchyrollUsername || !app.settings.credential.crunchyrollPassword || await page.evaluate(isAuthenticated)) return;
-  await page.goto('https://www.crunchyroll.com/login', {waitUntil: 'domcontentloaded'});
+  await page.goto('https://www.crunchyroll.com/login', {waitUntil: 'networkidle'});
+  await page.click('#onetrust-accept-btn-handler', {timeout: 1000}).then(() => page.waitForNavigation({waitUntil: 'domcontentloaded'})).catch(() => {});
+  await page.evaluate(() => document.querySelector('.opt-in')?.remove());
   await page.type('#login_form_name', app.settings.credential.crunchyrollUsername);
   await page.type('#login_form_password', app.settings.credential.crunchyrollPassword);
   await page.click('#login_submit_button', {force: true});
