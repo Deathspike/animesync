@@ -11,7 +11,7 @@ export class SeriesViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const series = await app.server.library.seriesAsync({seriesId: this.seriesId});
+    const series = await app.core.api.library.seriesAsync({seriesId: this.seriesId});
     if (series.value) {
       this.seasons = series.value.seasons.map(x => new app.SeriesSeasonViewModel(this.seriesId, x));
       this.title = series.value.title;

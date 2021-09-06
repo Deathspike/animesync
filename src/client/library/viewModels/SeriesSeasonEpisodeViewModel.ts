@@ -25,6 +25,6 @@ export class SeriesSeasonEpisodeViewModel {
 
   @mobx.computed
   get url() {
-    return this.episode.available && app.server.library.episodeUrl({seriesId: this.seriesId, episodeId: this.episode.id});
+    return this.episode.available && app.core.api.library.episodeUrl({seriesId: this.seriesId, episodeId: this.episode.id});
   }
 }

@@ -1,5 +1,6 @@
 import * as app from '.';
 import * as mobx from 'mobx';
+import * as mui from '@material-ui/core';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as ReactRouter from 'react-router-dom';
@@ -7,10 +8,19 @@ const packageData = require('../../package');
 
 function App() {
   return (
+    <mui.MuiThemeProvider theme={app.shared.theme}>
+      <mui.CssBaseline />
+      <Router />
+    </mui.MuiThemeProvider>
+  );
+}
+
+function Router() {
+  return (
     <ReactRouter.BrowserRouter>
       <ReactRouter.Switch>
-        <ReactRouter.Route exact strict path="/web/" component={app.MainController} />
-        <ReactRouter.Route exact strict path="/web/:seriesId/" component={app.SeriesController} />
+        <ReactRouter.Route exact strict path="/web/" component={app.library.MainController} />
+        <ReactRouter.Route exact strict path="/web/:seriesId/" component={app.library.SeriesController} />
         <ReactRouter.Redirect to="/web/" />
       </ReactRouter.Switch>
     </ReactRouter.BrowserRouter>
