@@ -33,10 +33,10 @@ export class Funimation implements app.IProvider {
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page, seriesUrl);
       const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
-      const locale = await seriesPromise.then(x => x.request().url()).then(x => new URL(x).searchParams.get('locale'));
       const series = await seriesPromise.then(x => x.json() as Promise<fun.Series>);
       const seasonEpisodes = await this.fetchEpisodesAsync(episodesPromise, series);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
+      const locale = await page.evaluate(() => (window as any).locale);
       const value = FunimationRemap.series(seriesUrl, series, seasonEpisodes, locale ?? undefined);
       return new app.Composable(seriesUrl, value, headers);
     });
@@ -62,7 +62,7 @@ export class Funimation implements app.IProvider {
     const episodesRequest = episodesResponse.request();
     const episodesUrl = episodesRequest.url();
     return await Promise.all(series.seasons.map(async (season) => {
-      const seasonUrl = episodesUrl.replace(/(\/seasons\/)[^\/\?]+/, (_, x) => x + season.id);
+      const seasonUrl = episodesUrl.replace(/(\/seasons\/).+(\.json)/, (_, x, y) => x + season.id + y);
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(([k]) => !k.startsWith(':'));
         const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});

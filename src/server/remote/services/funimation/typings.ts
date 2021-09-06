@@ -1,11 +1,15 @@
 export type Episode = {
   episodeNumber: string;
   images: Array<{key: string, path: string}>;
-  name: string;
+  name: Localized;
   slug: string;
-  synopsis: string;
-  videoList: Array<{spokenLanguages?: Array<{languageCode: string}>}>;
+  synopsis: Localized;
+  videoOptions: {audioLanguages: Array<{languageCode: string}>};
 };
+
+export type Localized = {
+  en: string;
+}
 
 export type Player = {
   seasons: Array<{
@@ -31,17 +35,18 @@ export type PlayerAlpha = {
 
 export type Season = {
   episodes: Array<Episode>;
-  name: string;
+  name: Localized;
 };
 
 export type Series = {
   images: Array<{key: string, path: string}>;
-  longSynopsis: string;
-  name: string;
+  longSynopsis: Localized;
+  name: Localized;
   seasons: Array<{id: string, name: string}>;
   slug: string;
 };
 
 export type Stream = {
+  errors?: Array<{detail: string}>;
   items: Array<{src: string, videoType: string}>;
 };
