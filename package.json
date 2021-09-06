@@ -24,7 +24,7 @@
   },
   "jest": {
     "maxWorkers": 1,
-    "testMatch": ["<rootDir>/dist/*.test.js"],
+    "testMatch": ["<rootDir>/dist/**/*.test.js"],
     "testTimeout": 300000
   },
   "dependencies": {
