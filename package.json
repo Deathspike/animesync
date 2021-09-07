@@ -23,8 +23,9 @@
     "node": ">= 16.0.0"
   },
   "jest": {
+    "globalTeardown": "<rootDir>/dist/test/global/teardown.js",
     "maxWorkers": 1,
-    "testMatch": ["<rootDir>/dist/**/*.test.js"],
+    "testMatch": ["<rootDir>/dist/test/*.test.js"],
     "testTimeout": 300000
   },
   "dependencies": {

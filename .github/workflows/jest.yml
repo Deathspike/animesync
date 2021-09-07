@@ -17,6 +17,7 @@ jobs:
       - run: npm ci
       - run: npm test
         env:
+          AST_CI: true
           AST_CRUNCHYROLL_PROXYSERVER: ${{secrets.AST_CRUNCHYROLL_PROXYSERVER}}
           AST_CRUNCHYROLL_USERNAME: ${{secrets.AST_CRUNCHYROLL_USERNAME}}
           AST_CRUNCHYROLL_PASSWORD: ${{secrets.AST_CRUNCHYROLL_PASSWORD}}
