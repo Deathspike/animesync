@@ -158,11 +158,11 @@ async function extractSubtitlesAsync(rawZip: Blob, subtitles: Array<app.session.
       const type = match[2] as 'ass' | 'srt';
       if (type === 'srt') {
         const value = buffer.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
-        const vtt = `WEBVTT - Generated using SRT2VTT\r\n\r\n${value}`;
+        const vtt = `WEBVTT\r\n\r\n${value}`;
         const url = URL.createObjectURL(new Blob([vtt]));
         subtitles.push({language, type: 'vtt', url});
       } else {
-        const url = URL.createObjectURL(buffer);
+        const url = URL.createObjectURL(new Blob([buffer]));
         subtitles.push({language, type, url});
       }
     }
