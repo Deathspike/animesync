@@ -153,11 +153,18 @@ async function extractSubtitlesAsync(rawZip: Blob, subtitles: Array<app.session.
   for (const zipFile of Object.values(zip.files)) {
     const match = zipFile.name.match(/\.(.+)\.(ass|srt)$/);
     if (match) {
-      const buffer = await zipFile.async('blob');
+      const buffer = await zipFile.async('text');
       const language = match[1];
-      const type: 'ass' | 'srt' = match[2];
-      const url = URL.createObjectURL(buffer);
-      subtitles.push({language, type, url});
+      const type = match[2] as 'ass' | 'srt';
+      if (type === 'srt') {
+        const value = buffer.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
+        const vtt = `WEBVTT - Generated using SRT2VTT\r\n\r\n${value}`;
+        const url = URL.createObjectURL(new Blob([vtt]));
+        subtitles.push({language, type: 'vtt', url});
+      } else {
+        const url = URL.createObjectURL(buffer);
+        subtitles.push({language, type, url});
+      }
     }
   }
 }

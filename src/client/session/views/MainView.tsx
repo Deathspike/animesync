@@ -81,10 +81,14 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
     const track = this.player.appendChild(document.createElement('track'));
     track.default = true;
     track.src = request.subtitle.url;
+
     track.addEventListener('load', () => {
       if (!this.vtt.current) return;
       app.WebVtt.attach(this.vtt.current, track);
       this.vtt.current.setAttribute('size', request.subtitle.size ?? 'normal');
+    });
+    track.addEventListener('error', (error) => {
+      console.error(error);
     });
   }
 
