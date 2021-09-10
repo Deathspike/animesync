@@ -80,7 +80,7 @@ export class MainControlSourceViewModel implements app.IVideoHandler, app.IViewH
   private loadSource(source: app.ISource) {
     this.isLoading = true;
     this.selectedSource = source;
-    this.bridge.dispatchRequest({type: 'loadSource', source, sourceType: source.type});
+    this.bridge.dispatchRequest({type: 'loadSource', source});
   }
 }
 

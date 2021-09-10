@@ -1,5 +1,6 @@
 import * as app from '..';
 import * as mobx from 'mobx';
+const api = app.shared.core.api;
 
 export class SeriesViewModel {
   private readonly seriesId: string;
@@ -11,9 +12,9 @@ export class SeriesViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const series = await app.core.api.library.seriesAsync({seriesId: this.seriesId});
+    const series = await api.library.seriesAsync({seriesId: this.seriesId});
     if (series.value) {
-      this.seasons = series.value.seasons.map(x => new app.SeriesSeasonViewModel(this.seriesId, x));
+      this.seasons = series.value.seasons.map(x => new app.SeriesSeasonViewModel(x));
       this.title = series.value.title;
     } else if (series.statusCode === 404) {
       // Handle not found.

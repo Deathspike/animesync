@@ -6,7 +6,6 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
   private hideTimeout?: NodeJS.Timeout;
 
   constructor(
-    private readonly bridge: app.Bridge,
     private readonly navigator: app.INavigator
   ) {}
 
@@ -106,6 +105,9 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
   @mobx.observable
   isWaiting = true;
 
+  @mobx.observable
+  readonly bridge = new app.Bridge();
+  
   @mobx.observable
   readonly control = new app.MainControlViewModel(this.bridge, this.navigator);
   

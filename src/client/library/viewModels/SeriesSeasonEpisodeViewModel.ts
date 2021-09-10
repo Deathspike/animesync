@@ -2,12 +2,10 @@ import * as app from '..';
 import * as mobx from 'mobx';
 
 export class SeriesSeasonEpisodeViewModel {
-  private readonly seriesId: string;
   private readonly episode: app.api.LibrarySeriesSeasonEpisode;
 
-  constructor(seriesId: string, episode: app.api.LibrarySeriesSeasonEpisode) {
+  constructor(episode: app.api.LibrarySeriesSeasonEpisode) {
     mobx.makeObservable(this);
-    this.seriesId = seriesId;
     this.episode = episode;
   }
 
@@ -25,6 +23,6 @@ export class SeriesSeasonEpisodeViewModel {
 
   @mobx.computed
   get url() {
-    return this.episode.available && app.core.api.library.episodeUrl({seriesId: this.seriesId, episodeId: this.episode.id});
+    return this.episode.available && this.episode.id + '/';
   }
 }

@@ -5,7 +5,7 @@ import * as React from 'react';
 import Hls from 'hls.js';
 
 @mobxReact.observer
-class View extends app.ViewComponent<typeof Styles, {bridge: app.Bridge, vm: app.MainViewModel}> implements app.IVideoHandler {
+class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> implements app.IVideoHandler {
   private readonly hls = new Hls();
   private readonly vtt = React.createRef<HTMLDivElement>();
   private octopus?: app.Octopus;
@@ -28,7 +28,7 @@ class View extends app.ViewComponent<typeof Styles, {bridge: app.Bridge, vm: app
         break;
       case 'loadSource':
         if (!this.player) break;
-        if (request.sourceType === 'mkv') {
+        if (request.source.type === 'src') {
           this.player.src = request.source.urls[0];
         } else {
           this.hls.loadSource(request.source.urls[0]);
@@ -91,13 +91,13 @@ class View extends app.ViewComponent<typeof Styles, {bridge: app.Bridge, vm: app
   private onCreate(player: HTMLVideoElement | null) {
     if (!player || this.player) return;
     this.player = player;
-    this.props.bridge.subscribe(this);
-    this.props.bridge.dispatchEvent({type: 'create'});
-    app.Dispatcher.attach(this.props.bridge, this.hls, this.player);
+    this.props.vm.bridge.subscribe(this);
+    this.props.vm.bridge.dispatchEvent({type: 'create'});
+    app.Dispatcher.attach(this.props.vm.bridge, this.hls, this.player);
   }
 
   private onDestroy() {
-    this.props.bridge.unsubscribe(this);
+    this.props.vm.bridge.unsubscribe(this);
     this.hls.destroy();
     this.octopus?.dispose();
   }

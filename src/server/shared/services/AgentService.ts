@@ -65,7 +65,7 @@ export class AgentService implements ncm.OnModuleDestroy {
       return await handlerAsync();
     } catch (error) {
       if (i >= app.settings.core.fetchMaximumRetries) throw error;
-      this.loggerService.debug(error);
+      this.loggerService.debug(error as any);
       await new Promise<void>((resolve) => setTimeout(resolve, app.settings.core.fetchTimeoutRetry));
     }
   }

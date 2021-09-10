@@ -21,6 +21,7 @@ function Router() {
       <ReactRouter.Switch>
         <ReactRouter.Route exact strict path="/web/" component={app.library.MainController} />
         <ReactRouter.Route exact strict path="/web/:seriesId/" component={app.library.SeriesController} />
+        <ReactRouter.Route exact strict path="/web/:seriesId/:episodeId/" component={app.library.WatchController} />
         <ReactRouter.Redirect to="/web/" />
       </ReactRouter.Switch>
     </ReactRouter.BrowserRouter>

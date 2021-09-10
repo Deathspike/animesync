@@ -1,12 +1,4 @@
 export class StoreManager {
-  get<T extends string>(key: string, defaultValue: T) {
-    return this.getString(key, defaultValue) as T;
-  }
-
-  getBoolean(key: string, defaultValue: boolean) {
-    return /^true$/.test(this.getString(key, String(defaultValue)));
-  }
-
   getNumber(key: string, defaultValue: number) {
     return Number(this.getString(key, String(defaultValue)));
   }
@@ -25,5 +17,5 @@ export class StoreManager {
 }
 
 function getKey(key: string) {
-  return `animeloyalty.${key}`;
+  return `animesync.${key}`;
 }

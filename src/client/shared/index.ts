@@ -1,4 +1,4 @@
-export * as api from '../../api';
+export * from '..';
 export * from './core';
 export * from './settings';
 export * from './typings';

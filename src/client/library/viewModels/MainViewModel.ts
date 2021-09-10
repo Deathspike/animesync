@@ -1,5 +1,6 @@
 import * as app from '..';
 import * as mobx from 'mobx';
+const api = app.shared.core.api;
 
 export class MainViewModel {
   constructor() {
@@ -8,7 +9,7 @@ export class MainViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const context = await app.core.api.library.contextAsync();
+    const context = await api.library.contextAsync();
     if (context.value) {
       this.series = context.value.series.map(x => new app.MainSeriesViewModel(x));
     } else {

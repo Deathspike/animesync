@@ -3,8 +3,8 @@ export interface INavigator {
   readonly episodes: Array<INavigatorEpisode>;
   readonly hasNext: boolean;
   readonly hasPrevious: boolean;
-  openNext: (shouldDelay: boolean) => void;
-  openPrevious: (shouldDelay: boolean) => void;
+  openNext: (manualRequest: boolean) => void;
+  openPrevious: (manualRequest: boolean) => void;
   preloadNext: () => void;
 }
 
@@ -21,7 +21,7 @@ export interface ISource {
   readonly resolutionX?: number;
   readonly resolutionY?: number;
   readonly urls: Array<string>;
-  readonly type: 'hls' | 'mkv';
+  readonly type: 'hls' | 'src';
 }
 
 export interface ISubtitle {
@@ -53,7 +53,7 @@ export type VideoEvent =
   
 export type VideoRequest =
   {type: 'clearSubtitle'} |
-  {type: 'loadSource', source: ISource, sourceType: 'hls' | 'mkv'} |
+  {type: 'loadSource', source: ISource} |
   {type: 'loadSubtitle', subtitle: ISubtitle} |
   {type: 'pause'} |
   {type: 'play'} |
