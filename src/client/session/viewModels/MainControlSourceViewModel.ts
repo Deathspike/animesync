@@ -4,9 +4,9 @@ import {language} from '../language';
 const sourceKey = 'preferredSource';
 
 export class MainControlSourceViewModel implements app.IVideoHandler, app.IViewHandler {
-  constructor(
-    private readonly bridge: app.Bridge
-  ) {}
+  constructor(private readonly bridge: app.Bridge) {
+    mobx.makeObservable(this);
+  }
 
   @mobx.action
   select(source: app.ISource) {

@@ -6,9 +6,9 @@ const subtitleKey = 'preferredSubtitle';
 const subtitleNone = 'none';
 
 export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IViewHandler {
-  constructor(
-    private readonly bridge: app.Bridge
-  ) {}
+  constructor(private readonly bridge: app.Bridge) {
+    mobx.makeObservable(this);
+  }
 
   @mobx.action
   clear() {
@@ -70,9 +70,9 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
 
   @mobx.action
   private detectSubtitle() {
-    const preferred = app.core.store.getString(subtitleKey, 'en-US');
+    const preferred = app.core.store.getString(subtitleKey, 'eng');
     if (preferred === subtitleNone || this.tryLoadSubtitle(preferred)) return;
-    this.tryLoadSubtitle('en-US');
+    this.tryLoadSubtitle('eng');
   }
 
   @mobx.action
@@ -96,16 +96,16 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
 
 function getSubtitleNames(subtitle: app.ISubtitle) {
   switch (subtitle.language) {
-    case 'ar-ME': return language.subtitleArMe;
-    case 'de-DE': return language.subtitleDeDe;
-    case 'en-US': return language.subtitleEnUs;
-    case 'es-ES': return language.subtitleEsEs;
-    case 'es-LA': return language.subtitleEsLa;
-    case 'fr-FR': return language.subtitleFrFr;
-    case 'it-IT': return language.subtitleItIt;
-    case 'pt-BR': return language.subtitlePtBr;
-    case 'ru-RU': return language.subtitleRuRu;
-    case 'tr-TR': return language.subtitleTrTr;
-    default: throw new Error();
+    case 'ara': return language.subtitleAra;
+    case 'eng': return language.subtitleEng;
+    case 'fre': return language.subtitleFre;
+    case 'ger': return language.subtitleGer;
+    case 'ita': return language.subtitleIta;
+    case 'por': return language.subtitlePor;
+    case 'rus': return language.subtitleRus;
+    case 'spa': return language.subtitleSpa;
+    case 'spa-419': return language.subtitleSpa419;
+    case 'tur': return language.subtitleTur;
+    default: return [subtitle.language, subtitle.language];
   }
 }

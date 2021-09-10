@@ -37,7 +37,7 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
         break;
       case 'loadSubtitle':
         this.clearSubtitle();
-        if (request.subtitle.type === 'srt') this.createSrt(request);
+        if (request.subtitle.type === 'vtt') this.createSrt(request);
         else this.createAss(request);
         break;
       case 'pause':

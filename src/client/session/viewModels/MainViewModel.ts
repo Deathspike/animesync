@@ -5,9 +5,9 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
   private clickTimeout?: number;
   private hideTimeout?: NodeJS.Timeout;
 
-  constructor(
-    private readonly navigator: app.INavigator
-  ) {}
+  constructor(private readonly navigator: app.INavigator) {
+    mobx.makeObservable(this);
+  }
 
   @mobx.action
   onInputKey(event: app.InputKeyEvent) {

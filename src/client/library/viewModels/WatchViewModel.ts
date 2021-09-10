@@ -107,17 +107,24 @@ export class WatchViewModel {
 
   @mobx.action
   async refreshAsync() {
-    const series = await api.library.seriesAsync({seriesId: this.seriesId});
-    if (series.value) {
+    const seriesPromise = api.library.seriesAsync({seriesId: this.seriesId});
+    const subtitlePromise = fetch(api.library.episodeSubtitleUrl({seriesId: this.seriesId, episodeId: this.episodeId}));
+    const series = await seriesPromise;
+    const subtitle = await subtitlePromise;
+    if (series.value && subtitle.status === 200) {
       const navigator = new Navigator(series.value, this.episodeId);
       const url = api.library.episodeUrl({seriesId: this.seriesId, episodeId: this.episodeId});
 
-      console.log('setting session');
+      this.onDestroy();
+      
       this.session = new app.session.MainViewModel(navigator);
+      this.subtitles = [];
+      await subtitle.blob().then(x => extractSubtitlesAsync(x, this.subtitles));
 
       setTimeout(() => {
         // LOL
-        this.session!.bridge.dispatchRequest({type: 'loadSource', source: {urls: [url], type: 'src'}});
+        this.session!.bridge.dispatchRequest({type: 'sources', sources: [{urls: [url], type: 'src'}]});
+        this.session!.bridge.dispatchRequest({type: 'subtitles', subtitles: this.subtitles});
       }, 250);
 
     } else if (series.statusCode === 404) {
@@ -127,6 +134,30 @@ export class WatchViewModel {
     }
   }
 
+  onDestroy() {
+
+  }
+
+  // TODO: release subtitles.
+
   @mobx.observable
   session?: app.session.MainViewModel = undefined;
+
+  @mobx.observable
+  subtitles = new Array<app.session.ISubtitle>();
+}
+
+import JSZip from 'jszip';
+async function extractSubtitlesAsync(rawZip: Blob, subtitles: Array<app.session.ISubtitle>) {
+  const zip = await JSZip.loadAsync(rawZip);
+  for (const zipFile of Object.values(zip.files)) {
+    const match = zipFile.name.match(/\.(.+)\.(ass|srt)$/);
+    if (match) {
+      const buffer = await zipFile.async('blob');
+      const language = match[1];
+      const type: 'ass' | 'srt' = match[2];
+      const url = URL.createObjectURL(buffer);
+      subtitles.push({language, type, url});
+    }
+  }
 }

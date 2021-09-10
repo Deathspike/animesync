@@ -4,10 +4,9 @@ import * as mobx from 'mobx';
 export class MainControlViewModel implements app.IInputHandler, app.IVideoHandler, app.IViewHandler {
   private seekTimeout?: NodeJS.Timeout;
 
-  constructor(
-    private readonly bridge: app.Bridge,
-    private readonly navigator: app.INavigator
-  ) {}
+  constructor(private readonly bridge: app.Bridge, private readonly navigator: app.INavigator) {
+    mobx.makeObservable(this);
+  }
 
   @mobx.action
   onInputKey(event: app.InputKeyEvent) {
@@ -175,7 +174,7 @@ export class MainControlViewModel implements app.IInputHandler, app.IVideoHandle
   currentTime = 0;
 
   @mobx.observable
-  isPlaying = true;
+  isPlaying = false;
 
   @mobx.observable
   isSeeking = false;

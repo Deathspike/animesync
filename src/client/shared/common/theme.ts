@@ -8,6 +8,7 @@ export const theme = mui.createTheme({
     secondary: {main: '#A00', contrastText: '#AAA'},
     type: 'dark'
   },
+  // spacing: (x) => app.sz(x),
   overrides: {
     MuiAppBar: {
       colorPrimary: {backgroundColor: '#333'}

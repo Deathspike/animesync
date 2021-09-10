@@ -26,9 +26,9 @@ export interface ISource {
 
 export interface ISubtitle {
   readonly displayNames?: Array<string>,
-  readonly language: 'ar-ME' | 'de-DE' | 'en-US' | 'es-ES' | 'es-LA' | 'fr-FR' | 'it-IT' | 'pt-BR' | 'ru-RU' | 'tr-TR';
+  readonly language: string;
   readonly size?: 'tiny'| 'small' | 'normal' | 'large' | 'huge';
-  readonly type: 'ass' | 'srt';
+  readonly type: 'ass' | 'vtt';
   readonly url: string;
 };
 

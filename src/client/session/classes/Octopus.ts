@@ -1,7 +1,7 @@
 import * as app from '..';
 import * as ass from 'ass-compiler';
-const fonts = ['assets/default.woff2', 'assets/arabic.woff2'];
-const workerUrl = 'subtitles-octopus-4.0.0/subtitles-octopus-worker.js';
+const fonts = ['/subtitles-octopus-4.0.0/assets/default.woff2', '/subtitles-octopus-4.0.0/assets/arabic.woff2'];
+const workerUrl = '/subtitles-octopus-4.0.0/subtitles-octopus-worker.js';
 
 export class Octopus {
   private readonly subtitle: app.ISubtitle;
