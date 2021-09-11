@@ -180,9 +180,6 @@ export class MainControlViewModel implements app.IInputHandler, app.IVideoHandle
   isSeeking = false;
 
   @mobx.observable
-  readonly source = new app.MainControlSourceViewModel(this.bridge);
-
-  @mobx.observable
   readonly subtitle = new app.MainControlSubtitleViewModel(this.bridge);
 
   @mobx.action

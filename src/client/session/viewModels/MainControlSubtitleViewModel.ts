@@ -63,7 +63,7 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
   }
 
   @mobx.observable
-  selectedSubtitle?: app.ISubtitle;
+  selectedSubtitle?: app.ISubtitle = undefined;
 
   @mobx.observable
   subtitles: Array<app.ISubtitle> = [];

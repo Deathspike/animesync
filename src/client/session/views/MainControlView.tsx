@@ -55,7 +55,11 @@ class View extends app.ViewComponent<typeof Styles, {className?: string, vm: app
             </mui.Grid>
             <mui.Grid className={this.classes.endBar}>
               <app.MainControlSubtitleView vm={this.props.vm.subtitle} />
-              <app.MainControlSourceView vm={this.props.vm.source} />
+              <mui.IconButton onClick={() => app.core.screen.toggleFullscreen()}>
+                {app.core.screen.isFullscreen
+                  ? <app.icons.FullscreenExit />
+                  : <app.icons.Fullscreen />}
+              </mui.IconButton>
             </mui.Grid>
           </mui.Toolbar>
         </mui.AppBar>

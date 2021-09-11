@@ -123,7 +123,7 @@ export class WatchViewModel {
 
       setTimeout(() => {
         // LOL
-        this.session!.bridge.dispatchRequest({type: 'sources', sources: [{urls: [url], type: 'src'}]});
+        this.session!.bridge.dispatchRequest({type: 'loadSource', source: {urls: [url], type: 'src'}});
         this.session!.bridge.dispatchRequest({type: 'subtitles', subtitles: this.subtitles});
       }, 250);
 
