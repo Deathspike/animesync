@@ -20,7 +20,7 @@ class View extends app.ViewComponent<typeof Styles, {className?: string, vm: app
                 onChangeCommitted={app.api.unsafe((_: never, x: number) => this.props.vm.seekStop(x))} />
               <mui.Grid className={this.classes.beginBar}>
                 <mui.Typography>
-                  {app.formatTime(this.props.vm.currentTime)} / {app.formatTime(this.props.vm.currentDuration)}
+                  {this.formatTime(this.props.vm.currentTime)} / {this.formatTime(this.props.vm.currentDuration)}
                 </mui.Typography>
               </mui.Grid>
             </mui.Grid>}
@@ -61,6 +61,14 @@ class View extends app.ViewComponent<typeof Styles, {className?: string, vm: app
         </mui.AppBar>
       </mui.Grid>
     );
+  }
+
+  private formatTime(seconds: number) {
+    const date = new Date(0, 0, 0, 0, 0, seconds);
+    const hoursString = String(date.getHours()).padStart(2, '0');
+    const minutesString = String(date.getMinutes()).padStart(2, '0');
+    const secondsString = String(date.getSeconds()).padStart(2, '0');
+    return date.getHours() ? `${hoursString}:${minutesString}:${secondsString}` : `${minutesString}:${secondsString}`;
   }
 }
 

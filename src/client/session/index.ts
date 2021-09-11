@@ -1,5 +1,4 @@
 export * from '../shared';
-export * from './utilities';
 export * from './typings';
 export * from './classes/Bridge';
 export * from './classes/Dispatcher';
