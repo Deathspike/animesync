@@ -148,21 +148,20 @@ export class WatchViewModel {
 }
 
 import JSZip from 'jszip';
-async function extractSubtitlesAsync(rawZip: Blob, subtitles: Array<app.session.ISubtitle>) {
-  const zip = await JSZip.loadAsync(rawZip);
-  for (const zipFile of Object.values(zip.files)) {
-    const match = zipFile.name.match(/\.(.+)\.(ass|srt)$/);
+async function extractSubtitlesAsync(zip: Blob, subtitles: Array<app.session.ISubtitle>) {
+  for (const file of await JSZip.loadAsync(zip).then(x => Object.values(x.files))) {
+    const match = file.name.match(/\.(.+)\.(ass|srt)$/);
     if (match) {
-      const buffer = await zipFile.async('text');
       const language = match[1];
+      const text = await file.async('text');
       const type = match[2] as 'ass' | 'srt';
       if (type === 'srt') {
-        const value = buffer.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
+        const value = text.replace(/(\d+:\d+:\d+)+,(\d+)/g, "$1.$2");
         const vtt = `WEBVTT\r\n\r\n${value}`;
         const url = URL.createObjectURL(new Blob([vtt]));
         subtitles.push({language, type: 'vtt', url});
       } else {
-        const url = URL.createObjectURL(new Blob([buffer]));
+        const url = URL.createObjectURL(new Blob([text]));
         subtitles.push({language, type, url});
       }
     }
