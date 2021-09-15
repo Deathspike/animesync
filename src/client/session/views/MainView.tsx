@@ -19,6 +19,27 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
     this.props.vm.bridge.unsubscribe(this);
   }
 
+  onInputKey(event: app.InputKeyEvent) {
+    if (event.type === 'enter') {
+      this.props.vm.control.togglePlay();
+      return true;
+    } else if (event.type === 'arrowDown') {
+      this.props.vm.control.openPrevious();
+      return true;
+    } else if (event.type === 'arrowLeft') {
+      this.props.vm.control.seekBackward();
+      return true;
+    } else if (event.type === 'arrowRight') {
+      this.props.vm.control.seekForward();
+      return true;
+    } else if (event.type === 'arrowUp') {
+      this.props.vm.control.openNext();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   onVideoRequest(request: app.VideoRequest) {
     switch (request.type) {
       case 'clearSubtitle':
@@ -46,20 +67,22 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
     return (
       <mui.Grid className={this.props.vm.isHidden ? this.classes.containerHidden : this.classes.container}>
         <app.LoaderView open={this.props.vm.isWaiting} />
-        <mui.Grid className={this.classes.playerContainer} ref={(el) => this.onCreateVideo(el)} onClick={() => this.props.vm.onVideoClick()} />
-        <mui.Grid className={this.classes.subtitleContainer} ref={(el) => this.onCreateVtt(el)} />
+        <mui.Grid className={this.classes.playerContainer} ref={(el) => this.onVideoRef(el)} onClick={() => this.props.vm.onVideoClick()} />
+        <mui.Grid className={this.classes.subtitleContainer} ref={(el) => this.onVttRef(el)} />
         <app.MainControlView className={this.classes.ui} vm={this.props.vm.control} />
       </mui.Grid>
     );
   }
 
-  private onCreateVideo(el: HTMLElement | null) {
-    if (!el || el.firstElementChild) return;
+  private onVideoRef(el: HTMLElement | null) {
+    if (!el || el.firstElementChild === this.renderer.video) return;
+    while (el.firstElementChild) el.removeChild(el.firstElementChild);
     el.appendChild(this.renderer.video);
   }
 
-  private onCreateVtt(el: HTMLElement | null) {
-    if (!el || el.firstElementChild) return;
+  private onVttRef(el: HTMLElement | null) {
+    if (!el || el.firstElementChild === this.renderer.vtt) return;
+    while (el.firstElementChild) el.removeChild(el.firstElementChild);
     el.appendChild(this.renderer.vtt);
   }
 }

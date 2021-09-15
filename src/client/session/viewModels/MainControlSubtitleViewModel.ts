@@ -4,9 +4,12 @@ import {language} from '../language';
 const subtitleKey = 'preferredSubtitle';
 const subtitleNone = 'none';
 
-export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IViewHandler {
-  constructor(private readonly bridge: app.Bridge) {
+export class MainControlSubtitleViewModel {
+  constructor(private renderer: app.Renderer, subtitles: Array<app.ISubtitle>) {
     mobx.makeObservable(this);
+    this.subtitles = subtitles.map(x => ({...x, displayNames: getSubtitleNames(x)})).sort((a, b) => a.displayNames[0].localeCompare(b.displayNames[0]));
+
+    this.renderer.video.addEventListener('loadedmetadata', () => this.detectSubtitle());
   }
 
   @mobx.action
@@ -14,7 +17,7 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
     if (!this.canSelectSubtitle || !this.selectedSubtitle) return;
     app.core.store.set(subtitleKey, subtitleNone);
     this.selectedSubtitle = undefined;
-    this.bridge.dispatchRequest({type: 'clearSubtitle'});
+    this.renderer.clearSubtitle();
   }
 
   @mobx.action
@@ -22,26 +25,6 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
     if (!this.canSelectSubtitle || this.selectedSubtitle === subtitle) return;
     app.core.store.set(subtitleKey, subtitle.language);
     this.loadSubtitle(subtitle);
-  }
-
-  @mobx.action
-  onVideoRequest(event: app.VideoRequest) {
-    switch (event.type) {
-      case 'subtitles':
-        this.subtitles = event.subtitles.map(x => ({...x, displayNames: getSubtitleNames(x)})).sort((a, b) => a.displayNames[0].localeCompare(b.displayNames[0]));
-        this.detectSubtitle();
-        break;
-    }
-  }
-  
-  @mobx.action
-  onViewMount() {
-    this.bridge.subscribe(this);
-  }
-
-  @mobx.action
-  onViewUnmount() {
-    this.bridge.unsubscribe(this);
   }
 
   @mobx.computed
@@ -70,7 +53,7 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
   @mobx.action
   private loadSubtitle(subtitle: app.ISubtitle) {
     this.selectedSubtitle = subtitle;
-    this.bridge.dispatchRequest({type: 'loadSubtitle', subtitle});
+    this.renderer.subtitleAsync(subtitle.type, subtitle.url).catch((error) => console.error(error));
   }
 
   @mobx.action

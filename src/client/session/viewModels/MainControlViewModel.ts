@@ -1,82 +1,28 @@
 import * as app from '..';
 import * as mobx from 'mobx';
 
-export class MainControlViewModel implements app.IInputHandler, app.IVideoHandler, app.IViewHandler {
+export class MainControlViewModel {
   private seekTimeout?: NodeJS.Timeout;
 
-  constructor(private readonly bridge: app.Bridge, private readonly navigator: app.INavigator) {
-    mobx.makeObservable(this);
-  }
-
-  @mobx.action
-  onInputKey(event: app.InputKeyEvent) {
-    if (event.type === 'enter') {
-      this.togglePlay();
-      return true;
-    } else if (event.type === 'arrowDown') {
-      this.openPrevious();
-      return true;
-    } else if (event.type === 'arrowLeft') {
-      this.seekBackward();
-      return true;
-    } else if (event.type === 'arrowRight') {
-      this.seekForward();
-      return true;
-    } else if (event.type === 'arrowUp') {
-      this.openNext();
-      return true;
-    } else {
-      return false;
-    }
-  }
-  
-  @mobx.action
-  onVideoEvent(event: app.VideoEvent) {
-    switch (event.type) {
-      case 'error':
-        this.isSeeking = true;
-        break;
-      case 'loadedmetadata':
-        this.currentDuration = event.duration;
-        break;
-      case 'playing':
-        this.isPlaying = true;
-        break;
-      case 'progress':
-        this.currentBuffer = event.buffer;
-        break;
-      case 'pause':
-        this.isPlaying = false;
-        break;
-      case 'seeking':
-        this.isSeeking = false;
-        break;
-      case 'timeupdate':
-        if (!this.isSeeking) this.currentTime = event.time;
-        break;
-      case 'waiting':
-        if (!this.isSeeking) this.currentTime = event.time;
-        break;
-    }
-  }
-
-  @mobx.action
-  onVideoRequest(event: app.VideoRequest) {
-    switch (event.type) {
-      case 'loadSource':
-        this.isSeeking = this.currentTime !== 0;
-        break;
-    }
+  constructor(private readonly navigator: app.INavigator, private readonly renderer: app.Renderer) {
+    mobx.makeObservable(this);  
   }
   
   @mobx.action
   onViewMount() {
-    this.bridge.subscribe(this);
+    this.renderer.video.addEventListener('error'         , () => this.isSeeking = true)
+    this.renderer.video.addEventListener('load'          , () => this.isSeeking = true);
+    this.renderer.video.addEventListener('loadedmetadata', () => this.currentDuration = this.renderer.video.duration);
+    this.renderer.video.addEventListener('playing'       , () => this.isPlaying = true);
+    this.renderer.video.addEventListener('progress'      , () => this.currentDuration = fetchBuffer(this.renderer.video));
+    this.renderer.video.addEventListener('pause'         , () => this.isPlaying = false);
+    this.renderer.video.addEventListener('seeking'       , () => this.isSeeking = false);
+    this.renderer.video.addEventListener('timeupdate'    , () => this.currentTime = this.isSeeking ? this.currentTime : this.renderer.video.currentTime);
+    this.renderer.video.addEventListener('waiting'       , () => this.currentTime = this.isSeeking ? this.currentTime : this.renderer.video.currentTime);
   }
 
   @mobx.action
   onViewUnmount() {
-    this.bridge.unsubscribe(this);
     this.removeSchedule();
   }
 
@@ -126,9 +72,13 @@ export class MainControlViewModel implements app.IInputHandler, app.IVideoHandle
 
   @mobx.action
   togglePlay() {
-    if (!this.isLoaded) return;
-    this.isPlaying = !this.isPlaying;
-    this.bridge.dispatchRequest(this.isPlaying ? {type: 'play'} : {type: 'pause'});
+    if (!this.isLoaded) {
+      return;
+    } else if (this.isPlaying) {
+      this.renderer.video.pause();
+    } else {
+      this.renderer.video.play();
+    }
   }
 
   @mobx.computed
@@ -197,4 +147,13 @@ export class MainControlViewModel implements app.IInputHandler, app.IVideoHandle
         : this.bridge.dispatchEvent({type: 'ended'});
     }, app.settings.seekTimeout);
   }
+}
+
+function fetchBuffer(player: HTMLVideoElement) {
+  for (let i = 0; i < player.buffered.length; i++) {
+    if (player.currentTime < player.buffered.start(i)) continue;
+    if (player.currentTime > player.buffered.end(i)) continue;
+    return Math.floor(player.buffered.end(i));
+  }
+  return 0;
 }
