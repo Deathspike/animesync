@@ -80,13 +80,17 @@ class Navigator implements app.session.INavigator {
   @mobx.action
   openNext() {
     if (!this.hasNext) return;
-    // TODO:
+    const episodeId = this.episodes[this.currentIndex + 1].id;
+    const url = new URL(`../${episodeId}/`, location.href);
+    app.shared.core.browser.replace(url.pathname);
   }
 
   @mobx.action
   openPrevious() {
     if (!this.hasPrevious) return;
-    // TODO:
+    const episodeId = this.episodes[this.currentIndex - 1].id;
+    const url = new URL(`../${episodeId}/`, location.href);
+    app.shared.core.browser.replace(url.pathname);
   }
 
   @mobx.action
@@ -95,25 +99,20 @@ class Navigator implements app.session.INavigator {
   }
 }
 
-export class WatchViewModel {
-  private readonly seriesId: string;
-  private readonly episodeId: string;
-  
-  constructor(seriesId: string, episodeId: string) {
+export class WatchViewModel {  
+  constructor() {
     mobx.makeObservable(this);
-    this.seriesId = seriesId;
-    this.episodeId = episodeId;
   }
 
   @mobx.action
-  async refreshAsync() {
-    const seriesPromise = api.library.seriesAsync({seriesId: this.seriesId});
-    const subtitlePromise = fetch(api.library.episodeSubtitleUrl({seriesId: this.seriesId, episodeId: this.episodeId}));
+  async loadAsync(seriesId: string, episodeId: string) {
+    const seriesPromise = api.library.seriesAsync({seriesId});
+    const subtitlePromise = fetch(api.library.episodeSubtitleUrl({seriesId, episodeId}));
     const series = await seriesPromise;
     const subtitle = await subtitlePromise;
     if (series.value && subtitle.status === 200) {
-      const navigator = new Navigator(series.value, this.episodeId);
-      const url = api.library.episodeUrl({seriesId: this.seriesId, episodeId: this.episodeId});
+      const navigator = new Navigator(series.value, episodeId);
+      const url = api.library.episodeUrl({seriesId, episodeId});
 
       this.onDestroy();
       
@@ -123,7 +122,7 @@ export class WatchViewModel {
 
       setTimeout(() => {
         // LOL
-        this.session!.bridge.dispatchRequest({type: 'loadSource', source: {urls: [url], type: 'src'}});
+        this.session!.bridge.dispatchRequest({type: 'loadSource', source: {url}});
         this.session!.bridge.dispatchRequest({type: 'subtitles', subtitles: this.subtitles});
       }, 250);
 

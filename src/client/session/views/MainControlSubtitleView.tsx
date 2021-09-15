@@ -9,18 +9,6 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitle
   render() {
     return (
       <mui.Grid className={this.classes.container}>
-        <app.MenuComponent className={this.classes.menu} disabled={!this.props.vm.canSelectSize} elevation={0} placement="bottom-end">
-          <mui.IconButton disabled={!this.props.vm.canSelectSize}>
-            <app.icons.FormatSize />
-          </mui.IconButton>
-          <mui.Grid>
-            {this.sizeItem('tiny', language.sizeTiny)}
-            {this.sizeItem('small', language.sizeSmall)}
-            {this.sizeItem('normal', language.sizeNormal)}
-            {this.sizeItem('large', language.sizeLarge)}
-            {this.sizeItem('huge', language.sizeHuge)}
-          </mui.Grid>
-        </app.MenuComponent>
         <app.MenuComponent className={this.classes.menu} disabled={!this.props.vm.canSelectSubtitle} elevation={0} placement="bottom-end">
           <mui.IconButton disabled={!this.props.vm.canSelectSubtitle}>
             <app.icons.Subtitles />
@@ -35,16 +23,6 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitle
     );
   }
 
-  private sizeItem(size: app.ISubtitle['size'], label: string) {
-    return (
-      <mui.MenuItem key={size} onClick={() => this.props.vm.selectSize(size)}>
-        <mui.FormControlLabel className={this.classes.label} label={label} control={<mui.Radio
-          checked={this.props.vm.selectedSubtitle?.size === size}
-          color="primary" />} />
-      </mui.MenuItem>
-    );
-  }
-
   private subtitleItem(i: number, subtitle?: app.ISubtitle) {
     const displayNames = subtitle
       ? subtitle.displayNames
@@ -53,7 +31,7 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitle
       ? this.props.vm.selectedSubtitle?.language === subtitle.language
       : this.props.vm.selectedSubtitle == null;
     const onClick = subtitle
-      ? () => this.props.vm.selectSubtitle(subtitle)
+      ? () => this.props.vm.select(subtitle)
       : () => this.props.vm.clear();
     return (
       <mui.MenuItem key={i} onClick={onClick}>

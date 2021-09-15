@@ -8,7 +8,7 @@ class Component extends app.BaseComponent<typeof Styles, {className?: string, pr
       <mui.Grid>
         <mui.AppBar className={this.props.className}>
           <mui.Toolbar className={this.classes.toolBar}>
-            <mui.IconButton className={this.classes.toolBarButton} onClick={() => {/*app.core.view.leave()*/}}>
+            <mui.IconButton className={this.classes.toolBarButton} onClick={() => app.core.browser.goBack()}>
               <app.icons.ArrowBackIos />
             </mui.IconButton>
             <mui.Grid className={this.classes.title}>

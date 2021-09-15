@@ -3,6 +3,7 @@ export * from './core';
 export * from './settings';
 export * from './typings';
 export * from './utilities';
+export * from './classes/BrowserHistory';
 export * from './common/icons';
 export * from './common/theme';
 export * from './components/BaseComponent';

@@ -1,20 +1,17 @@
 import * as app from '..';
-import Hls from 'hls.js';
 
 export class Dispatcher {
   private constructor(
     private readonly bridge: app.Bridge,
-    private readonly hls: Hls,
     private readonly player: HTMLVideoElement
   ) {}
 
-  static attach(bridge: app.Bridge, hls: Hls, player: HTMLVideoElement) {
-    const dispatcher = new Dispatcher(bridge, hls, player);
+  static attach(bridge: app.Bridge, player: HTMLVideoElement) {
+    const dispatcher = new Dispatcher(bridge, player);
     dispatcher.attach();
   }
 
   attach() {
-    this.hls.on('hlsError', (_, data) => this.onHlsError(data));
     this.player.addEventListener('ended', () => this.bridge.dispatchEvent({type: 'ended'}));
     this.player.addEventListener('error', () => this.bridge.dispatchEvent(fetch('error', this.player)));
     this.player.addEventListener('loadedmetadata', () => this.bridge.dispatchEvent(fetch('loadedmetadata', this.player)));
@@ -26,12 +23,6 @@ export class Dispatcher {
     this.player.addEventListener('timeupdate', () => this.bridge.dispatchEvent(fetch('timeupdate', this.player)));
     this.player.addEventListener('waiting', () => this.bridge.dispatchEvent(fetch('waiting', this.player)));
     return this;
-  }
-
-  private onHlsError(data: Hls.errorData) {
-    this.bridge.dispatchEvent(data.fatal
-      ? fetch('error', this.player)
-      : fetch('warning', this.player));
   }
 }
 

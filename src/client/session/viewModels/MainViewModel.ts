@@ -11,14 +11,14 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
 
   @mobx.action
   onInputKey(event: app.InputKeyEvent) {
-    if (event.type !== 'escape') {
+    if (event.type !== 'backspace') {
       this.schedule();
       return false;
     } else if (this.isHidden) {
       this.schedule();
       return true;
     } else {
-      // TODO: app.core.view.leave();
+      app.core.browser.goBack();
       return true;
     }
   }
@@ -51,7 +51,10 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
     switch (event.type) {
       case 'ended':
         if (this.navigator.hasNext) this.navigator.openNext(false);
-        // TODO: else app.core.view.leave();
+        else app.core.browser.goBack();
+        break;
+      case 'loadedmetadata':
+        this.isWaiting = false;
         break;
       case 'playing':
         this.isWaiting = false;
@@ -89,13 +92,11 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
   @mobx.action
   onViewMount() {
     this.bridge.subscribe(this);
-    this.session.subscribe();
   }
 
   @mobx.action
   onViewUnmount() {
     this.bridge.unsubscribe(this);
-    this.session.unsubscribe();
     this.removeSchedule();
   }
 
@@ -111,9 +112,6 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
   @mobx.observable
   readonly control = new app.MainControlViewModel(this.bridge, this.navigator);
   
-  @mobx.observable
-  readonly session = new app.Session(this.bridge, this.control);
-
   @mobx.action
   private removeHide() {
     this.isHidden = false;

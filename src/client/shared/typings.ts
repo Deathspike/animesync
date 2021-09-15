@@ -13,8 +13,8 @@ export type InputKeyEvent =
   {type: 'arrowLeft'} |
   {type: 'arrowRight'} |
   {type: 'arrowUp'} |
+  {type: 'backspace'} |
   {type: 'enter'} | 
-  {type: 'escape'} |
   {type: 'fullscreen'};
 
 export type InputMouseEvent =

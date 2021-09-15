@@ -4,10 +4,19 @@ import * as React from 'react';
 
 @mobxReact.observer
 export class WatchController extends React.Component<{match: {params: {seriesId: string, episodeId: string}}}> {
-  private readonly vm = new app.WatchViewModel(this.props.match.params.seriesId, this.props.match.params.episodeId);
+  private readonly vm = new app.WatchViewModel();
+  private episodeId = this.props.match.params.episodeId;
+  private seriesId = this.props.match.params.seriesId;
 
   componentDidMount() {
-    this.vm.refreshAsync();
+    this.vm.loadAsync(this.seriesId, this.episodeId);
+  }
+
+  componentDidUpdate() {
+    if (this.props.match.params.seriesId === this.seriesId && this.props.match.params.episodeId === this.episodeId) return;
+    this.seriesId = this.props.match.params.seriesId;
+    this.episodeId = this.props.match.params.episodeId;
+    this.vm.loadAsync(this.seriesId, this.episodeId);
   }
 
   render() {

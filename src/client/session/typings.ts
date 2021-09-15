@@ -16,18 +16,12 @@ export interface INavigatorEpisode {
 }
 
 export interface ISource {
-  readonly displayName?: string;
-  readonly bandwidth?: number;
-  readonly resolutionX?: number;
-  readonly resolutionY?: number;
-  readonly urls: Array<string>;
-  readonly type: 'hls' | 'src';
+  readonly url: string;
 }
 
 export interface ISubtitle {
   readonly displayNames?: Array<string>,
   readonly language: string;
-  readonly size?: 'tiny'| 'small' | 'normal' | 'large' | 'huge';
   readonly type: 'ass' | 'vtt';
   readonly url: string;
 };
@@ -38,7 +32,6 @@ export interface IVideoHandler {
 }
 
 export type VideoEvent =
-  {type: 'create'} |
   {type: 'ended'} |
   {type: 'error'} & {time: number} |
   {type: 'loadedmetadata'} & {duration: number} |

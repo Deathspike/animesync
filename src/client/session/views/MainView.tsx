@@ -2,53 +2,42 @@ import * as app from '..';
 import * as mobxReact from 'mobx-react';
 import * as mui from '@material-ui/core';
 import * as React from 'react';
-import Hls from 'hls.js';
 
 @mobxReact.observer
 class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> implements app.IVideoHandler {
-  private readonly hls = new Hls();
-  private readonly vtt = React.createRef<HTMLDivElement>();
-  private octopus?: app.Octopus;
-  private player?: HTMLVideoElement;
+  private readonly renderer = new app.Renderer();
 
   componentDidMount() {
+    this.props.vm.bridge.subscribe(this);
+    app.Dispatcher.attach(this.props.vm.bridge, this.renderer.video);
     document.body.style.overflow = 'hidden';
   }
   
   componentWillUnmount() {
     super.componentWillUnmount();
     document.body.style.removeProperty('overflow');
-    this.onDestroy();
+    this.props.vm.bridge.unsubscribe(this);
   }
 
   onVideoRequest(request: app.VideoRequest) {
     switch (request.type) {
       case 'clearSubtitle':
-        this.clearSubtitle();
+        this.renderer.clearSubtitle();
         break;
       case 'loadSource':
-        if (!this.player) break;
-        if (request.source.type === 'src') {
-          this.player.src = request.source.urls[0];
-        } else {
-          this.hls.loadSource(request.source.urls[0]);
-          this.hls.attachMedia(this.player);
-        }
+        this.renderer.video.src = request.source.url;
         break;
       case 'loadSubtitle':
-        this.clearSubtitle();
-        if (request.subtitle.type === 'vtt') this.createSrt(request);
-        else this.createAss(request);
+        this.renderer.subtitleAsync(request.subtitle.type, request.subtitle.url);
         break;
       case 'pause':
-        this.player?.pause();
+        this.renderer.video.pause();
         break;
       case 'play':
-        this.player?.play();
+        this.renderer.video.play();
         break;
       case 'seek':
-        if (!this.player) break;
-        this.player.currentTime = request.time;
+        this.renderer.video.currentTime = request.time;
         break;
     }
   }
@@ -56,54 +45,22 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
   render() {
     return (
       <mui.Grid className={this.props.vm.isHidden ? this.classes.containerHidden : this.classes.container}>
-        <video className={this.classes.player} autoPlay crossOrigin="anonymous" ref={(el) => this.onCreate(el)} onClick={() => this.props.vm.onVideoClick()} />
-        <mui.Grid className={this.classes.subtitleContainer} ref={this.vtt} />
         <app.LoaderView open={this.props.vm.isWaiting} />
+        <mui.Grid className={this.classes.playerContainer} ref={(el) => this.onCreateVideo(el)} onClick={() => this.props.vm.onVideoClick()} />
+        <mui.Grid className={this.classes.subtitleContainer} ref={(el) => this.onCreateVtt(el)} />
         <app.MainControlView className={this.classes.ui} vm={this.props.vm.control} />
       </mui.Grid>
     );
   }
 
-  private clearSubtitle() {
-    Array.from(this.player?.querySelectorAll('track') ?? []).forEach(x => this.player?.removeChild(x));
-    this.octopus?.dispose();
-    delete this.octopus;
+  private onCreateVideo(el: HTMLElement | null) {
+    if (!el || el.firstElementChild) return;
+    el.appendChild(this.renderer.video);
   }
 
-  private createAss(request: app.VideoRequest) {
-    if (request.type !== 'loadSubtitle' || !this.player) return;
-    this.octopus = new app.Octopus(this.player, request.subtitle);
-    this.octopus.loadAsync().catch(() => {});
-  }
-
-  private createSrt(request: app.VideoRequest) {
-    if (request.type !== 'loadSubtitle' || !this.player) return;
-    const track = this.player.appendChild(document.createElement('track'));
-    track.default = true;
-    track.src = request.subtitle.url;
-
-    track.addEventListener('load', () => {
-      if (!this.vtt.current) return;
-      app.WebVtt.attach(this.vtt.current, track);
-      this.vtt.current.setAttribute('size', request.subtitle.size ?? 'normal');
-    });
-    track.addEventListener('error', (error) => {
-      console.error(error);
-    });
-  }
-
-  private onCreate(player: HTMLVideoElement | null) {
-    if (!player || this.player) return;
-    this.player = player;
-    this.props.vm.bridge.subscribe(this);
-    this.props.vm.bridge.dispatchEvent({type: 'create'});
-    app.Dispatcher.attach(this.props.vm.bridge, this.hls, this.player);
-  }
-
-  private onDestroy() {
-    this.props.vm.bridge.unsubscribe(this);
-    this.hls.destroy();
-    this.octopus?.dispose();
+  private onCreateVtt(el: HTMLElement | null) {
+    if (!el || el.firstElementChild) return;
+    el.appendChild(this.renderer.vtt);
   }
 }
 
@@ -116,26 +73,24 @@ const Styles = mui.createStyles({
     height: '100vh',
     '& $ui': {opacity: 0, pointerEvents: 'none'}
   },
-  player: {
+  playerContainer: {
     backgroundColor: '#000',
-    height: '100vh',
-    width: '100vw'
+    '& video': {
+      height: '100vh',
+      width: '100vw'
+    }
   },
   subtitleContainer: {
     pointerEvents: 'none',
     fontFamily: 'Trebuchet MS',
+    fontSize: app.sz(20),
     lineHeight: 'normal',
     textAlign: 'center',
     textShadow: `#000 0px 0px ${app.sz(1)}, #000 0px 0px ${app.sz(1)}, #000 0px 0px ${app.sz(1)}, #000 0px 0px ${app.sz(1)}, #000 0px 0px ${app.sz(1)}, #000 0px 0px ${app.sz(1)}`,
     whiteSpace: 'pre-line',
     position: 'absolute',
     width: '100vw',
-    inset: `auto auto ${app.sz(25)}`,
-    '&[size=tiny]': {fontSize: app.sz(12)},
-    '&[size=small]': {fontSize: app.sz(16)},
-    '&[size=normal]': {fontSize: app.sz(20)},
-    '&[size=large]': {fontSize: app.sz(26)},
-    '&[size=huge]': {fontSize: app.sz(36)}
+    inset: `auto auto ${app.sz(25)}`
   },
   ui: {
     opacity: 1,

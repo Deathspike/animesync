@@ -1,7 +1,6 @@
 import * as app from '..';
 import * as mobx from 'mobx';
 import {language} from '../language';
-const sizeKey = 'preferredSize';
 const subtitleKey = 'preferredSubtitle';
 const subtitleNone = 'none';
 
@@ -19,14 +18,7 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
   }
 
   @mobx.action
-  selectSize(size: app.ISubtitle['size']) {
-    if (!this.canSelectSize || !this.selectedSubtitle || this.selectedSubtitle.size === size) return;
-    app.core.store.set(sizeKey, size);
-    this.loadSubtitle(this.selectedSubtitle);
-  }
-
-  @mobx.action
-  selectSubtitle(subtitle: app.ISubtitle) {
+  select(subtitle: app.ISubtitle) {
     if (!this.canSelectSubtitle || this.selectedSubtitle === subtitle) return;
     app.core.store.set(subtitleKey, subtitle.language);
     this.loadSubtitle(subtitle);
@@ -77,9 +69,8 @@ export class MainControlSubtitleViewModel implements app.IVideoHandler, app.IVie
 
   @mobx.action
   private loadSubtitle(subtitle: app.ISubtitle) {
-    const size = app.core.store.getString(sizeKey, 'normal') as app.ISubtitle['size'];
-    this.selectedSubtitle = {...subtitle, size};
-    this.bridge.dispatchRequest({type: 'loadSubtitle', subtitle: this.selectedSubtitle});
+    this.selectedSubtitle = subtitle;
+    this.bridge.dispatchRequest({type: 'loadSubtitle', subtitle});
   }
 
   @mobx.action

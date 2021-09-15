@@ -56,10 +56,7 @@ export class InputManager {
         this.dispatchKeyEvent(event, {type: 'fullscreen'});
         break;
       case 'Backspace':
-        this.dispatchKeyEvent(event, {type: 'escape'});
-        break;
-      case 'Escape':
-        this.dispatchKeyEvent(event, {type: 'escape'});
+        this.dispatchKeyEvent(event, {type: 'backspace'});
         break;
       case 'Enter':
         this.dispatchKeyEvent(event, event.altKey ? {type: 'fullscreen'} : {type: 'enter'});
