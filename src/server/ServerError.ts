@@ -17,21 +17,21 @@ export class ServerError implements ncm.ExceptionFilter {
       const message = error.stack ?? error.message;
       const statusCode = 500;
       const value = {...error.data, statusCode, message};
-      response.status(statusCode).json(value);
       this.loggerService.debug(app.ResponseLoggerInterceptor.forResponse(request, response, value));
+      response.status(statusCode).json(value);
     } else if (error instanceof ncm.HttpException) {
       const message = error.stack ?? error.message;
       const statusCode = error.getStatus();
       const value = {statusCode, message};
-      response.status(statusCode).json(value);
       this.loggerService.debug(app.ResponseLoggerInterceptor.forResponse(request, response, value));
+      response.status(statusCode).json(value);
     } else {
       const message = error && (error.stack ?? error.message);
       const statusCode = 500;
       const value = {statusCode, message};
-      response.status(statusCode).json(value);
       this.loggerService.debug(app.ResponseLoggerInterceptor.forResponse(request, response, value));
       this.loggerService.error(message);
+      response.status(statusCode).json(value);
     }
   }
 }
