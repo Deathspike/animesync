@@ -8,7 +8,6 @@ export class MainControlSubtitleViewModel {
   constructor(private renderer: app.Renderer, subtitles: Array<app.ISubtitle>) {
     mobx.makeObservable(this);
     this.subtitles = subtitles.map(x => ({...x, displayNames: getSubtitleNames(x)})).sort((a, b) => a.displayNames[0].localeCompare(b.displayNames[0]));
-
     this.renderer.video.addEventListener('loadedmetadata', () => this.detectSubtitle());
   }
 

@@ -130,7 +130,7 @@ export class MainControlViewModel {
   isSeeking = false;
 
   @mobx.observable
-  readonly subtitle = new app.MainControlSubtitleViewModel(this.bridge);
+  readonly subtitle = new app.MainControlSubtitleViewModel(this.renderer, this.subtitles);
 
   @mobx.action
   private removeSchedule() {
