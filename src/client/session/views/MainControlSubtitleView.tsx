@@ -5,12 +5,12 @@ import * as React from 'react';
 import {language} from '../language';
 
 @mobxReact.observer
-class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitleViewModel}> {
+class View extends app.StyleComponent<typeof Styles, {vm: app.MainControlSubtitleViewModel}> {
   render() {
     return (
       <mui.Grid className={this.classes.container}>
-        <app.MenuComponent className={this.classes.menu} disabled={!this.props.vm.canSelectSubtitle} elevation={0} placement="bottom-end">
-          <mui.IconButton disabled={!this.props.vm.canSelectSubtitle}>
+        <app.MenuComponent className={this.classes.menu} disabled={!this.props.vm.canSelect} elevation={0} placement="bottom-end">
+          <mui.IconButton disabled={!this.props.vm.canSelect}>
             <app.icons.Subtitles />
           </mui.IconButton>
           <mui.Grid>
@@ -24,8 +24,8 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitle
   }
 
   private subtitleItem(i: number, subtitle?: app.ISubtitle) {
-    const displayNames = subtitle
-      ? subtitle.displayNames
+    const displayName = subtitle
+      ? getSubtitleNames(subtitle)
       : language.subtitle;
     const isChecked = subtitle
       ? this.props.vm.selectedSubtitle?.language === subtitle.language
@@ -36,8 +36,7 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainControlSubtitle
     return (
       <mui.MenuItem key={i} onClick={onClick}>
         <mui.FormControlLabel className={this.classes.label} control={<mui.Radio checked={isChecked} color="primary" />} label={<mui.Grid>
-          <mui.Typography>{displayNames && displayNames[0]}</mui.Typography>
-          <mui.Typography className={this.classes.regionText}>{displayNames && displayNames[1]}</mui.Typography>
+          <mui.Typography>{displayName}</mui.Typography>
         </mui.Grid>} />
       </mui.MenuItem>
     );
@@ -60,3 +59,19 @@ const Styles = mui.createStyles({
 });
 
 export const MainControlSubtitleView = mui.withStyles(Styles)(View);
+
+function getSubtitleNames(subtitle: app.ISubtitle) {
+  switch (subtitle.language) {
+    case 'ara': return language.subtitleAra;
+    case 'eng': return language.subtitleEng;
+    case 'fre': return language.subtitleFre;
+    case 'ger': return language.subtitleGer;
+    case 'ita': return language.subtitleIta;
+    case 'por': return language.subtitlePor;
+    case 'rus': return language.subtitleRus;
+    case 'spa': return language.subtitleSpa;
+    case 'spa-419': return language.subtitleSpa419;
+    case 'tur': return language.subtitleTur;
+    default: return [subtitle.language, subtitle.language];
+  }
+}

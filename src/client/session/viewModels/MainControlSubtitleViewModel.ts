@@ -1,38 +1,39 @@
 import * as app from '..';
 import * as mobx from 'mobx';
-import {language} from '../language';
 const subtitleKey = 'preferredSubtitle';
 const subtitleNone = 'none';
 
 export class MainControlSubtitleViewModel {
-  constructor(private renderer: app.Renderer, subtitles: Array<app.ISubtitle>) {
+  private readonly player: app.Renderer;
+
+  constructor(player: app.Renderer, subtitles: Array<app.ISubtitle>) {
     mobx.makeObservable(this);
-    this.subtitles = subtitles.map(x => ({...x, displayNames: getSubtitleNames(x)})).sort((a, b) => a.displayNames[0].localeCompare(b.displayNames[0]));
-    this.renderer.video.addEventListener('loadedmetadata', () => this.detectSubtitle());
+    this.player = player;
+    this.subtitles = subtitles.sort((a, b) => a.language.localeCompare(b.language));
+  }
+
+  @mobx.action
+  attach() {
+    this.detectSubtitle();
   }
 
   @mobx.action
   clear() {
-    if (!this.canSelectSubtitle || !this.selectedSubtitle) return;
+    if (!this.canSelect || !this.selectedSubtitle) return;
     app.core.store.set(subtitleKey, subtitleNone);
     this.selectedSubtitle = undefined;
-    this.renderer.clearSubtitle();
+    this.player.clearSubtitle();
   }
 
   @mobx.action
   select(subtitle: app.ISubtitle) {
-    if (!this.canSelectSubtitle || this.selectedSubtitle === subtitle) return;
+    if (!this.canSelect || this.selectedSubtitle === subtitle) return;
     app.core.store.set(subtitleKey, subtitle.language);
     this.loadSubtitle(subtitle);
   }
 
   @mobx.computed
-  get canSelectSize() {
-    return Boolean(this.selectedSubtitle);
-  }
-
-  @mobx.computed
-  get canSelectSubtitle() {
+  get canSelect() {
     return Boolean(this.subtitles.length);
   }
 
@@ -45,40 +46,13 @@ export class MainControlSubtitleViewModel {
   @mobx.action
   private detectSubtitle() {
     const preferred = app.core.store.getString(subtitleKey, 'eng');
-    if (preferred === subtitleNone || this.tryLoadSubtitle(preferred)) return;
-    this.tryLoadSubtitle('eng');
+    const subtitle = this.subtitles.find(x => x.language === preferred) ?? this.subtitles.find(x => x.language === 'eng');
+    if (subtitle) this.loadSubtitle(subtitle);
   }
 
   @mobx.action
   private loadSubtitle(subtitle: app.ISubtitle) {
     this.selectedSubtitle = subtitle;
-    this.renderer.subtitleAsync(subtitle.type, subtitle.url).catch((error) => console.error(error));
-  }
-
-  @mobx.action
-  private tryLoadSubtitle(language: string | null) {
-    const subtitle = this.subtitles.find(x => x.language === language);
-    if (subtitle) {
-      this.loadSubtitle(subtitle);
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-function getSubtitleNames(subtitle: app.ISubtitle) {
-  switch (subtitle.language) {
-    case 'ara': return language.subtitleAra;
-    case 'eng': return language.subtitleEng;
-    case 'fre': return language.subtitleFre;
-    case 'ger': return language.subtitleGer;
-    case 'ita': return language.subtitleIta;
-    case 'por': return language.subtitlePor;
-    case 'rus': return language.subtitleRus;
-    case 'spa': return language.subtitleSpa;
-    case 'spa-419': return language.subtitleSpa419;
-    case 'tur': return language.subtitleTur;
-    default: return [subtitle.language, subtitle.language];
+    this.player.subtitleAsync(subtitle.type, subtitle.url).catch((error) => console.error(error));
   }
 }

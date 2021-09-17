@@ -2,7 +2,7 @@ import * as app from '..';
 import * as mui from '@material-ui/core';
 import * as React from 'react';
 
-export class Component extends app.BaseComponent<typeof Styles, {className?: string, disabled?: boolean, elevation?: number, children: React.ReactNode | React.ReactNodeArray, placement: mui.PopperPlacementType}> {
+export class Component extends app.StyleComponent<typeof Styles, {className?: string, disabled?: boolean, elevation?: number, children: React.ReactNode | React.ReactNodeArray, placement: mui.PopperPlacementType}> {
   state = {
     anchorEl: undefined,
   };

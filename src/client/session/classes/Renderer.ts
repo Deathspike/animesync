@@ -6,9 +6,9 @@ export class Renderer {
   readonly vtt: HTMLDivElement;
 
   constructor() {
-    this.vtt = document.createElement('div');
     this.video = document.createElement('video');
     this.video.autoplay = true;
+    this.vtt = document.createElement('div');
   }
   
   clearSubtitle() {

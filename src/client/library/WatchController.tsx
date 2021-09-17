@@ -19,9 +19,13 @@ export class WatchController extends React.Component<{match: {params: {seriesId:
     this.vm.loadAsync(this.seriesId, this.episodeId);
   }
 
+  componentWillUnmount() {
+    this.vm.detach();
+  }
+
   render() {
-    if (this.vm.session) {
-      return <app.session.MainView key={location.href} vm={this.vm.session} />;
+    if (this.vm.player && this.vm.session) {
+      return <app.session.MainView key={location.href} player={this.vm.player} vm={this.vm.session} />;
     } else {
       return <app.session.LoaderView />;
     }

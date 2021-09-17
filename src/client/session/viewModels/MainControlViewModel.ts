@@ -2,40 +2,48 @@ import * as app from '..';
 import * as mobx from 'mobx';
 
 export class MainControlViewModel {
+  private readonly navigator: app.INavigator;
+  private readonly player: app.Renderer;
   private seekTimeout?: NodeJS.Timeout;
 
-  constructor(private readonly navigator: app.INavigator, private readonly renderer: app.Renderer) {
-    mobx.makeObservable(this);  
+  constructor(navigator: app.INavigator, player: app.Renderer, subtitles: Array<app.ISubtitle>) {
+    mobx.makeObservable(this);
+    this.navigator = navigator;
+    this.player = player;
+    this.subtitle = new app.MainControlSubtitleViewModel(this.player, subtitles);
   }
   
   @mobx.action
-  onViewMount() {
-    this.renderer.video.addEventListener('error'         , () => this.isSeeking = true)
-    this.renderer.video.addEventListener('load'          , () => this.isSeeking = true);
-    this.renderer.video.addEventListener('loadedmetadata', () => this.currentDuration = this.renderer.video.duration);
-    this.renderer.video.addEventListener('playing'       , () => this.isPlaying = true);
-    this.renderer.video.addEventListener('progress'      , () => this.currentDuration = fetchBuffer(this.renderer.video));
-    this.renderer.video.addEventListener('pause'         , () => this.isPlaying = false);
-    this.renderer.video.addEventListener('seeking'       , () => this.isSeeking = false);
-    this.renderer.video.addEventListener('timeupdate'    , () => this.currentTime = this.isSeeking ? this.currentTime : this.renderer.video.currentTime);
-    this.renderer.video.addEventListener('waiting'       , () => this.currentTime = this.isSeeking ? this.currentTime : this.renderer.video.currentTime);
+  attach() {
+    mediaSessionAttach(this);
+    this.subtitle.attach();
+    this.player.video.addEventListener('error'         , () => this.isSeeking = true)
+    this.player.video.addEventListener('load'          , () => this.isSeeking = true);
+    this.player.video.addEventListener('loadedmetadata', () => this.currentDuration = this.player.video.duration);
+    this.player.video.addEventListener('playing'       , () => this.isPlaying = true);
+    this.player.video.addEventListener('progress'      , () => this.currentBuffer = fetchBuffer(this.player.video));
+    this.player.video.addEventListener('pause'         , () => this.isPlaying = false);
+    this.player.video.addEventListener('seeking'       , () => this.isSeeking = false);
+    this.player.video.addEventListener('timeupdate'    , () => this.currentTime = this.isSeeking ? this.currentTime : this.player.video.currentTime);
+    this.player.video.addEventListener('waiting'       , () => this.currentTime = this.isSeeking ? this.currentTime : this.player.video.currentTime);
   }
 
   @mobx.action
-  onViewUnmount() {
+  detach() {
+    mediaSessionDetach();
     this.removeSchedule();
   }
 
   @mobx.action
   openNext() {
     if (!this.hasNext) return;
-    this.navigator.openNext(true);
+    this.navigator.openNext();
   }
   
   @mobx.action
   openPrevious() {
     if (!this.hasPrevious) return;
-    this.navigator.openPrevious(true);
+    this.navigator.openPrevious();
   }
 
   @mobx.action
@@ -75,9 +83,9 @@ export class MainControlViewModel {
     if (!this.isLoaded) {
       return;
     } else if (this.isPlaying) {
-      this.renderer.video.pause();
+      this.player.video.pause();
     } else {
-      this.renderer.video.play();
+      this.player.video.play();
     }
   }
 
@@ -130,7 +138,7 @@ export class MainControlViewModel {
   isSeeking = false;
 
   @mobx.observable
-  readonly subtitle = new app.MainControlSubtitleViewModel(this.renderer, this.subtitles);
+  subtitle: app.MainControlSubtitleViewModel;
 
   @mobx.action
   private removeSchedule() {
@@ -141,11 +149,7 @@ export class MainControlViewModel {
   @mobx.action
   private schedule() {
     this.removeSchedule();
-    this.seekTimeout = setTimeout(() => {
-      return this.currentTime < this.currentDuration
-        ? this.bridge.dispatchRequest({type: 'seek', time: this.currentTime})
-        : this.bridge.dispatchEvent({type: 'ended'});
-    }, app.settings.seekTimeout);
+    this.seekTimeout = setTimeout(() => this.player.video.currentTime = this.currentTime, app.settings.seekTimeout);
   }
 }
 
@@ -156,4 +160,20 @@ function fetchBuffer(player: HTMLVideoElement) {
     return Math.floor(player.buffered.end(i));
   }
   return 0;
+}
+
+function mediaSessionAttach(control: app.MainControlViewModel) {
+  navigator.mediaSession.metadata = new MediaMetadata({title: control.titlePrimary, artist: control.titleSecondary});
+  navigator.mediaSession.setActionHandler('previoustrack', control.hasPrevious ? () => control.openPrevious() : null);
+  navigator.mediaSession.setActionHandler('nexttrack', control.hasNext ? () => control.openNext() : null);
+  navigator.mediaSession.setActionHandler('seekbackward', () => control.seekBackward());
+  navigator.mediaSession.setActionHandler('seekforward', () => control.seekForward());
+}
+
+function mediaSessionDetach() {
+  navigator.mediaSession.metadata = null;
+  navigator.mediaSession.setActionHandler('previoustrack', null);
+  navigator.mediaSession.setActionHandler('nexttrack', null);
+  navigator.mediaSession.setActionHandler('seekbackward', null);
+  navigator.mediaSession.setActionHandler('seekforward', null);
 }

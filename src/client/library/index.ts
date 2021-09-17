@@ -1,4 +1,6 @@
 export * from '..';
+export * from './classes/Navigator';
+export * from './classes/NavigatorEpisode';
 export * from './viewModels/MainSeriesViewModel';
 export * from './viewModels/MainViewModel';
 export * from './viewModels/SeriesSeasonEpisodeViewModel';

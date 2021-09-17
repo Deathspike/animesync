@@ -4,19 +4,15 @@ import * as mui from '@material-ui/core';
 import * as React from 'react';
 
 @mobxReact.observer
-class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> implements app.IVideoHandler {
-  private readonly renderer = new app.Renderer();
-
+class View extends app.StyleComponent<typeof Styles, {player: app.Renderer, vm: app.MainViewModel}> {
   componentDidMount() {
-    this.props.vm.bridge.subscribe(this);
-    app.Dispatcher.attach(this.props.vm.bridge, this.renderer.video);
+    app.core.input.subscribe(this);
     document.body.style.overflow = 'hidden';
   }
   
   componentWillUnmount() {
-    super.componentWillUnmount();
     document.body.style.removeProperty('overflow');
-    this.props.vm.bridge.unsubscribe(this);
+    app.core.input.unsubscribe(this);
   }
 
   onInputKey(event: app.InputKeyEvent) {
@@ -40,29 +36,6 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
     }
   }
 
-  onVideoRequest(request: app.VideoRequest) {
-    switch (request.type) {
-      case 'clearSubtitle':
-        this.renderer.clearSubtitle();
-        break;
-      case 'loadSource':
-        this.renderer.video.src = request.source.url;
-        break;
-      case 'loadSubtitle':
-        this.renderer.subtitleAsync(request.subtitle.type, request.subtitle.url);
-        break;
-      case 'pause':
-        this.renderer.video.pause();
-        break;
-      case 'play':
-        this.renderer.video.play();
-        break;
-      case 'seek':
-        this.renderer.video.currentTime = request.time;
-        break;
-    }
-  }
-
   render() {
     return (
       <mui.Grid className={this.props.vm.isHidden ? this.classes.containerHidden : this.classes.container}>
@@ -75,15 +48,15 @@ class View extends app.ViewComponent<typeof Styles, {vm: app.MainViewModel}> imp
   }
 
   private onVideoRef(el: HTMLElement | null) {
-    if (!el || el.firstElementChild === this.renderer.video) return;
+    if (!el || el.firstElementChild === this.props.player.video) return;
     while (el.firstElementChild) el.removeChild(el.firstElementChild);
-    el.appendChild(this.renderer.video);
+    el.appendChild(this.props.player.video);
   }
 
   private onVttRef(el: HTMLElement | null) {
-    if (!el || el.firstElementChild === this.renderer.vtt) return;
+    if (!el || el.firstElementChild === this.props.player.vtt) return;
     while (el.firstElementChild) el.removeChild(el.firstElementChild);
-    el.appendChild(this.renderer.vtt);
+    el.appendChild(this.props.player.vtt);
   }
 }
 

@@ -4,7 +4,7 @@ import * as mobxReact from 'mobx-react';
 import * as React from 'react';
 
 @mobxReact.observer
-class View extends app.ViewComponent<typeof Styles, {open?: boolean, quiet?: boolean, vm?: app.LoaderViewModel}> { 
+class View extends app.StyleComponent<typeof Styles, {open?: boolean, quiet?: boolean, vm?: app.LoaderViewModel}> { 
   render() {
     if (!this.props.open && !this.props.vm?.isLoading) {
       return false;

@@ -2,7 +2,7 @@ import * as app from '..';
 import * as mui from '@material-ui/core';
 import * as React from 'react';
 
-class Component extends app.BaseComponent<typeof Styles, {className?: string, primary?: string, secondary?: string}> {
+class Component extends app.StyleComponent<typeof Styles, {className?: string, primary?: string, secondary?: string}> {
   render() {
     return (
       <mui.Grid>

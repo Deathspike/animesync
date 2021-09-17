@@ -1,14 +1,40 @@
 import * as app from '..';
 import * as mobx from 'mobx';
 
-export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.IViewHandler {
+export class MainViewModel {
+  private readonly navigator: app.INavigator;
+  private readonly player: app.Renderer;
   private clickTimeout?: number;
   private hideTimeout?: NodeJS.Timeout;
 
-  constructor(private readonly navigator: app.INavigator) {
+  constructor(navigator: app.INavigator, player: app.Renderer, subtitles: Array<app.ISubtitle>) {
     mobx.makeObservable(this);
+    this.control = new app.MainControlViewModel(navigator, player, subtitles);
+    this.navigator = navigator;
+    this.player = player;
   }
 
+  @mobx.action
+  attach() {
+    app.core.input.subscribe(this);
+    this.control.attach();
+    this.player.video.addEventListener('ended', () => this.navigator.openNext());
+    this.player.video.addEventListener('loadedmetadata', () => this.isWaiting = false);
+    this.player.video.addEventListener('play', () => this.isWaiting = false);
+    this.player.video.addEventListener('playing', () => this.schedule());
+    this.player.video.addEventListener('pause', () => this.schedule());
+    this.player.video.addEventListener('seeked', () => this.isWaiting = false);
+    this.player.video.addEventListener('seeking', () => this.isWaiting = true);
+    this.player.video.addEventListener('waiting', () => this.isWaiting = true);
+  }
+
+  @mobx.action
+  detach() {
+    this.control.detach();
+    this.removeSchedule();
+    app.core.input.unsubscribe(this);
+  }
+  
   @mobx.action
   onInputKey(event: app.InputKeyEvent) {
     if (event.type !== 'backspace') {
@@ -46,72 +72,15 @@ export class MainViewModel implements app.IInputHandler, app.IVideoHandler, app.
     }
   }
 
-  @mobx.action
-  onVideoEvent(event: app.VideoEvent) {
-    switch (event.type) {
-      case 'ended':
-        if (this.navigator.hasNext) this.navigator.openNext(false);
-        else app.core.browser.goBack();
-        break;
-      case 'loadedmetadata':
-        this.isWaiting = false;
-        break;
-      case 'playing':
-        this.isWaiting = false;
-        this.schedule();
-        break;
-      case 'pause':
-        this.schedule();
-        break;
-      case 'seeked':
-        this.isWaiting = false;
-        break;
-      case 'seeking':
-        this.isWaiting = true;
-        break;
-      case 'timeupdate':
-        if (!event.duration || event.duration - event.time > app.settings.preloadTreshold) break;
-        this.navigator.preloadNext();
-        break;
-      case 'waiting':
-        this.isWaiting = true;
-        break;
-    }
-  }
-
-  @mobx.action
-  onVideoRequest(request: app.VideoRequest) {
-    switch (request.type) {
-      case 'loadSource':
-        this.isWaiting = true;
-        this.schedule();
-        break;
-    }
-  }
-
-  @mobx.action
-  onViewMount() {
-    this.bridge.subscribe(this);
-  }
-
-  @mobx.action
-  onViewUnmount() {
-    this.bridge.unsubscribe(this);
-    this.removeSchedule();
-  }
-
+  @mobx.observable
+  control: app.MainControlViewModel;
+  
   @mobx.observable
   isHidden = false;
 
   @mobx.observable
   isWaiting = true;
 
-  @mobx.observable
-  readonly bridge = new app.Bridge();
-  
-  @mobx.observable
-  readonly control = new app.MainControlViewModel(this.bridge, this.navigator);
-  
   @mobx.action
   private removeHide() {
     this.isHidden = false;

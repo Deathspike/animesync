@@ -3,9 +3,8 @@ export interface INavigator {
   readonly episodes: Array<INavigatorEpisode>;
   readonly hasNext: boolean;
   readonly hasPrevious: boolean;
-  openNext: (manualRequest: boolean) => void;
-  openPrevious: (manualRequest: boolean) => void;
-  preloadNext: () => void;
+  openNext: () => void;
+  openPrevious: () => void;
 }
 
 export interface INavigatorEpisode {
@@ -16,7 +15,6 @@ export interface INavigatorEpisode {
 }
 
 export interface ISubtitle {
-  readonly displayNames?: Array<string>,
   readonly language: string;
   readonly type: 'ass' | 'vtt';
   readonly url: string;
