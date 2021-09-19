@@ -42,8 +42,8 @@ export class LoggerService implements ncm.LoggerService {
     this.enqueue('WARN', fetchMessage(value), zoneId);
   }
 
-  private enqueue(level: string, line: string, zoneId?: string) {
-    const value = `[${new Date().toISOString()}] ${level.padEnd(5)} ${line.trim()}`;
+  private enqueue(level: string, line?: string, zoneId?: string) {
+    const value = `[${new Date().toISOString()}] ${level.padEnd(5)} ${line?.trim()}`;
     this.queue.push({value, zoneId});
     this.tryRun();
   }
