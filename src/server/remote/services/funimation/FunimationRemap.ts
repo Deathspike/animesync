@@ -50,9 +50,9 @@ function checkOrThrowError(stream: fun.Stream) {
 }
 
 function hasJapaneseAudio(episode: fun.Episode) {
-  return episode.videoOptions
-    .audioLanguages
-    .some(x => x && x.languageCode === 'ja');
+  return Object.values(episode.videoOptions.audioLanguages)
+    .flatMap(x => x.all)
+    .some(x => x.languageCode === 'ja');
 }
 
 const languages = app.api.unsafe({

@@ -4,7 +4,7 @@ export type Episode = {
   name: Localized;
   slug: string;
   synopsis: Localized;
-  videoOptions: {audioLanguages: Array<{languageCode: string}>};
+  videoOptions: {audioLanguages: Record<string, {all: Array<{languageCode: string}>}>};
 };
 
 export type Localized = {
