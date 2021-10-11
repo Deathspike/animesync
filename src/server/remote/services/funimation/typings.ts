@@ -11,28 +11,6 @@ export type Localized = {
   en: string;
 }
 
-export type Player = {
-  seasons: Array<{
-    episodes: Array<{
-      languages: Record<string, {
-        alpha: Record<string, PlayerAlpha>
-      }>
-    }>;
-  }>;
-};
-
-export type PlayerAlpha = {
-  experienceId: number;
-  sources: Array<{
-    type: string;
-    textTracks: Array<{
-      language: 'es' | 'en' | 'pt';
-      src: string;
-      type: string;
-    }>;
-  }>;
-};
-
 export type Season = {
   episodes: Array<Episode>;
   name: Localized;
@@ -48,5 +26,8 @@ export type Series = {
 
 export type Stream = {
   errors?: Array<{detail: string}>;
-  items: Array<{src: string, videoType: string}>;
+  videoList: Array<{
+    spokenLanguages: Array<{languageCode: 'en' | 'ja'}>,
+    videoInstances: Array<{ext: string, filePath: string, language: {languageCode: 'es' | 'en' | 'pt'}}>
+  }>;
 };

@@ -29,16 +29,16 @@ export class FunimationRemap {
     });
   }
 
-  static stream(player: fun.PlayerAlpha, stream: fun.Stream) {
+  static stream(m3u8: string, stream: fun.Stream) {
     checkOrThrowError(stream);
-    const sources = stream.items
-      .filter(x => x.videoType === 'm3u8')
-      .map(x => new app.api.RemoteStreamSource({type: 'hls', url: x.src}));
-    const subtitles = player.sources
-      .filter(x => x.type === 'application/x-mpegURL')
-      .flatMap(x => x.textTracks)
-      .filter(x => x.src.endsWith('.srt') && x.type.toLowerCase() === 'full')
-      .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.language], type: 'srt', url: x.src}));
+    const languageCode = m3u8.includes('Japanese') ? 'ja' : 'en';
+    const sources = new Array(
+      new app.api.RemoteStreamSource({type: 'hls', url: m3u8}));
+    const subtitles = stream.videoList
+      .filter(x => x.spokenLanguages.some(y => y.languageCode === languageCode))
+      .flatMap(x => x.videoInstances)
+      .filter(x => x.ext === 'srt')
+      .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.language.languageCode], type: 'srt', url: x.filePath}));
     return new app.api.RemoteStream({sources, subtitles});
   }
 }

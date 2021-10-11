@@ -1,7 +1,6 @@
 import * as app from '../..';
 import * as fun from './typings';
 import * as ncm from '@nestjs/common';
-import {FunimationIntercept} from './FunimationIntercept';
 import {FunimationRemap} from './FunimationRemap';
 import playwright from 'playwright-core';
 
@@ -9,12 +8,10 @@ import playwright from 'playwright-core';
 export class Funimation implements app.IProvider {
   private readonly agentService: app.AgentService;
   private readonly browserService: app.BrowserService;
-  private readonly loggerService: app.LoggerService;
 
-  constructor(agentService: app.AgentService, browserService: app.BrowserService, loggerService: app.LoggerService) {
+  constructor(agentService: app.AgentService, browserService: app.BrowserService) {
     this.agentService = agentService;
     this.browserService = browserService;
-    this.loggerService = loggerService;
   }
 
   isSeriesAsync(seriesUrl: string) {
@@ -29,7 +26,7 @@ export class Funimation implements app.IProvider {
 
   async seriesAsync(seriesUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const observer = new app.Observer(page);
+      const observer = new app.Observer(page);     
       await page.goto(seriesUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page, seriesUrl);
       const [seriesPromise, episodesPromise] = observer.getAsync(/\/shows\/[^\/]+$/, /\/seasons\/[^\/]+$/);
@@ -44,15 +41,16 @@ export class Funimation implements app.IProvider {
 
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
+      const context = page.context();
       const observer = new app.Observer(page);
-      const playerIntercept = new FunimationIntercept(this.agentService, this.loggerService, page);
+      await context.addCookies([{name: 'videoPlayer/selectedSpokenLanguage', value: 'ja', domain: defaultHeaders.referer, path: '/'}]);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page, streamUrl);
-      const [streamPromise] = observer.getAsync(/\/showexperience\/[^\/]+\/$/);
-      const player = await playerIntercept.getAsync();
+      const [m3u8Promise, streamPromise] = observer.getAsync(/\.m3u8$/, /\/shows\/[^\/]+\/episodes\/[^\/]+\/$/);
+      const m3u8 = await m3u8Promise.then(x => x.url());
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const value = FunimationRemap.stream(player, stream);
+      const value = FunimationRemap.stream(m3u8, stream);
       return new app.Composable(streamUrl, value, headers);
     });
   }
