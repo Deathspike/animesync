@@ -2,6 +2,7 @@ import * as app from '..';
 import commander from 'commander';
 import fs from 'fs';
 import path from 'path';
+const packageData = require('../../../package');
 
 export function createDownload() {
   return commander.createCommand('download')
@@ -15,7 +16,7 @@ export function createDownload() {
 
 async function checkAsync(this: app.Options, urls: Array<string>) {
   await app.Server.usingAsync(async (api) => {
-    api.logger.info(`Listening at ${app.settings.server.url}`);
+    api.logger.info(`Listening at ${app.settings.server.url} (${packageData.version})`);
     await app.checkAsync(api, urls, downloadAsync.bind(this, api), this);
   });
 }

@@ -1,5 +1,6 @@
 import * as app from '..';
 import commander from 'commander';
+const packageData = require('../../../package');
 
 export function createUpdate() {
   return commander.createCommand('update').alias('add')
@@ -11,7 +12,7 @@ export function createUpdate() {
 
 async function checkAsync(this: app.Options, urls: Array<string>) {
   await app.Server.usingAsync(async (api) => {
-    api.logger.info(`Listening at ${app.settings.server.url}`);
+    api.logger.info(`Listening at ${app.settings.server.url} (${packageData.version})`);
     await app.checkAsync(api, urls, updateAsync.bind(app, api), this);
   });
 }

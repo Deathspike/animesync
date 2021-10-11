@@ -1,5 +1,6 @@
 import * as app from '..';
 import commander from 'commander';
+const packageData = require('../../../package');
 
 export function createBrowser() {
   return commander.createCommand('browser')
@@ -9,7 +10,7 @@ export function createBrowser() {
 
 async function browserAsync() {
   await app.Server.usingAsync(async (api) => {
-    api.logger.info(`Listening at ${app.settings.server.url}`);
+    api.logger.info(`Listening at ${app.settings.server.url} (${packageData.version})`);
     app.settings.core = new app.api.SettingCore(app.settings.core, {chromeHeadless: false});
     await api.browser.pageAsync(async (page) => {
       const context = page.context();
@@ -21,3 +22,4 @@ async function browserAsync() {
     });
   });
 }
+
