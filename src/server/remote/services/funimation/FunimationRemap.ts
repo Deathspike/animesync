@@ -31,14 +31,11 @@ export class FunimationRemap {
 
   static stream(m3u8: string, stream: fun.Stream) {
     checkOrThrowError(stream);
-    const languageCode = m3u8.includes('Japanese') ? 'ja' : 'en';
     const sources = new Array(
       new app.api.RemoteStreamSource({type: 'hls', url: m3u8}));
-    const subtitles = stream.videoList
-      .filter(x => x.spokenLanguages.some(y => y.languageCode === languageCode))
-      .flatMap(x => x.videoInstances)
-      .filter(x => x.ext === 'srt')
-      .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.language.languageCode], type: 'srt', url: x.filePath}));
+    const subtitles = stream.primary.subtitles
+      .filter(x => x.fileExt === 'srt')
+      .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.languageCode], type: 'srt', url: x.filePath}));
     return new app.api.RemoteStream({sources, subtitles});
   }
 }

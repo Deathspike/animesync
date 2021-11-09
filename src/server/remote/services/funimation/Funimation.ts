@@ -46,7 +46,7 @@ export class Funimation implements app.IProvider {
       await context.addCookies([{name: 'videoPlayer/selectedSpokenLanguage', value: 'ja', domain: defaultHeaders.referer, path: '/'}]);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page, streamUrl);
-      const [m3u8Promise, streamPromise] = observer.getAsync(/\.m3u8$/, /\/shows\/[^\/]+\/episodes\/[^\/]+\/$/);
+      const [m3u8Promise, streamPromise] = observer.getAsync(/\.m3u8$/, /\/v1\/play\/[^\/]+$/);
       const m3u8 = await m3u8Promise.then(x => x.url());
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);

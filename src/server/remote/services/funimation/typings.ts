@@ -26,8 +26,5 @@ export type Series = {
 
 export type Stream = {
   errors?: Array<{detail: string}>;
-  videoList: Array<{
-    spokenLanguages: Array<{languageCode: 'en' | 'ja'}>,
-    videoInstances: Array<{ext: string, filePath: string, language: {languageCode: 'es' | 'en' | 'pt'}}>
-  }>;
+  primary: {subtitles: Array<{fileExt: string, filePath: string, languageCode: 'es' | 'en' | 'pt'}>};
 };
