@@ -27,7 +27,7 @@ export class Vrv implements app.IProvider {
   async seriesAsync(seriesUrl: string) {
     const baseUrl = new URL(seriesUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(baseUrl, {waitUntil: 'networkidle'});
       await tryLoginAsync(page);
       await page.waitForLoadState('networkidle');
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
@@ -44,7 +44,7 @@ export class Vrv implements app.IProvider {
   async streamAsync(streamUrl: string) {
     const baseUrl = new URL(streamUrl).origin;
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
+      await page.goto(baseUrl, {waitUntil: 'networkidle'});
       await tryLoginAsync(page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(tryNavigateEvaluator, streamUrl);
