@@ -6,10 +6,12 @@ import playwright from 'playwright-core';
 @ncm.Injectable()
 export class BrowserService implements ncm.OnModuleDestroy {
   private browser?: Promise<playwright.ChromiumBrowserContext>;
+  private loggerService: app.LoggerService;
   private numberOfPages: number;
   private timeoutHandle: NodeJS.Timeout;
   
-  constructor() {
+  constructor(loggerService: app.LoggerService) {
+    this.loggerService = loggerService;
     this.numberOfPages = 0;
     this.timeoutHandle = setTimeout(() => {}, 0);
   }
@@ -47,6 +49,7 @@ export class BrowserService implements ncm.OnModuleDestroy {
       const headless = app.settings.core.chromeHeadless;
       const proxy = {server: app.settings.server.url};
       const viewport = app.settings.core.chromeHeadless ? parseResolution(app.settings.core.chromeViewport) : undefined;
+      this.loggerService.debug(`Launching browser ${executablePath}`);
       this.browser = playwright.chromium.launchPersistentContext(app.settings.path.chrome, {args, executablePath, headless, proxy, viewport}) as Promise<playwright.ChromiumBrowserContext>;
       return await this.browser;
     } catch (error) {
