@@ -76,6 +76,10 @@
     "webpack-dev-server": "4.0.0"
   },
   "scripts": {
+    "ci:crunchyroll": "jest crunchyroll.test.js",
+    "ci:crunchyrollBeta": "jest crunchyrollBeta.test.js",
+    "ci:funimation": "jest funimation.test.js",
+    "ci:vrv": "jest vrv.test.js",
     "prepare": "npm run repository:prune && npm run repository:build && npm run webpack:build",
     "postinstall": "node postinstall",
     "repository:build": "tsc",

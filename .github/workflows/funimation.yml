@@ -1,0 +1,23 @@
+name: funimation
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '30 17 * * *'
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm ci
+      - run: npm run ci:funimation
+        env:
+          AST_CI: true
+          AST_FUNIMATION_PROXYSERVER: ${{secrets.AST_FUNIMATION_PROXYSERVER}}
+          AST_FUNIMATION_USERNAME: ${{secrets.AST_FUNIMATION_USERNAME}}
+          AST_FUNIMATION_PASSWORD: ${{secrets.AST_FUNIMATION_PASSWORD}}

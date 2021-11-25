@@ -1,0 +1,23 @@
+name: crunchyrollBeta
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '15 17 * * *'
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm ci
+      - run: npm run ci:crunchyrollBeta
+        env:
+          AST_CI: true
+          AST_CRUNCHYROLLBETA_PROXYSERVER: ${{secrets.AST_CRUNCHYROLLBETA_PROXYSERVER}}
+          AST_CRUNCHYROLLBETA_USERNAME: ${{secrets.AST_CRUNCHYROLLBETA_USERNAME}}
+          AST_CRUNCHYROLLBETA_PASSWORD: ${{secrets.AST_CRUNCHYROLLBETA_PASSWORD}}
