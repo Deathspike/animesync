@@ -26,5 +26,18 @@ export type Series = {
 
 export type Stream = {
   errors?: Array<{detail: string}>;
-  primary: {subtitles: Array<{fileExt: string, filePath: string, languageCode: 'es' | 'en' | 'pt'}>};
+  primary: StreamEntry;
+  fallback: Array<StreamEntry>;
+};
+
+export type StreamEntry = {
+  audioLanguage: string;
+  fileExt: string;
+  manifestPath: string;
+  subtitles: Array<{
+    contentType: string;
+    fileExt: string;
+    filePath: string;
+    languageCode: 'es' | 'en' | 'pt'
+  }>
 };

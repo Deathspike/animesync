@@ -39,18 +39,16 @@ export class Funimation implements app.IProvider {
     });
   }
 
+  // TODO: If login is ever fixed, check logged-in expression.
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
-      const context = page.context();
       const observer = new app.Observer(page);
-      await context.addCookies([{name: 'videoPlayer/selectedSpokenLanguage', value: 'ja', domain: defaultHeaders.referer, path: '/'}]);
       await page.goto(streamUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page, streamUrl);
-      const [m3u8Promise, streamPromise] = observer.getAsync(/\.m3u8$/, /\/v1\/play\/[^\/]+$/);
-      const m3u8 = await m3u8Promise.then(x => x.url());
+      const [streamPromise] = observer.getAsync(/\/v1\/play(\/[^\/]+)?\/[^\/]+$/);
       const stream = await streamPromise.then(x => x.json() as Promise<fun.Stream>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const value = FunimationRemap.stream(m3u8, stream);
+      const value = FunimationRemap.stream(stream);
       return new app.Composable(streamUrl, value, headers);
     });
   }

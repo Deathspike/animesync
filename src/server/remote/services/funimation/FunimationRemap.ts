@@ -29,14 +29,23 @@ export class FunimationRemap {
     });
   }
 
-  static stream(m3u8: string, stream: fun.Stream) {
+  static stream(stream: fun.Stream) {
     checkOrThrowError(stream);
-    const sources = new Array(
-      new app.api.RemoteStreamSource({type: 'hls', url: m3u8}));
-    const subtitles = stream.primary.subtitles
-      .filter(x => x.fileExt === 'srt')
-      .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.languageCode], type: 'srt', url: x.filePath}));
-    return new app.api.RemoteStream({sources, subtitles});
+    const match = [stream.primary].concat(stream.fallback)
+      .filter(x => x.audioLanguage === 'ja')
+      .filter(x => x.fileExt === 'm3u8')
+      .shift();
+    if (match) {
+      const sources = new Array(
+        new app.api.RemoteStreamSource({type: 'hls', url: match.manifestPath}));
+      const subtitles = match.subtitles
+        .filter(x => x.contentType === 'full')
+        .filter(x => x.fileExt === 'srt')
+        .map(x => new app.api.RemoteStreamSubtitle({language: languages[x.languageCode], type: 'srt', url: x.filePath}));
+      return new app.api.RemoteStream({sources, subtitles});
+    } else {
+      throw new Error('Invalid video match.');
+    }
   }
 }
 
