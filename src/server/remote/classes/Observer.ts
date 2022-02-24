@@ -3,33 +3,24 @@ import playwright from 'playwright-core';
 
 export class Observer {
   private readonly observers: Array<{expression: RegExp, future: app.Future<playwright.Response>}>;
-  private readonly responses: Array<playwright.Response>;
 
   constructor(page: playwright.Page) {
     this.observers = [];
-    this.responses = [];
-    page.on('response', this.onResponse.bind(this));
+    page.on('request', this.onRequestAsync.bind(this));
   }
 
   getAsync(...expression: Array<RegExp>) {
     return expression.map(async (expression) => {
       const future = new app.Future<playwright.Response>();
       this.observers.push({expression, future});
-      this.responses.forEach(x => this.resolveResponse(x));
       return await future.getAsync(app.settings.core.chromeTimeoutNavigation);
     });
   }
 
-  private onResponse(response: playwright.Response) {
-    this.responses.push(response);
-    this.resolveResponse(response);
-  }
-
-  private resolveResponse(response: playwright.Response) {
-    const pathname = new URL(response.url()).pathname;
-    for (const {expression, future} of this.observers) {
-      if (!expression.test(pathname)) continue;
-      future.resolve(response);
-    }
+  private async onRequestAsync(request: playwright.Request) {
+    const pathname = new URL(request.url()).pathname;
+    const responseObservers = this.observers.filter(x => x.expression.test(pathname));
+    const response = await request.response();
+    if (response) responseObservers.forEach(x => x.future.resolve(response));
   }
 }
