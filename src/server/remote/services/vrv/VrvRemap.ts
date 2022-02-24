@@ -32,7 +32,9 @@ export class VrvRemap {
   static stream(streams: vrv.Streams) {
     return new app.api.RemoteStream({
       sources: [{type: 'hls', url: streams.streams['adaptive_hls'][''].url}],
-      subtitles: Object.values(streams.subtitles).map(x => new app.api.RemoteStreamSubtitle({language: languages[x.locale], type: x.format, url: x.url}))
+      subtitles: Object.entries(streams.subtitles)
+        .filter(([k]) => Boolean(k))
+        .map(([_, v]) => new app.api.RemoteStreamSubtitle({language: languages[v.locale], type: v.format, url: v.url}))
     });
   }
 }
@@ -57,14 +59,14 @@ function hasJapaneseAudio(season: app.api.RemoteSeriesSeason) {
 }
 
 const languages = app.api.unsafe({
-  'ar-ME': 'ara',
-  'fr-FR': 'fre',
-  'de-DE': 'ger',
-  'en-US': 'eng',
-  'es-LA': 'spa-419',
-  'es-ES': 'spa',
-  'it-IT': 'ita',
-  'pt-BR': 'por',
-  'ru-RU': 'rus',
-  'tr-TR': 'tur'
+  'ar-SA' : 'ara',
+  'fr-FR' : 'fre',
+  'de-DE' : 'ger',
+  'en-US' : 'eng',
+  'es-419': 'spa-419',
+  'es-ES' : 'spa',
+  'it-IT' : 'ita',
+  'pt-BR' : 'por',
+  'ru-RU' : 'rus',
+  'tr-TR' : 'tur'
 });
