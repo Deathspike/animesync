@@ -38,12 +38,12 @@ describe('Vrv', () => {
 });
 
 function fetchCore(): Partial<app.api.SettingCore> {
-  const proxyServer = process.env.AST_VRV_PROXYSERVER;
+  const proxyServer = process.env.AST_VRV_PROXYSERVER || undefined;
   return {proxyServer};
 }
 
 function fetchCredential(): Partial<app.api.SettingCredential> {
-  const vrvPassword = process.env.AST_VRV_PASSWORD;
-  const vrvUsername = process.env.AST_VRV_USERNAME;
+  const vrvPassword = process.env.AST_VRV_PASSWORD || undefined;
+  const vrvUsername = process.env.AST_VRV_USERNAME || undefined;
   return {vrvPassword, vrvUsername};
 }

@@ -39,7 +39,6 @@ export class Funimation implements app.IProvider {
     });
   }
 
-  // TODO: If login is ever fixed, check logged-in expression.
   async streamAsync(streamUrl: string) {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       const observer = new app.Observer(page);

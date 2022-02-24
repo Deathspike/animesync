@@ -38,12 +38,12 @@ describe('CrunchyrollBeta', () => {
 });
 
 function fetchCore(): Partial<app.api.SettingCore> {
-  const proxyServer = process.env.AST_CRUNCHYROLLBETA_PROXYSERVER;
+  const proxyServer = process.env.AST_CRUNCHYROLLBETA_PROXYSERVER || undefined;
   return {proxyServer};
 }
 
 function fetchCredential(): Partial<app.api.SettingCredential> {
-  const crunchyrollPassword = process.env.AST_CRUNCHYROLLBETA_PASSWORD;
-  const crunchyrollUsername = process.env.AST_CRUNCHYROLLBETA_USERNAME;
+  const crunchyrollPassword = process.env.AST_CRUNCHYROLLBETA_PASSWORD || undefined;
+  const crunchyrollUsername = process.env.AST_CRUNCHYROLLBETA_USERNAME || undefined;
   return {crunchyrollPassword, crunchyrollUsername};
 }

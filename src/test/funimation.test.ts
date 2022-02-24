@@ -38,12 +38,12 @@ describe('Funimation', () => {
 });
 
 function fetchCore(): Partial<app.api.SettingCore> {
-  const proxyServer = process.env.AST_FUNIMATION_PROXYSERVER;
+  const proxyServer = process.env.AST_FUNIMATION_PROXYSERVER || undefined;
   return {proxyServer};
 }
 
 function fetchCredential(): Partial<app.api.SettingCredential> {
-  const funimationPassword = process.env.AST_FUNIMATION_PASSWORD;
-  const funimationUsername = process.env.AST_FUNIMATION_USERNAME;
+  const funimationPassword = process.env.AST_FUNIMATION_PASSWORD || undefined;
+  const funimationUsername = process.env.AST_FUNIMATION_USERNAME || undefined;
   return {funimationPassword, funimationUsername};
 }
