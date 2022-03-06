@@ -16,9 +16,7 @@ const defaultCore = new app.api.SettingCore({
 
 const defaultCredential = new app.api.SettingCredential({
   crunchyrollUsername: undefined,
-  crunchyrollPassword: undefined,
-  funimationUsername: undefined,
-  funimationPassword: undefined
+  crunchyrollPassword: undefined
 });
 
 const defaultPath = new app.api.SettingPath({

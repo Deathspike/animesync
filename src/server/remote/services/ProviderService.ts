@@ -3,8 +3,6 @@ import * as ncm from '@nestjs/common';
 import * as ncr from '@nestjs/core';
 import {Crunchyroll} from './crunchyroll/Crunchyroll';
 import {CrunchyrollBeta} from './crunchyrollBeta/CrunchyrollBeta';
-import {Funimation} from './funimation/Funimation';
-import {Vrv} from './vrv/Vrv';
 
 @ncm.Injectable()
 export class ProviderService {
@@ -12,7 +10,7 @@ export class ProviderService {
   private readonly supervisor: app.Supervisor;
 
   constructor(moduleRef: ncr.ModuleRef) {
-    this.providers = [moduleRef.create(Crunchyroll), moduleRef.create(CrunchyrollBeta), moduleRef.create(Funimation), moduleRef.create(Vrv)];
+    this.providers = [moduleRef.create(Crunchyroll), moduleRef.create(CrunchyrollBeta)];
     this.supervisor = new app.Supervisor();
   }
 

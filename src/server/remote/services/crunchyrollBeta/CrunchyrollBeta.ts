@@ -1,7 +1,7 @@
+import * as api from './typings';
 import * as app from '../..';
 import * as ncm from '@nestjs/common';
-import * as vrv from '../vrv/typings';
-import {VrvRemap} from '../vrv/VrvRemap';
+import {CrunchyrollBetaRemap} from './CrunchyrollBetaRemap';
 import playwright from 'playwright-core';
 
 @ncm.Injectable()
@@ -31,11 +31,11 @@ export class CrunchyrollBeta implements app.IProvider {
       await tryLoginAsync(page);
       const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
       await page.evaluate(tryNavigateEvaluator, seriesUrl);
-      const seasons = await seasonsPromise.then(x => x.json() as Promise<vrv.Collection<vrv.Season>>);
-      const series = await seriesPromise.then(x => x.json() as Promise<vrv.Series>);
+      const seasons = await seasonsPromise.then(x => x.json() as Promise<api.Collection<api.Season>>);
+      const series = await seriesPromise.then(x => x.json() as Promise<api.Series>);
       const seasonEpisodes = await this.fetchEpisodesAsync(episodesPromise, seasons);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const value = VrvRemap.series(seriesUrl, series, seasons, seasonEpisodes);
+      const value = CrunchyrollBetaRemap.series(seriesUrl, series, seasons, seasonEpisodes);
       return new app.Composable(seriesUrl, value, headers);
     });
   }
@@ -47,14 +47,14 @@ export class CrunchyrollBeta implements app.IProvider {
       await tryLoginAsync(page);
       const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
       await page.evaluate(tryNavigateEvaluator, streamUrl);
-      const streams = await streamsPromise.then(x => x.json() as Promise<vrv.Streams>);
+      const streams = await streamsPromise.then(x => x.json() as Promise<api.Streams>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);
-      const value = VrvRemap.stream(streams);
+      const value = CrunchyrollBetaRemap.stream(streams);
       return new app.Composable(streamUrl, value, headers);
     });
   }
 
-  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, seasons: vrv.Collection<vrv.Season>) {
+  private async fetchEpisodesAsync(episodesPromise: Promise<playwright.Response>, seasons: api.Collection<api.Season>) {
     const episodesResponse = await episodesPromise;
     const episodesRequest = episodesResponse.request();
     const episodesUrl = episodesRequest.url();
@@ -63,10 +63,10 @@ export class CrunchyrollBeta implements app.IProvider {
       if (episodesUrl !== seasonUrl) {
         const headers = Object.entries(episodesRequest.headers()).filter(x => !x[0].startsWith(':'));
         const buffer = await this.agentService.fetchAsync(seasonUrl, {headers});
-        return JSON.parse(buffer.toString()) as vrv.Collection<vrv.Episode>;
+        return JSON.parse(buffer.toString()) as api.Collection<api.Episode>;
       } else {
         const episodes = await episodesResponse.json();
-        return episodes as vrv.Collection<vrv.Episode>;
+        return episodes as api.Collection<api.Episode>;
       }
     }));   
   }

@@ -1,8 +1,8 @@
+import * as api from './typings';
 import * as app from '../..';
-import * as vrv from './typings';
 
-export class VrvRemap {
-  static series(seriesUrl: string, series: vrv.Series, seasons: vrv.Collection<vrv.Season>, seasonEpisodes: Array<vrv.Collection<vrv.Episode>>) {
+export class CrunchyrollBetaRemap {
+  static series(seriesUrl: string, series: api.Series, seasons: api.Collection<api.Season>, seasonEpisodes: Array<api.Collection<api.Episode>>) {
     return new app.api.RemoteSeries({
       imageUrl: fetchImage(series.images, 'poster_tall'),
       seasons: seasons.items.map((x, i) => this.seriesSeason(seriesUrl, series, x, seasonEpisodes[i])).filter(hasJapaneseAudio),
@@ -12,14 +12,14 @@ export class VrvRemap {
     });
   }
 
-  static seriesSeason(seriesUrl: string, series: vrv.Series, season: vrv.Season, episodes: vrv.Collection<vrv.Episode>) {
+  static seriesSeason(seriesUrl: string, series: api.Series, season: api.Season, episodes: api.Collection<api.Episode>) {
     return new app.api.RemoteSeriesSeason({
       episodes: episodes.items.map(x => this.seriesSeasonEpisode(seriesUrl, series, x)),
       title: season.title
     });
   }
 
-  static seriesSeasonEpisode(seriesUrl: string, series: vrv.Series, episode: vrv.Episode) {
+  static seriesSeasonEpisode(seriesUrl: string, series: api.Series, episode: api.Episode) {
     return new app.api.RemoteSeriesSeasonEpisode({
       imageUrl: fetchImage(episode.images, 'thumbnail'),
       name: episode.episode || episode.title,
@@ -29,7 +29,7 @@ export class VrvRemap {
     });
   }
 
-  static stream(streams: vrv.Streams) {
+  static stream(streams: api.Streams) {
     return new app.api.RemoteStream({
       sources: [{type: 'hls', url: streams.streams['adaptive_hls'][''].url}],
       subtitles: Object.entries(streams.subtitles)
@@ -45,7 +45,7 @@ function createSlug(value: string) {
     .replace(/(\s|-)+/g, '-')
 }
 
-function fetchImage(images: Record<string, Array<Array<vrv.Artwork>>>, k: string) {
+function fetchImage(images: Record<string, Array<Array<api.Artwork>>>, k: string) {
   return images[k]
     ?.find(Boolean)
     ?.slice()?.sort((a, b) => b.width - a.width)
