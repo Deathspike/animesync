@@ -36,7 +36,7 @@ async function downloadAsync(this: app.Options, api: app.Server, series: app.api
       } else if (this.skipDownload) {
         api.logger.info(`Tracking ${episodeName}`);
         await trackAsync(trackerPath);
-      } else {
+      } else if (episode.url) {
         api.logger.info(`Fetching ${episodeName}`);
         if (await api.library.episodePutAsync({seriesId: series.id, episodeId: episode.id}).then(x => x.success)) {
           await trackAsync(trackerPath);

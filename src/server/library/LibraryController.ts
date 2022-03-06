@@ -37,7 +37,9 @@ export class LibraryController {
   @nsg.ApiResponse({status: 404})
   async contextPutAsync() {
     const context = await this.libraryService.contextAsync();
-    await context.series.reduce((p, c) => p.then(() => this.libraryService.seriesPutAsync(c.path)), Promise.resolve());
+    await context.series.reduce((p, c) => p.then(() => c.url 
+      ? this.libraryService.seriesPutAsync(c.path, c.url)
+      : Promise.resolve()), Promise.resolve());
   }
 
   @app.ResponseValidator(app.api.LibrarySeries)
@@ -64,9 +66,11 @@ export class LibraryController {
   @ncm.HttpCode(204)
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
+  @nsg.ApiResponse({status: 409})
   async seriesPutAsync(@ncm.Param() params: app.api.LibraryParamSeries) {
     const series = await this.fetchSeriesAsync(params.seriesId);
-    await this.libraryService.seriesPutAsync(series.path)
+    if (series.url) return await this.libraryService.seriesPutAsync(series.path, series.url);
+    throw new ncm.ConflictException();
   }
 
   @ncm.Get(':seriesId/image')
@@ -106,9 +110,11 @@ export class LibraryController {
   @ncm.HttpCode(204)
   @nsg.ApiResponse({status: 204})
   @nsg.ApiResponse({status: 404})
+  @nsg.ApiResponse({status: 409})
   async episodePutAsync(@ncm.Param() params: app.api.LibraryParamSeriesEpisode) {
     const match = await this.fetchEpisodeAsync(params.seriesId, params.episodeId);
-    await this.libraryService.episodePutAsync(match.episode.path);
+    if (match.episode.url) return await this.libraryService.episodePutAsync(match.episode.path, match.episode.url);
+    throw new ncm.ConflictException();
   }
 
   @ncm.Get(':seriesId/:episodeId/image')

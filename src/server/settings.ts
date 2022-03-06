@@ -22,6 +22,7 @@ const defaultCredential = new app.api.SettingCredential({
 });
 
 const defaultPath = new app.api.SettingPath({
+  cache: path.join(os.homedir(), 'animesync', 'cache'),
   chrome: path.join(os.homedir(), 'animesync', 'chrome-data'),
   library: path.join(os.homedir(), 'animesync', 'library'),
   logger: path.join(os.homedir(), 'animesync', 'logger'),

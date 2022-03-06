@@ -9,7 +9,7 @@ export class LibraryContextSeries {
     this.seasons = api.property('seasons', source, sourcePatch, undefined);
     this.synopsis = api.property('synopsis', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
-    this.url = api.property('url', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, undefined);
   }
   
   @clv.IsString()
@@ -41,8 +41,9 @@ export class LibraryContextSeries {
   @nsg.ApiProperty()
   readonly title: string;
 
+  @clv.IsOptional()
   @clv.IsString()
   @clv.IsUrl()
   @nsg.ApiProperty()
-  readonly url: string;
+  readonly url?: string;
 }

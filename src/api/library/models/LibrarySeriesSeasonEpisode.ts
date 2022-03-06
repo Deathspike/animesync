@@ -11,7 +11,7 @@ export class LibrarySeriesSeasonEpisode {
     this.episode = api.property('episode', source, sourcePatch, 0);
     this.synopsis = api.property('synopsis', source, sourcePatch, '');
     this.title = api.property('title', source, sourcePatch, '');
-    this.url = api.property('url', source, sourcePatch, '');
+    this.url = api.property('url', source, sourcePatch, undefined);
   }
   
   @clv.IsString()
@@ -48,8 +48,9 @@ export class LibrarySeriesSeasonEpisode {
   @nsg.ApiPropertyOptional()
   readonly title?: string;
 
+  @clv.IsOptional()
   @clv.IsString()
   @clv.IsUrl()
   @nsg.ApiProperty()
-  readonly url: string;
+  readonly url?: string;
 }

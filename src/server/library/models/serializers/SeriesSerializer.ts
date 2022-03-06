@@ -40,8 +40,8 @@ export class SeriesSerializer {
   get url() {
     return this.value.uniqueid
       ?.filter(x => typeof x !== 'string' && x.$.type.includes('animesync'))
-      ?.map(x => typeof x !== 'string' ? x._ : '')
-      ?.find(Boolean) ?? '';
+      ?.map(x => typeof x !== 'string' ? x._ : undefined)
+      ?.find(Boolean);
   }
 }
 

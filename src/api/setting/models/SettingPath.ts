@@ -4,11 +4,17 @@ import * as nsg from '@nestjs/swagger';
 
 export class SettingPath {
   constructor(source?: SettingPath, sourcePatch?: Partial<SettingPath>) {
+    this.cache = api.property('cache', source, sourcePatch, '');
     this.chrome = api.property('chrome', source, sourcePatch, '');
     this.library = api.property('library', source, sourcePatch, '');
     this.logger = api.property('logger', source, sourcePatch, '');
     this.sync = api.property('sync', source, sourcePatch, '');
   }
+
+  @clv.IsString()
+  @clv.IsNotEmpty()
+  @nsg.ApiProperty()
+  readonly cache: string;
 
   @clv.IsString()
   @clv.IsNotEmpty()

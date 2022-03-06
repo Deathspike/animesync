@@ -47,7 +47,8 @@ export class SeriesInfo {
   @clv.IsNotEmpty()
   readonly title: string;
 
+  @clv.IsOptional()
   @clv.IsString()
   @clv.IsUrl()
-  readonly url: string;
+  readonly url?: string;
 }
