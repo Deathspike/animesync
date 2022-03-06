@@ -4,16 +4,14 @@
   "description": "AnimeSync is capable of downloading anime episodes from popular streaming services.",
   "license": "MIT",
   "repository": "git://github.com/Deathspike/animesync",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "main": "dist/shell",
   "types": "dist/shell",
   "keywords": [
     "animesync",
     "anime",
     "download",
-    "crunchyroll",
-    "funimation",
-    "vrv"
+    "crunchyroll"
   ],
   "bin": {
     "animesync": "./bin/animesync"
