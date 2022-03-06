@@ -25,12 +25,12 @@ export class SubtitleExtractor {
   }
 
   private async matchAsync(filePath: string, subtitles: Array<[string, string]>) {
-    const expression = /Stream #0:([0-9]+)(?:\((.+)\)): Subtitle: (ass|subrip)/gm;    
+    const expression = /Stream #0:([0-9]+)(?:\((.+)\))?: Subtitle: (ass|subrip)/gm;    
     const text = await this.textAsync(filePath);
     let match: RegExpMatchArray | null;
     while (match = expression.exec(text)) {
       const id = match[1];
-      const language = match[2];
+      const language = match[2] ?? 'eng';
       const extension = match[3] === 'ass' ? 'ass' : 'srt';
       subtitles.push([id, path.join(this.syncPath, `${path.parse(filePath).name}.${language}.${extension}`)]);
     }
