@@ -2,8 +2,6 @@
 
 [![crunchyroll](https://github.com/Deathspike/animesync/actions/workflows/crunchyroll.yml/badge.svg)](https://github.com/Deathspike/animesync/actions/workflows/crunchyroll.yml)
 [![crunchyrollBeta](https://github.com/Deathspike/animesync/actions/workflows/crunchyrollBeta.yml/badge.svg)](https://github.com/Deathspike/animesync/actions/workflows/crunchyrollBeta.yml)
-[![funimation](https://github.com/Deathspike/animesync/actions/workflows/funimation.yml/badge.svg)](https://github.com/Deathspike/animesync/actions/workflows/funimation.yml)
-[![vrv](https://github.com/Deathspike/animesync/actions/workflows/vrv.yml/badge.svg)](https://github.com/Deathspike/animesync/actions/workflows/vrv.yml)
 
 AnimeSync is capable of downloading anime episodes from popular streaming services. Episodes are downloaded as `mkv` files containing the `h264` video and each subtitle. Metadata is downloaded as well, and includes posters and thumbnails. The metadata is compatible with *Jellyfin* and *Emby*.
 
@@ -30,10 +28,8 @@ Repeat step three to update to the latest version.
 The following streaming services are currently supported:
 
 * [Crunchyroll](https://www.crunchyroll.com/)
-* [Funimation](https://www.funimation.com/)
-* [Vrv](https://vrv.co/) (See [#42](https://github.com/Deathspike/animesync/issues/42))
-
-Requests to support additional streaming services are welcome.
+* [Funimation](https://www.funimation.com/) (*Deprecated; See [#57](https://github.com/Deathspike/animesync/issues/57)*)
+* [Vrv](https://vrv.co/) (*Deprecated; See [#57](https://github.com/Deathspike/animesync/issues/57)*)
 
 # Usage
 
@@ -66,18 +62,6 @@ Streaming services require paid subscriptions to access all content, so can prov
 To set your *Crunchyroll* credentials, you can use:
 
     animesync settings credential --crunchyrollUsername YOURUSER --crunchyrollPassword YOURPASS
-
-#### Funimation
-
-To set your *Funimation* credentials, you can use:
-
-    animesync settings credential --funimationUsername YOURUSER --funimationPassword YOURPASS
-
-#### Vrv
-
-To set your *Vrv* credentials, you can use:
-
-    animesync settings credential --vrvUsername YOURUSER --vrvPassword YOURPASS
 
 ### Download
 
@@ -157,8 +141,6 @@ You can use HTTP, HTTPS, SOCKS4 & SOCKS5 proxies. Examples:
 * `socks4://username:password@example.com`
 * `socks5://example.com`
 * `socks5://username:password@example.com`
-
-Note that *Crunchyroll* and *Funimation* are USA-based. So I recommend a USA-based proxy.
 
 ## Developers
 
