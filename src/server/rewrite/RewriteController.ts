@@ -12,12 +12,10 @@ import express from 'express';
 export class RewriteController {
   private readonly agentService: app.AgentService;
   private readonly hlsService: app.HlsService;
-  private readonly subtitleService: app.SubtitleService;
 
-  constructor(agentService: app.AgentService, hlsService: app.HlsService, subtitleService: app.SubtitleService) {
+  constructor(agentService: app.AgentService, hlsService: app.HlsService) {
     this.agentService = agentService;
     this.hlsService = hlsService;
-    this.subtitleService = subtitleService;
   }
   
   @ncm.Get(':emulateUrl')
@@ -29,10 +27,10 @@ export class RewriteController {
     await this.agentService.emulateAsync(params.emulateUrl, response, {headers: {...headers, ...query}});
   }
 
-  @ncm.Get('hls/master/:masterUrl/:mediaUrl')
-  async hlsMasterAsync(
+  @ncm.Get('master/:masterUrl/:mediaUrl')
+  async masterAsync(
     @ncm.Headers() headers: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamHlsMaster,
+    @ncm.Param() params: app.api.RewriteParamMaster,
     @ncm.Query() query: Record<string, string>) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(params.masterUrl, {headers: {...headers, ...query}});
@@ -42,26 +40,15 @@ export class RewriteController {
     return masterHls.toString();
   }
 
-  @ncm.Get('hls/media/:mediaUrl')
-  async hlsMediaAsync(
+  @ncm.Get('media/:mediaUrl')
+  async mediaAsync(
     @ncm.Headers() headers: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamHlsMedia,
+    @ncm.Param() params: app.api.RewriteParamMedia,
     @ncm.Query() query: Record<string, string>) {
     delete headers['range'];
     const buffer = await this.agentService.fetchAsync(params.mediaUrl, {headers: {...headers, ...query}});
     const mediaHls = app.HlsManifest.from(buffer.toString());
     this.hlsService.rewrite(params.mediaUrl, mediaHls, query);
     return mediaHls.toString();
-  }
-
-  @ncm.Get('subtitle/:subtitleType/:subtitleUrl')
-  async subtitleAsync(
-    @ncm.Headers() headers: Record<string, string>,
-    @ncm.Param() params: app.api.RewriteParamSubtitle,
-    @ncm.Query() query: Record<string, string>) {
-    delete headers['range'];
-    const buffer = await this.agentService.fetchAsync(params.subtitleUrl, {headers: {...headers, ...query}});
-    const subtitle = buffer.toString();
-    return this.subtitleService.rewrite(subtitle, params.subtitleType);
   }
 }

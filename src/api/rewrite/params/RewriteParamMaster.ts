@@ -2,8 +2,8 @@ import * as api from '..';
 import * as clv from 'class-validator';
 import * as nsg from '@nestjs/swagger';
 
-export class RewriteParamHlsMaster {
-  constructor(source?: RewriteParamHlsMaster, sourcePatch?: Partial<RewriteParamHlsMaster>) {
+export class RewriteParamMaster {
+  constructor(source?: RewriteParamMaster, sourcePatch?: Partial<RewriteParamMaster>) {
     this.masterUrl = api.property('masterUrl', source, sourcePatch, '');
     this.mediaUrl = api.property('mediaUrl', source, sourcePatch, '');
   }

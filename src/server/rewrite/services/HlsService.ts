@@ -14,10 +14,10 @@ export class HlsService {
       if ((hls[i].type === 'EXT-X-KEY' || hls[i].type === 'EXT-X-SESSION-KEY') && hls[i].params['URI']) {
         hls[i].params['URI'] = this.rewriteService.emulateUrl(baseUrl, hls[i].params['URI'], headers);
       } else if (hls[i].type === 'EXT-X-MEDIA' && hls[i].params['URI']) {
-        hls[i].params['URI'] = this.rewriteService.hlsMediaUrl(baseUrl, hls[i].params['URI'], headers);
+        hls[i].params['URI'] = this.rewriteService.mediaUrl(baseUrl, hls[i].params['URI'], headers);
       } else if (hls[i].type === 'EXT-X-STREAM-INF') {
         while (hls[++i].type) continue;
-        hls[i].data = this.rewriteService.hlsMediaUrl(baseUrl, hls[i].data, headers);
+        hls[i].data = this.rewriteService.mediaUrl(baseUrl, hls[i].data, headers);
       } else if (hls[i].data && !hls[i].type) {
         hls[i].data = this.rewriteService.emulateUrl(baseUrl, hls[i].data, headers);
       }

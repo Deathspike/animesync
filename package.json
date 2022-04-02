@@ -33,7 +33,6 @@
     "@nestjs/serve-static": "2.2.2",
     "@nestjs/swagger": "5.0.9",
     "abort-controller": "3.0.0",
-    "ass-compiler": "0.1.4",
     "chrome-launcher": "0.13.4",
     "class-transformer": "0.4.0",
     "class-validator": "0.13.1",
@@ -45,7 +44,6 @@
     "playwright-core": "1.14.1",
     "sanitize-filename": "1.6.3",
     "socks": "2.5.1",
-    "subtitle": "4.0.1",
     "swagger-ui-express": "4.1.6",
     "which": "2.0.2",
     "xml2js": "0.4.23"

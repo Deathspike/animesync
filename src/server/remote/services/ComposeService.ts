@@ -28,7 +28,7 @@ export class ComposeService {
         .then(x => x.flatMap(y => y))
         .then(x => x.sort(app.api.RemoteStreamSource.compareFn)),
       subtitles: compose.value.subtitles.map(subtitle => new app.api.RemoteStreamSubtitle(subtitle, {
-        url: this.rewriteService.subtitleUrl(compose.baseUrl, subtitle.type, subtitle.url, compose.headers)
+        url: this.rewriteService.emulateUrl(compose.baseUrl, subtitle.url, compose.headers)
       }))
     });
   }
@@ -43,7 +43,7 @@ export class ComposeService {
       resolutionX: x.resolution.x || undefined,
       resolutionY: x.resolution.y || undefined,
       type: 'hls',
-      url: this.rewriteService.hlsMasterUrl(sourceUrl, x.url, headers)
+      url: this.rewriteService.masterUrl(sourceUrl, x.url, headers)
     }));
   }
 }
