@@ -29,7 +29,7 @@ export class CrunchyrollBeta implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page);
-      const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-\/episodes$/, /\/-\/seasons$/, /\/-\/series\/[^\/]+$/);
+      const [episodesPromise, seasonsPromise, seriesPromise] = new app.Observer(page).getAsync(/\/-|crunchyroll\/episodes$/, /\/-|crunchyroll\/seasons$/, /\/-|crunchyroll\/series\/[^\/]+$/);
       await page.evaluate(tryNavigateEvaluator, seriesUrl);
       const seasons = await seasonsPromise.then(x => x.json() as Promise<api.Collection<api.Season>>);
       const series = await seriesPromise.then(x => x.json() as Promise<api.Series>);
@@ -45,7 +45,7 @@ export class CrunchyrollBeta implements app.IProvider {
     return await this.browserService.pageAsync(async (page, userAgent) => {
       await page.goto(baseUrl, {waitUntil: 'domcontentloaded'});
       await tryLoginAsync(page);
-      const [streamsPromise] = new app.Observer(page).getAsync(/\/-\/videos\/[^\/]+\/streams$/);
+      const [streamsPromise] = new app.Observer(page).getAsync(/\/-|crunchyroll\/videos\/[^\/]+\/streams$/);
       await page.evaluate(tryNavigateEvaluator, streamUrl);
       const streams = await streamsPromise.then(x => x.json() as Promise<api.Streams>);
       const headers = Object.assign({'user-agent': userAgent}, defaultHeaders);

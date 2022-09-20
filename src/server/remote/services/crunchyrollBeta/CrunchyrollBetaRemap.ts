@@ -55,6 +55,7 @@ function fetchImage(images: Record<string, Array<Array<api.Artwork>>>, k: string
 function hasJapaneseAudio(season: app.api.RemoteSeriesSeason) {
   if (/\((Arabic|English|French|German|Italian|Portuguese|Russian|Spanish)(\s+Dub)?\)$/.test(season.title)) return false;
   if (/\((Dub|Dubbed)\)$/.test(season.title)) return false;
+  if (season.title === '') return false;
   return true;
 }
 

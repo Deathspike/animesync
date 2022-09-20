@@ -16,7 +16,6 @@ export class RemoteSeriesSeason {
   readonly episodes: Array<api.RemoteSeriesSeasonEpisode>;
 
   @clv.IsString()
-  @clv.IsNotEmpty()
   @nsg.ApiProperty()
   readonly title: string;
 }
