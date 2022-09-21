@@ -46,7 +46,8 @@
     "socks": "2.5.1",
     "swagger-ui-express": "4.1.6",
     "which": "2.0.2",
-    "xml2js": "0.4.23"
+    "xml2js": "0.4.23",
+    "rxjs": "7.3.0"
   },
   "devDependencies": {
     "@types/cors": "2.8.12",
