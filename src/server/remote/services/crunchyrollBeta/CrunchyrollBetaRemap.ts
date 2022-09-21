@@ -61,11 +61,13 @@ function hasJapaneseAudio(season: app.api.RemoteSeriesSeason) {
 
 const languages = app.api.unsafe({
   'ar-SA' : 'ara',
+  'ar-ME' : 'ara',
   'fr-FR' : 'fre',
   'de-DE' : 'ger',
   'en-US' : 'eng',
   'es-419': 'spa-419',
   'es-ES' : 'spa',
+  'es-LA' : 'spa',
   'it-IT' : 'ita',
   'pt-BR' : 'por',
   'ru-RU' : 'rus',
