@@ -67,7 +67,7 @@ const languages = app.api.unsafe({
   'en-US' : 'eng',
   'es-419': 'spa-419',
   'es-ES' : 'spa',
-  'es-LA' : 'spa',
+  'es-LA' : 'spa-419',
   'it-IT' : 'ita',
   'pt-BR' : 'por',
   'ru-RU' : 'rus',
