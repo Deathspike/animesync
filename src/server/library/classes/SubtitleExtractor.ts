@@ -32,7 +32,13 @@ export class SubtitleExtractor {
       const id = match[1];
       const language = match[2] ?? 'eng';
       const extension = match[3] === 'ass' ? 'ass' : 'srt';
-      subtitles.push([id, path.join(this.syncPath, `${path.parse(filePath).name}.${language}.${extension}`)]);
+      if (app.settings.core.filterSubtitles) {
+        if (app.settings.core.filterSubtitles.find((lng => lng === language)) !== undefined) {
+          subtitles.push([id, path.join(this.syncPath, `${path.parse(filePath).name}.${language}.${extension}`)]);
+        }
+      } else {
+        subtitles.push([id, path.join(this.syncPath, `${path.parse(filePath).name}.${language}.${extension}`)]);
+      }
     }
   }
 

@@ -11,7 +11,8 @@ const defaultCore = new app.api.SettingCore({
   chromeViewport: '1920x974',
   fetchMaximumRetries: 8,
   fetchTimeoutRequest: 30000,
-  fetchTimeoutRetry: 3750
+  fetchTimeoutRetry: 3750,
+  filterSubtitles: undefined
 });
 
 const defaultCredential = new app.api.SettingCredential({

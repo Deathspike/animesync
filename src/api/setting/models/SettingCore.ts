@@ -15,6 +15,7 @@ export class SettingCore {
     this.fetchTimeoutRetry = api.property('fetchTimeoutRetry', source, sourcePatch, 0);
     this.ffmpeg = api.property('ffmpeg', source, sourcePatch, undefined);
     this.proxyServer = api.property('proxyServer', source, sourcePatch, undefined);
+    this.filterSubtitles = api.property('filterSubtitles', source, sourcePatch, [])
   }
 
   @clv.IsBoolean()
@@ -73,4 +74,10 @@ export class SettingCore {
   @clv.Matches(/^(http|https|socks|socks4|socks5)\:\/\/(?:(.+)\:(.+)@)?(?:.+)$/)
   @nsg.ApiPropertyOptional()
   readonly proxyServer?: string;
+
+  @clv.IsOptional()
+  @clv.IsArray()
+  @clt.Type(() => Array)
+  @nsg.ApiPropertyOptional()
+  readonly filterSubtitles?: Array<string>
 }
